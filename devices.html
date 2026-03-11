@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardian - Dispositivos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    if (!localStorage.getItem('guardian_token')) {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span class="logo-icon">🛡️</span>
+          <h1>Guardian</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Principal</div>
+          <a href="index.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="dependents.html" class="nav-item">
+            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+            <span>Dependentes</span>
+          </a>
+          <a href="devices.html" class="nav-item active">
+            <span class="nav-icon">💻</span>
+            <span>Dispositivos</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Relatórios</div>
+          <a href="activity.html" class="nav-item">
+            <span class="nav-icon">📋</span>
+            <span>Atividades</span>
+          </a>
+          <a href="alerts.html" class="nav-item">
+            <span class="nav-icon">🔔</span>
+            <span>Alertas</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Configurações</div>
+          <a href="policies.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Políticas</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info" id="userInfo">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Carregando...</div>
+            <div class="user-role">Responsável</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-full" id="logoutBtn" style="margin-top: var(--space-sm);">
+          <span class="btn-icon">🚪</span>
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Dispositivos</h1>
+        <p>Visualize e gerencie os dispositivos vinculados</p>
+      </div>
+
+      <!-- Filter -->
+      <div class="card" style="margin-bottom: var(--space-lg);">
+        <div class="card-body" style="padding: var(--space-md) var(--space-lg);">
+          <div style="display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap;">
+            <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+              <label for="dependentFilter">Filtrar por Dependente</label>
+              <select id="dependentFilter" style="width: 100%;">
+                <option value="">Todos os dependentes</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" id="refreshBtn" style="margin-top: 1.25rem;">
+              <span class="btn-icon">🔄</span>
+              Atualizar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Devices Table -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">💻 Dispositivos Vinculados</h3>
+          <span class="badge badge-info" id="deviceCount">0 dispositivos</span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <div class="table-container">
+            <table id="devicesTable">
+              <thead>
+                <tr>
+                  <th>Dispositivo</th>
+                  <th>Dependente</th>
+                  <th>Vinculado em</th>
+                  <th>Última atividade</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="devicesBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: var(--space-2xl);">
+                    <div class="loading-spinner" style="margin: 0 auto;"></div>
+                    <p style="color: var(--text-secondary); margin-top: var(--space-md);">Carregando dispositivos...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="card" id="emptyState" style="display: none;">
+        <div class="card-body">
+          <div class="empty-state">
+            <div class="empty-state-icon">💻</div>
+            <div class="empty-state-title">Nenhum dispositivo vinculado</div>
+            <div class="empty-state-text">
+              Vá para a página de Dependentes para gerar um código de vinculação.
+            </div>
+            <a href="dependents.html" class="btn btn-primary">
+              <span class="btn-icon">👨‍👩‍👧‍👦</span>
+              Ir para Dependentes
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Policy Modal -->
+  <div class="modal-overlay" id="policyModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ Configurar Política</h3>
+        <button class="modal-close" type="button">&times;</button>
+      </div>
+      <form id="policyForm">
+        <div class="modal-body">
+          <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+            Configurando política para: <strong id="policyDeviceName">-</strong>
+          </p>
+          
+          <div class="form-group">
+            <label for="policyMode">Modo de Proteção</label>
+            <select id="policyMode" required>
+              <option value="BLOCK">🚫 Bloquear - Impede acesso a conteúdo impróprio</option>
+              <option value="WARN">⚠️ Avisar - Mostra alerta mas permite continuar</option>
+              <option value="EDUCATE">📝 Educativo - Apenas registra para análise</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="riskThreshold">Limite de Risco (0-100)</label>
+            <input type="number" id="riskThreshold" min="0" max="100" value="50" required />
+            <small style="color: var(--text-muted);">
+              Quanto menor, mais restritivo. Recomendado: 30 (crianças), 50 (pré-adolescentes), 70 (adolescentes)
+            </small>
+          </div>
+          
+          <div class="form-group">
+            <label for="blockedDomains">Sites Bloqueados (um por linha)</label>
+            <textarea id="blockedDomains" rows="4" placeholder="exemplo.com&#10;outrosite.com" style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: monospace; resize: vertical;"></textarea>
+          </div>
+          
+          <p class="error-message" id="policyError"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="policySubmitBtn">
+            <span class="btn-icon">💾</span>
+            Salvar Política
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    const { $, $$, showToast, formatDate, formatRelativeTime, requireAuth, calculateAge } = GuardianUtils;
+    const { auth, dependents, devices, policy } = GuardianAPI;
+
+    // Check auth
+    if (!requireAuth()) {
+      throw new Error('Not authenticated');
+    }
+
+    // State
+    let dependentsList = [];
+    let devicesList = [];
+    let currentDevice = null;
+
+    // Init
+    async function init() {
+      $('#userName').textContent = auth.getEmail() || 'Responsável';
+      $('#logoutBtn').addEventListener('click', () => auth.logout());
+      
+      $('#dependentFilter').addEventListener('change', renderDevices);
+      $('#refreshBtn').addEventListener('click', loadData);
+      
+      setupPolicyModal();
+      
+      await loadData();
+    }
+
+    async function loadData() {
+      try {
+        // Load dependents for filter
+        dependentsList = await dependents.list();
+        
+        const filter = $('#dependentFilter');
+        const currentValue = filter.value;
+        filter.innerHTML = '<option value="">Todos os dependentes</option>';
+        
+        dependentsList.forEach(dep => {
+          const option = document.createElement('option');
+          option.value = dep.id;
+          option.textContent = `${dep.nickname} (${calculateAge(dep.birthYear)} anos)`;
+          filter.appendChild(option);
+        });
+        
+        filter.value = currentValue;
+        
+        // Load all devices
+        devicesList = await devices.list();
+        
+        renderDevices();
+      } catch (error) {
+        showToast('Erro ao carregar dados: ' + error.message, 'error');
+      }
+    }
+
+    function renderDevices() {
+      const filterValue = $('#dependentFilter').value;
+      const tbody = $('#devicesBody');
+      const emptyState = $('#emptyState');
+      const table = $('#devicesTable').closest('.card');
+      const countBadge = $('#deviceCount');
+      
+      let filteredDevices = devicesList;
+      
+      if (filterValue) {
+        filteredDevices = devicesList.filter(d => d.dependentId === filterValue);
+      }
+      
+      countBadge.textContent = `${filteredDevices.length} dispositivo${filteredDevices.length !== 1 ? 's' : ''}`;
+      
+      if (filteredDevices.length === 0) {
+        table.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      table.style.display = 'block';
+      emptyState.style.display = 'none';
+      
+      tbody.innerHTML = filteredDevices.map(device => {
+        const isOnline = device.lastSeenAt && (Date.now() - new Date(device.lastSeenAt).getTime()) < 300000; // 5 min
+        const statusClass = isOnline ? 'success' : 'warning';
+        const statusText = isOnline ? 'Online' : 'Offline';
+        
+        const deviceIcon = getDeviceIcon(device.name || '');
+        
+        return `
+          <tr data-id="${device.id}">
+            <td>
+              <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                <span style="font-size: 1.5rem;">${deviceIcon}</span>
+                <div>
+                  <div style="font-weight: 500;">${device.name || 'Dispositivo'}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">${device.id.substring(0, 8)}...</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                <span>👦</span>
+                <span>${device.dependentNickname || '-'}</span>
+              </div>
+            </td>
+            <td>${formatDate(device.enrolledAt)}</td>
+            <td>${device.lastSeenAt ? formatRelativeTime(device.lastSeenAt) : 'Nunca'}</td>
+            <td>
+              <span class="badge badge-${statusClass}">${statusText}</span>
+            </td>
+            <td>
+              <button class="btn btn-ghost btn-small policy-btn" data-id="${device.id}" title="Configurar Política">
+                ⚙️
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      // Add event listeners
+      $$('.policy-btn').forEach(btn => {
+        btn.addEventListener('click', () => openPolicyModal(btn.dataset.id));
+      });
+    }
+
+    function getDeviceIcon(deviceName) {
+      const name = deviceName.toLowerCase();
+      if (name.includes('chrome')) return '🌐';
+      if (name.includes('firefox')) return '🦊';
+      if (name.includes('edge')) return '🔷';
+      if (name.includes('safari')) return '🧭';
+      if (name.includes('windows')) return '🪟';
+      if (name.includes('mac')) return '🍎';
+      if (name.includes('linux')) return '🐧';
+      if (name.includes('android')) return '🤖';
+      if (name.includes('iphone') || name.includes('ios')) return '📱';
+      return '💻';
+    }
+
+    function setupPolicyModal() {
+      $('#policyModal .modal-close').addEventListener('click', () => closeModal());
+      $('#policyModal .modal-cancel').addEventListener('click', () => closeModal());
+      $('#policyModal').addEventListener('click', (e) => {
+        if (e.target === $('#policyModal')) closeModal();
+      });
+      
+      $('#policyForm').addEventListener('submit', handleSavePolicy);
+    }
+
+    async function openPolicyModal(deviceId) {
+      currentDevice = devicesList.find(d => d.id === deviceId);
+      
+      if (!currentDevice) {
+        showToast('Dispositivo não encontrado', 'error');
+        return;
+      }
+      
+      $('#policyDeviceName').textContent = currentDevice.name || 'Dispositivo';
+      $('#policyError').textContent = '';
+      
+      // Load current policy
+      try {
+        const currentPolicy = await policy.get(deviceId);
+        
+        $('#policyMode').value = currentPolicy.mode || 'BLOCK';
+        $('#riskThreshold').value = currentPolicy.riskThreshold || 50;
+        
+        // Parse blocked domains
+        let domains = [];
+        if (currentPolicy.blockedDomains) {
+          try {
+            domains = typeof currentPolicy.blockedDomains === 'string' 
+              ? JSON.parse(currentPolicy.blockedDomains)
+              : currentPolicy.blockedDomains;
+          } catch {
+            domains = [];
+          }
+        }
+        $('#blockedDomains').value = domains.join('\n');
+        
+      } catch (error) {
+        // Default values if no policy exists
+        $('#policyMode').value = 'BLOCK';
+        $('#riskThreshold').value = 50;
+        $('#blockedDomains').value = '';
+      }
+      
+      $('#policyModal').classList.add('show');
+    }
+
+    function closeModal() {
+      $('#policyModal').classList.remove('show');
+      currentDevice = null;
+    }
+
+    async function handleSavePolicy(e) {
+      e.preventDefault();
+      
+      if (!currentDevice) return;
+      
+      const mode = $('#policyMode').value;
+      const riskThreshold = parseInt($('#riskThreshold').value);
+      const blockedDomainsText = $('#blockedDomains').value.trim();
+      const errorEl = $('#policyError');
+      const btn = $('#policySubmitBtn');
+      
+      errorEl.textContent = '';
+      
+      if (riskThreshold < 0 || riskThreshold > 100) {
+        errorEl.textContent = 'O limite de risco deve estar entre 0 e 100';
+        return;
+      }
+      
+      const blockedDomains = blockedDomainsText
+        .split('\n')
+        .map(d => d.trim().toLowerCase())
+        .filter(d => d.length > 0);
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-icon">⏳</span> Salvando...';
+      
+      try {
+        await policy.update(currentDevice.id, {
+          mode,
+          riskThreshold,
+          blockedDomains,
+        });
+        
+        showToast('Política atualizada com sucesso!', 'success');
+        closeModal();
+      } catch (error) {
+        errorEl.textContent = error.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="btn-icon">💾</span> Salvar Política';
+      }
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>

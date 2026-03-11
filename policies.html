@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardian - Políticas</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .domain-chip {
+      position: relative;
+    }
+    .domain-chip:hover {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+    .domain-chip .chip-remove {
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .domain-chip:hover .chip-remove {
+      opacity: 1;
+      color: white;
+    }
+    .domain-chip.badge-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+    .domain-chip.badge-success:hover {
+      background: var(--success);
+      color: white;
+    }
+    /* Accordion styles */
+    .accordion-card .card-header {
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .accordion-card .card-header:hover {
+      background: var(--surface-muted);
+    }
+    .accordion-card .card-body {
+      max-height: 0;
+      overflow: hidden;
+      border-top: 0 solid var(--border);
+      transition: max-height 0.4s ease-out, padding 0.3s ease-out, border-top 0.2s;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .accordion-card.expanded .card-body {
+      max-height: 2000px;
+      border-top: 1px solid var(--border);
+      padding-top: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      transition: max-height 0.5s ease-in, padding 0.3s ease-in, border-top 0.2s;
+    }
+    .accordion-arrow {
+      transition: transform 0.3s ease;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .accordion-arrow svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-secondary);
+      transition: stroke 0.2s;
+    }
+    .accordion-card .card-header:hover .accordion-arrow svg {
+      stroke: var(--primary);
+    }
+    .accordion-card.expanded .accordion-arrow {
+      transform: rotate(180deg);
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem('guardian_token')) {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span class="logo-icon">🛡️</span>
+          <h1>Guardian</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Principal</div>
+          <a href="index.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="dependents.html" class="nav-item">
+            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+            <span>Dependentes</span>
+          </a>
+          <a href="devices.html" class="nav-item">
+            <span class="nav-icon">💻</span>
+            <span>Dispositivos</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Relatórios</div>
+          <a href="activity.html" class="nav-item">
+            <span class="nav-icon">📋</span>
+            <span>Atividades</span>
+          </a>
+          <a href="alerts.html" class="nav-item">
+            <span class="nav-icon">🔔</span>
+            <span>Alertas</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Configurações</div>
+          <a href="policies.html" class="nav-item active">
+            <span class="nav-icon">⚙️</span>
+            <span>Políticas</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info" id="userInfo">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Carregando...</div>
+            <div class="user-role">Responsável</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-full" id="logoutBtn" style="margin-top: var(--space-sm);">
+          <span class="btn-icon">🚪</span>
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Políticas de Proteção</h1>
+        <p>Configure os níveis de proteção para cada dependente</p>
+      </div>
+
+      <!-- Mode Explanation -->
+      <div class="card" style="margin-bottom: var(--space-lg);">
+        <div class="card-header">
+          <h3 class="card-title">📚 Entenda os Modos de Proteção</h3>
+        </div>
+        <div class="card-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg);">
+            <div style="padding: var(--space-md); background: var(--danger-light); border-radius: var(--radius-md);">
+              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">🚫</div>
+              <h4 style="color: var(--danger); margin-bottom: var(--space-xs);">BLOCK (Bloquear)</h4>
+              <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                Impede completamente o acesso a conteúdo impróprio. Ideal para crianças mais novas.
+              </p>
+            </div>
+            <div style="padding: var(--space-md); background: var(--warning-light); border-radius: var(--radius-md);">
+              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">⚠️</div>
+              <h4 style="color: var(--warning); margin-bottom: var(--space-xs);">WARN (Avisar)</h4>
+              <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                Exibe um aviso sobre o conteúdo, mas permite continuar. Bom para pré-adolescentes.
+              </p>
+            </div>
+            <div style="padding: var(--space-md); background: var(--primary-light); border-radius: var(--radius-md);">
+              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">📝</div>
+              <h4 style="color: var(--primary); margin-bottom: var(--space-xs);">EDUCATE (Educativo)</h4>
+              <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                Apenas registra a navegação sem interferir. Ideal para adolescentes mais velhos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policies by Dependent -->
+      <div id="policiesContainer">
+        <div class="card">
+          <div class="card-body">
+            <div style="text-align: center; padding: var(--space-2xl);">
+              <div class="loading-spinner" style="margin: 0 auto;"></div>
+              <p style="color: var(--text-secondary); margin-top: var(--space-md);">Carregando políticas...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+
+  <!-- Modal de Confirmação Sites Permitidos -->
+  <div class="modal-overlay" id="allowedDomainsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">⚠️ Atenção - Modo Restritivo</h3>
+        <button class="modal-close" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="padding: var(--space-md); background: var(--warning-light); border-radius: var(--radius-md); margin-bottom: var(--space-md);">
+          <p style="font-weight: 600; color: var(--warning); margin-bottom: var(--space-sm);">
+            🚨 Você está ativando o modo ULTRA RESTRITIVO!
+          </p>
+          <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+            Ao definir "Sites Sempre Permitidos", <strong>TODOS os outros sites serão bloqueados</strong>, incluindo os que estavam na lista de sites bloqueados.
+          </p>
+        </div>
+        <p style="margin-bottom: var(--space-sm);">O dependente só poderá acessar:</p>
+        <ul id="allowedDomainsList" style="background: var(--surface-muted); padding: var(--space-md); border-radius: var(--radius-md); list-style: none; margin: 0;">
+          <!-- Será preenchido via JS -->
+        </ul>
+        <p style="color: var(--danger); font-weight: 600; margin-top: var(--space-md);">
+          Qualquer outro site será BLOQUEADO automaticamente.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelAllowedBtn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="confirmAllowedBtn">
+          <span class="btn-icon">✅</span>
+          Confirmar e Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { $, $$, showToast, calculateAge, requireAuth } = GuardianUtils;
+    const { auth, dependents, devices, policy } = GuardianAPI;
+
+    // Check auth
+    if (!requireAuth()) {
+      throw new Error('Not authenticated');
+    }
+
+    // State
+    let dependentsList = [];
+    let devicesByDependent = {};
+    let pendingSaveData = null; // Para guardar dados enquanto modal está aberto
+
+    // Init
+    async function init() {
+      $('#userName').textContent = auth.getEmail() || 'Responsável';
+      $('#logoutBtn').addEventListener('click', () => auth.logout());
+      
+      // Modal handlers
+      $('#allowedDomainsModal .modal-close').addEventListener('click', closeAllowedModal);
+      $('#cancelAllowedBtn').addEventListener('click', closeAllowedModal);
+      $('#confirmAllowedBtn').addEventListener('click', confirmAndSave);
+      $('#allowedDomainsModal').addEventListener('click', (e) => {
+        if (e.target === $('#allowedDomainsModal')) closeAllowedModal();
+      });
+      
+      await loadData();
+    }
+
+    function closeAllowedModal() {
+      $('#allowedDomainsModal').classList.remove('show');
+      pendingSaveData = null;
+    }
+
+    async function confirmAndSave() {
+      if (!pendingSaveData) return;
+      
+      const { depDevices, policyData, form } = pendingSaveData;
+      const btn = form.querySelector('button[type="submit"]');
+      const errorEl = form.querySelector('.error-message');
+      
+      closeAllowedModal();
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-icon">⏳</span> Salvando...';
+      
+      try {
+        for (const device of depDevices) {
+          await policy.update(device.id, policyData);
+        }
+        
+        showToast('Política atualizada com sucesso!', 'success');
+        await loadData();
+      } catch (error) {
+        errorEl.textContent = error.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="btn-icon">💾</span> Salvar Alterações';
+      }
+    }
+
+    async function loadData() {
+      try {
+        // Load dependents
+        dependentsList = await dependents.list();
+        
+        // Load devices for each dependent
+        const allDevices = await devices.list();
+        
+        devicesByDependent = {};
+        allDevices.forEach(device => {
+          const depId = device.dependentId;
+          if (depId) {
+            if (!devicesByDependent[depId]) {
+              devicesByDependent[depId] = [];
+            }
+            devicesByDependent[depId].push(device);
+          }
+        });
+        
+        renderPolicies();
+      } catch (error) {
+        showToast('Erro ao carregar dados: ' + error.message, 'error');
+      }
+    }
+
+    async function renderPolicies() {
+      const container = $('#policiesContainer');
+      
+      if (dependentsList.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="card-body">
+              <div class="empty-state">
+                <div class="empty-state-icon">👨‍👩‍👧‍👦</div>
+                <div class="empty-state-title">Nenhum dependente cadastrado</div>
+                <div class="empty-state-text">Adicione dependentes para configurar políticas de proteção.</div>
+                <a href="dependents.html" class="btn btn-primary">
+                  <span class="btn-icon">➕</span>
+                  Adicionar Dependente
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      for (const dep of dependentsList) {
+        const age = calculateAge(dep.birthYear);
+        const depDevices = devicesByDependent[dep.id] || [];
+        
+        // Load policy for first device if exists
+        let currentPolicy = null;
+        if (depDevices.length > 0) {
+          try {
+            currentPolicy = await policy.get(depDevices[0].id);
+          } catch (e) {
+            // No policy yet
+          }
+        }
+        
+        const card = document.createElement('div');
+        card.className = 'card accordion-card';
+        card.style.marginBottom = 'var(--space-lg)';
+        
+        const modeLabels = {
+          'BLOCK': '🚫 Bloquear',
+          'WARN': '⚠️ Avisar',
+          'EDUCATE': '📝 Educativo'
+        };
+        
+        const modeBadgeClass = {
+          'BLOCK': 'danger',
+          'WARN': 'warning',
+          'EDUCATE': 'info'
+        };
+        
+        const mode = currentPolicy?.mode || 'BLOCK';
+        const threshold = currentPolicy?.riskThreshold || 50;
+        const protectionEnabled = currentPolicy?.protectionEnabled !== false;
+        const schoolModeEnabled = currentPolicy?.schoolModeEnabled || false;
+        const schoolStart = currentPolicy?.schoolStart || '07:00';
+        const schoolEnd = currentPolicy?.schoolEnd || '17:00';
+        
+        let blockedDomains = [];
+        if (currentPolicy?.blockedDomains) {
+          try {
+            blockedDomains = typeof currentPolicy.blockedDomains === 'string'
+              ? JSON.parse(currentPolicy.blockedDomains)
+              : currentPolicy.blockedDomains;
+          } catch {
+            blockedDomains = [];
+          }
+        }
+        
+        let allowedDomains = [];
+        if (currentPolicy?.allowedDomains) {
+          try {
+            allowedDomains = typeof currentPolicy.allowedDomains === 'string'
+              ? JSON.parse(currentPolicy.allowedDomains)
+              : currentPolicy.allowedDomains;
+          } catch {
+            allowedDomains = [];
+          }
+        }
+        
+        card.innerHTML = `
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: var(--space-md);">
+              <span style="font-size: 1.5rem;">👦</span>
+              <div>
+                <h3 class="card-title">${dep.nickname}</h3>
+                <span style="font-size: 0.875rem; color: var(--text-secondary);">${age} anos • ${depDevices.length} dispositivo(s)</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-md);">
+              <span class="badge badge-${modeBadgeClass[mode]}">${modeLabels[mode]}</span>
+              <span class="accordion-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </div>
+          </div>
+          <div class="card-body">
+            ${depDevices.length === 0 ? `
+              <div class="empty-state" style="padding: var(--space-lg);">
+                <div class="empty-state-icon">💻</div>
+                <div class="empty-state-text">Nenhum dispositivo vinculado a este dependente.</div>
+                <a href="dependents.html" class="btn btn-secondary btn-small">
+                  <span class="btn-icon">🔗</span>
+                  Vincular Dispositivo
+                </a>
+              </div>
+            ` : `
+              <form class="policy-form" data-dependent-id="${dep.id}">
+                <!-- Toggle Proteção -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-md); background: ${protectionEnabled ? 'var(--success-light)' : 'var(--warning-light)'}; border-radius: var(--radius-md); margin-bottom: var(--space-lg);">
+                  <div>
+                    <span style="font-weight: 600;">${protectionEnabled ? '✅ Proteção Ativa' : '⚠️ Proteção Desativada'}</span>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Ativa/desativa a proteção neste dependente</p>
+                  </div>
+                  <label style="cursor: pointer;">
+                    <input type="checkbox" name="protectionEnabled" ${protectionEnabled ? 'checked' : ''} style="width: 20px; height: 20px;" />
+                  </label>
+                </div>
+                
+                <!-- Modo e Limite -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                  <div class="form-group">
+                    <label>Modo de Proteção</label>
+                    <select name="mode" required>
+                      <option value="BLOCK" ${mode === 'BLOCK' ? 'selected' : ''}>🚫 Bloquear</option>
+                      <option value="WARN" ${mode === 'WARN' ? 'selected' : ''}>⚠️ Avisar</option>
+                      <option value="EDUCATE" ${mode === 'EDUCATE' ? 'selected' : ''}>📝 Educativo</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Limite de Risco (0-100)</label>
+                    <input type="number" name="riskThreshold" min="0" max="100" value="${threshold}" required />
+                  </div>
+                </div>
+                
+                <!-- Sites Bloqueados -->
+                <div class="form-group" style="margin-bottom: var(--space-lg);">
+                  <label>🚫 Sites Bloqueados</label>
+                  <div class="domain-chips blocked-chips" data-type="blocked" style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-xs); min-height: 32px;">
+                    ${blockedDomains.length > 0 ? blockedDomains.map(d => `
+                      <span class="domain-chip badge badge-danger" data-domain="${d}" style="padding: var(--space-xs) var(--space-sm); cursor: pointer; transition: all 0.2s;">
+                        ${d}
+                        <span class="chip-remove" style="margin-left: 6px; font-weight: bold;">×</span>
+                      </span>
+                    `).join('') : '<span class="empty-placeholder" style="color: var(--text-muted);">Nenhum site bloqueado</span>'}
+                  </div>
+                  <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-sm);">
+                    <input type="text" class="add-domain-input" data-type="blocked" placeholder="Digite um site (ex: exemplo.com)" style="flex: 1; padding: var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: monospace;" />
+                    <button type="button" class="btn btn-secondary add-domain-btn" data-type="blocked">
+                      <span class="btn-icon">➕</span> Adicionar
+                    </button>
+                  </div>
+                  <input type="hidden" name="blockedDomains" value="${blockedDomains.join(',')}" />
+                </div>
+                
+                <!-- Sites Permitidos -->
+                <div class="form-group" style="margin-bottom: var(--space-lg);">
+                  <label>✅ Sites Sempre Permitidos</label>
+                  <p style="font-size: 0.75rem; color: var(--warning); margin: var(--space-xs) 0;">⚠️ Se definido, APENAS estes sites serão acessíveis!</p>
+                  <div class="domain-chips allowed-chips" data-type="allowed" style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-xs); min-height: 32px;">
+                    ${allowedDomains.length > 0 ? allowedDomains.map(d => `
+                      <span class="domain-chip badge badge-success" data-domain="${d}" style="padding: var(--space-xs) var(--space-sm); cursor: pointer; transition: all 0.2s;">
+                        ${d}
+                        <span class="chip-remove" style="margin-left: 6px; font-weight: bold;">×</span>
+                      </span>
+                    `).join('') : '<span class="empty-placeholder" style="color: var(--text-muted);">Nenhum (acesso livre exceto bloqueados)</span>'}
+                  </div>
+                  <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-sm);">
+                    <input type="text" class="add-domain-input" data-type="allowed" placeholder="Digite um site (ex: escola.edu.br)" style="flex: 1; padding: var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: monospace;" />
+                    <button type="button" class="btn btn-secondary add-domain-btn" data-type="allowed">
+                      <span class="btn-icon">➕</span> Adicionar
+                    </button>
+                  </div>
+                  <input type="hidden" name="allowedDomains" value="${allowedDomains.join(',')}" />
+                </div>
+                
+                <!-- Modo Escola -->
+                <div style="padding: var(--space-md); background: var(--surface-muted); border-radius: var(--radius-md); margin-bottom: var(--space-lg);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+                    <div>
+                      <span style="font-weight: 600;">🏫 Modo Escola</span>
+                      <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Proteção extra durante horário escolar</p>
+                    </div>
+                    <label style="cursor: pointer;">
+                      <input type="checkbox" name="schoolModeEnabled" ${schoolModeEnabled ? 'checked' : ''} style="width: 20px; height: 20px;" />
+                    </label>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--space-md); align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label style="font-size: 0.75rem;">Início</label>
+                      <input type="time" name="schoolStart" value="${schoolStart}" />
+                    </div>
+                    <span style="color: var(--text-muted);">até</span>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label style="font-size: 0.75rem;">Fim</label>
+                      <input type="time" name="schoolEnd" value="${schoolEnd}" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-sm); justify-content: flex-end;">
+                  <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">💾</span>
+                    Salvar Alterações
+                  </button>
+                </div>
+                <p class="error-message" style="margin-top: var(--space-sm);"></p>
+              </form>
+            `}
+          </div>
+        `;
+        
+        container.appendChild(card);
+      }
+      
+      // Add accordion listeners
+      $$('.accordion-card .card-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const card = header.closest('.accordion-card');
+          card.classList.toggle('expanded');
+        });
+      });
+      
+      // Add form listeners
+      $$('.policy-form').forEach(form => {
+        form.addEventListener('submit', handleSavePolicy);
+        
+        // Add domain button listeners
+        form.querySelectorAll('.add-domain-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+            const input = form.querySelector(`.add-domain-input[data-type="${type}"]`);
+            const domain = input.value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+            
+            if (!domain) return;
+            
+            addDomainChip(form, type, domain);
+            input.value = '';
+            input.focus();
+          });
+        });
+        
+        // Add enter key support for inputs
+        form.querySelectorAll('.add-domain-input').forEach(input => {
+          input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const type = input.dataset.type;
+              const btn = form.querySelector(`.add-domain-btn[data-type="${type}"]`);
+              btn.click();
+            }
+          });
+        });
+        
+        // Add chip remove listeners
+        form.querySelectorAll('.domain-chip').forEach(chip => {
+          chip.addEventListener('click', () => removeDomainChip(form, chip));
+        });
+      });
+    }
+    
+    function addDomainChip(form, type, domain) {
+      const container = form.querySelector(`.domain-chips[data-type="${type}"]`);
+      const hiddenInput = form.querySelector(`input[name="${type}Domains"]`);
+      
+      // Get current domains
+      const currentDomains = hiddenInput.value ? hiddenInput.value.split(',').filter(d => d) : [];
+      
+      // Check duplicate
+      if (currentDomains.includes(domain)) {
+        showToast('Este site já está na lista', 'warning');
+        return;
+      }
+      
+      // Remove empty placeholder
+      const placeholder = container.querySelector('.empty-placeholder');
+      if (placeholder) placeholder.remove();
+      
+      // Add new chip
+      const badgeClass = type === 'blocked' ? 'badge-danger' : 'badge-success';
+      const chip = document.createElement('span');
+      chip.className = `domain-chip badge ${badgeClass}`;
+      chip.dataset.domain = domain;
+      chip.style.cssText = 'padding: var(--space-xs) var(--space-sm); cursor: pointer; transition: all 0.2s;';
+      chip.innerHTML = `${domain}<span class="chip-remove" style="margin-left: 6px; font-weight: bold;">×</span>`;
+      chip.addEventListener('click', () => removeDomainChip(form, chip));
+      
+      container.appendChild(chip);
+      
+      // Update hidden input
+      currentDomains.push(domain);
+      hiddenInput.value = currentDomains.join(',');
+    }
+    
+    function removeDomainChip(form, chip) {
+      const container = chip.parentElement;
+      const type = container.dataset.type;
+      const domain = chip.dataset.domain;
+      const hiddenInput = form.querySelector(`input[name="${type}Domains"]`);
+      
+      // Remove chip
+      chip.remove();
+      
+      // Update hidden input
+      const currentDomains = hiddenInput.value ? hiddenInput.value.split(',').filter(d => d && d !== domain) : [];
+      hiddenInput.value = currentDomains.join(',');
+      
+      // Add placeholder if empty
+      if (currentDomains.length === 0) {
+        const placeholderText = type === 'blocked' 
+          ? 'Nenhum site bloqueado' 
+          : 'Nenhum (acesso livre exceto bloqueados)';
+        container.innerHTML = `<span class="empty-placeholder" style="color: var(--text-muted);">${placeholderText}</span>`;
+      }
+    }
+
+    async function handleSavePolicy(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const dependentId = form.dataset.dependentId;
+      const depDevices = devicesByDependent[dependentId] || [];
+      
+      if (depDevices.length === 0) {
+        showToast('Nenhum dispositivo vinculado', 'error');
+        return;
+      }
+      
+      // Coleta todos os valores do formulário
+      const mode = form.querySelector('[name="mode"]').value;
+      const riskThreshold = parseInt(form.querySelector('[name="riskThreshold"]').value);
+      const protectionEnabled = form.querySelector('[name="protectionEnabled"]').checked;
+      const schoolModeEnabled = form.querySelector('[name="schoolModeEnabled"]').checked;
+      const schoolStart = form.querySelector('[name="schoolStart"]').value;
+      const schoolEnd = form.querySelector('[name="schoolEnd"]').value;
+      
+      const blockedDomainsText = form.querySelector('[name="blockedDomains"]').value.trim();
+      const allowedDomainsText = form.querySelector('[name="allowedDomains"]').value.trim();
+      
+      const errorEl = form.querySelector('.error-message');
+      const btn = form.querySelector('button[type="submit"]');
+      
+      errorEl.textContent = '';
+      
+      if (riskThreshold < 0 || riskThreshold > 100) {
+        errorEl.textContent = 'O limite de risco deve estar entre 0 e 100';
+        return;
+      }
+      
+      // Processa domínios (agora separados por vírgula)
+      const blockedDomains = blockedDomainsText
+        .split(',')
+        .map(d => d.trim().toLowerCase())
+        .filter(d => d.length > 0);
+      
+      const allowedDomains = allowedDomainsText
+        .split(',')
+        .map(d => d.trim().toLowerCase())
+        .filter(d => d.length > 0);
+      
+      const policyData = {
+        mode,
+        riskThreshold,
+        protectionEnabled,
+        blockedDomains: allowedDomains.length > 0 ? [] : blockedDomains, // Se tem allowedDomains, limpa blockedDomains
+        allowedDomains,
+        schoolModeEnabled,
+        schoolStart: schoolStart || null,
+        schoolEnd: schoolEnd || null,
+      };
+      
+      // Se tem sites permitidos, mostrar modal de confirmação
+      if (allowedDomains.length > 0) {
+        const listEl = $('#allowedDomainsList');
+        listEl.innerHTML = allowedDomains.map(d => `<li style="padding: var(--space-xs) 0;"><span style="color: var(--success);">✅</span> ${d}</li>`).join('');
+        
+        pendingSaveData = { depDevices, policyData, form };
+        $('#allowedDomainsModal').classList.add('show');
+        return;
+      }
+      
+      // Salva diretamente se não tem allowedDomains
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-icon">⏳</span> Salvando...';
+      
+      try {
+        // Atualiza política para todos os dispositivos deste dependente
+        for (const device of depDevices) {
+          await policy.update(device.id, policyData);
+        }
+        
+        showToast('Política atualizada com sucesso!', 'success');
+        
+        // Reload para mostrar dados atualizados
+        await loadData();
+      } catch (error) {
+        errorEl.textContent = error.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="btn-icon">💾</span> Salvar Alterações';
+      }
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>

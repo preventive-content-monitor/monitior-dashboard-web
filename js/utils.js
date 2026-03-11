@@ -1,0 +1,240 @@
+/**
+ * Guardian Dashboard - Utilities
+ */
+
+(function() {
+  // ========== DOM Helpers ==========
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => document.querySelectorAll(selector);
+
+// ========== Toast Notifications ==========
+let toastContainer = null;
+
+function initToasts() {
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
+}
+
+function showToast(message, type = 'info') {
+  initToasts();
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icons = {
+    success: '✓',
+    error: '✕',
+    warning: '⚠',
+    info: 'ℹ',
+  };
+  
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || icons.info}</span>
+    <span class="toast-message">${message}</span>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideIn 0.3s ease reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ========== Loading ==========
+function showLoading(message = 'Carregando...') {
+  let overlay = $('#loading-overlay');
+  
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = `
+      <div class="loading-spinner"></div>
+      <p class="loading-text">${message}</p>
+    `;
+    document.body.appendChild(overlay);
+  } else {
+    overlay.querySelector('.loading-text').textContent = message;
+    overlay.style.display = 'flex';
+  }
+}
+
+function hideLoading() {
+  const overlay = $('#loading-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
+}
+
+// ========== Modal ==========
+function createModal(options) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">${options.title || 'Modal'}</h3>
+        <button class="modal-close" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        ${options.content || ''}
+      </div>
+      ${options.footer !== false ? `
+        <div class="modal-footer">
+          <button class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button class="btn btn-primary modal-confirm">${options.confirmText || 'Confirmar'}</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  // Show with animation
+  requestAnimationFrame(() => overlay.classList.add('show'));
+  
+  // Close handlers
+  const close = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 200);
+  };
+  
+  overlay.querySelector('.modal-close').onclick = close;
+  overlay.querySelector('.modal-cancel')?.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+  
+  return {
+    element: overlay,
+    close,
+    onConfirm(callback) {
+      overlay.querySelector('.modal-confirm')?.addEventListener('click', () => {
+        callback();
+        close();
+      });
+    },
+  };
+}
+
+function confirmModal(options) {
+  return new Promise((resolve) => {
+    const modal = createModal({
+      title: options.title || 'Confirmar',
+      content: `<p>${options.message || 'Tem certeza?'}</p>`,
+      confirmText: options.confirmText || 'Confirmar',
+    });
+    
+    modal.onConfirm(() => resolve(true));
+    modal.element.querySelector('.modal-cancel').onclick = () => {
+      modal.close();
+      resolve(false);
+    };
+  });
+}
+
+// ========== Date Helpers ==========
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR');
+}
+
+function formatDateTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString('pt-BR');
+}
+
+function formatRelativeTime(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  if (diffMins < 1) return 'agora';
+  if (diffMins < 60) return `${diffMins} min atrás`;
+  if (diffHours < 24) return `${diffHours}h atrás`;
+  if (diffDays < 7) return `${diffDays}d atrás`;
+  return formatDate(dateString);
+}
+
+function getDateRangeForPeriod(period) {
+  const now = new Date();
+  const to = now.toISOString();
+  let from;
+  
+  switch (period) {
+    case 'today':
+      from = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      break;
+    case 'week':
+      from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      break;
+    case 'month':
+      from = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      break;
+    default:
+      from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  }
+  
+  return { from, to };
+}
+
+// ========== String Helpers ==========
+function truncate(str, length = 50) {
+  if (!str) return '';
+  if (str.length <= length) return str;
+  return str.substring(0, length) + '...';
+}
+
+function calculateAge(birthYear) {
+  const currentYear = new Date().getFullYear();
+  return currentYear - birthYear;
+}
+
+// ========== Number Helpers ==========
+function formatNumber(num) {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toString();
+}
+
+// ========== Auth Check ==========
+function requireAuth() {
+  const token = localStorage.getItem('guardian_token');
+  if (!token) {
+    window.location.replace('login.html');
+    return false;
+  }
+  return true;
+}
+
+// ========== Exports ==========
+  window.GuardianUtils = {
+    $,
+    $$,
+    showToast,
+    showLoading,
+    hideLoading,
+    createModal,
+    confirmModal,
+    formatDate,
+    formatDateTime,
+    formatRelativeTime,
+    getDateRangeForPeriod,
+    truncate,
+    calculateAge,
+    formatNumber,
+    requireAuth,
+  };
+})();
