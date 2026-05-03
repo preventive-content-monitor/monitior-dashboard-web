@@ -378,7 +378,13 @@
       
       try {
         const result = await devices.generateCode(dependentId);
-        codeDisplay.textContent = result.code.toUpperCase();
+        const code = result?.code ?? result?.codigo;
+
+        if (!code) {
+          throw new Error('Resposta da API sem o campo de código');
+        }
+
+        codeDisplay.textContent = String(code).toUpperCase();
       } catch (error) {
         showToast('Erro ao gerar código: ' + error.message, 'error');
         codeDisplay.textContent = 'ERRO';

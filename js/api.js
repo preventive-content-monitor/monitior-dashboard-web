@@ -280,7 +280,11 @@ const devices = {
   },
   
   async generateCode(dependentId) {
-    return apiPost(`/api/dispositivos/gerar-codigo/${dependentId}`, {});
+    const data = await apiPost(`/api/dispositivos/gerar-codigo/${dependentId}`, {});
+    return {
+      ...data,
+      code: data?.code ?? data?.codigo ?? null,
+    };
   },
   
   async enroll(code, deviceInfo) {
