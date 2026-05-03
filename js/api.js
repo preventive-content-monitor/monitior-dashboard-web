@@ -32,6 +32,94 @@ function isAuthenticated() {
   return !!getToken();
 }
 
+function extractErrorMessage(error) {
+  if (!error || typeof error !== 'object') {
+    return null;
+  }
+
+  return error.mensagem || error.message || null;
+}
+
+async function parseJsonSafely(response) {
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+function normalizeDependent(dependent = {}) {
+  return {
+    ...dependent,
+    nickname: dependent.nickname ?? dependent.apelido,
+    birthYear: dependent.birthYear ?? dependent.anoNascimento,
+    createdAt: dependent.createdAt ?? dependent.criadoEm,
+  };
+}
+
+function normalizeDevice(device = {}) {
+  return {
+    ...device,
+    name: device.name ?? device.nome ?? device.nomeDispositivo,
+    platform: device.platform ?? device.plataforma,
+    dependentId: device.dependentId ?? device.dependenteId,
+    dependentNickname: device.dependentNickname ?? device.apelidoDependente,
+    enrolledAt: device.enrolledAt ?? device.vinculadoEm,
+    lastSeenAt: device.lastSeenAt ?? device.ultimoAcessoEm,
+  };
+}
+
+function parseDomainList(value) {
+  if (!value) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return value
+        .split(',')
+        .map((domain) => domain.trim())
+        .filter((domain) => domain.length > 0);
+    }
+  }
+
+  return [];
+}
+
+function normalizePolicy(data = {}) {
+  return {
+    ...data,
+    riskThreshold: data.riskThreshold ?? data.limiteRisco,
+    blockedDomains: data.blockedDomains ?? data.dominiosBloqueados,
+    allowedDomains: data.allowedDomains ?? data.dominiosPermitidos,
+    schoolModeEnabled: data.schoolModeEnabled ?? data.modoEscolaAtivo,
+    schoolStart: data.schoolStart ?? data.escolaInicio,
+    schoolEnd: data.schoolEnd ?? data.escolaFim,
+    protectionEnabled: data.protectionEnabled ?? true,
+  };
+}
+
+function normalizeSummary(data = {}) {
+  return {
+    ...data,
+    totalEvents: data.totalEvents ?? data.totalEventos,
+    sensitiveEvents: data.sensitiveEvents ?? data.eventosSensiveis,
+    blockAttempts: data.blockAttempts ?? data.tentativasBloqueio,
+  };
+}
+
+function normalizeVulnerabilityItem(item = {}) {
+  return {
+    ...item,
+    day: item.day ?? item.dia,
+    score: item.score ?? item.pontuacao,
+  };
+}
+
 // ========== Base Fetch ==========
 async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -65,11 +153,11 @@ async function apiGet(endpoint) {
   const response = await apiFetch(endpoint, { method: 'GET' });
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `GET ${endpoint} failed: ${response.status}`);
+    const error = await parseJsonSafely(response).catch(() => ({}));
+    throw new Error(extractErrorMessage(error) || `GET ${endpoint} failed: ${response.status}`);
   }
   
-  return response.json();
+  return parseJsonSafely(response);
 }
 
 async function apiPost(endpoint, data) {
@@ -79,13 +167,12 @@ async function apiPost(endpoint, data) {
   });
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `POST ${endpoint} failed: ${response.status}`);
+    const error = await parseJsonSafely(response).catch(() => ({}));
+    throw new Error(extractErrorMessage(error) || `POST ${endpoint} failed: ${response.status}`);
   }
   
   // Some endpoints return 201 with no body
-  const text = await response.text();
-  return text ? JSON.parse(text) : {};
+  return (await parseJsonSafely(response)) || {};
 }
 
 async function apiPut(endpoint, data) {
@@ -95,19 +182,19 @@ async function apiPut(endpoint, data) {
   });
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `PUT ${endpoint} failed: ${response.status}`);
+    const error = await parseJsonSafely(response).catch(() => ({}));
+    throw new Error(extractErrorMessage(error) || `PUT ${endpoint} failed: ${response.status}`);
   }
   
-  return response.json();
+  return (await parseJsonSafely(response)) || {};
 }
 
 async function apiDelete(endpoint) {
   const response = await apiFetch(endpoint, { method: 'DELETE' });
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `DELETE ${endpoint} failed: ${response.status}`);
+    const error = await parseJsonSafely(response).catch(() => ({}));
+    throw new Error(extractErrorMessage(error) || `DELETE ${endpoint} failed: ${response.status}`);
   }
   
   return true;
@@ -116,18 +203,18 @@ async function apiDelete(endpoint) {
 // ========== Auth ==========
 const auth = {
   async login(email, password) {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/autenticacao/entrar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, senha: password }),
     });
     
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Email ou senha incorretos');
       }
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erro ao fazer login');
+      const error = await parseJsonSafely(response).catch(() => ({}));
+      throw new Error(extractErrorMessage(error) || 'Erro ao fazer login');
     }
     
     const data = await response.json();
@@ -137,18 +224,18 @@ const auth = {
   },
   
   async register(email, password) {
-    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/autenticacao/registrar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, senha: password }),
     });
     
     if (!response.ok) {
       if (response.status === 409) {
         throw new Error('Este email já está cadastrado');
       }
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erro ao criar conta');
+      const error = await parseJsonSafely(response).catch(() => ({}));
+      throw new Error(extractErrorMessage(error) || 'Erro ao criar conta');
     }
     
     return true;
@@ -167,30 +254,42 @@ const auth = {
 // ========== Dependents ==========
 const dependents = {
   async list() {
-    return apiGet('/api/dependents');
+    const data = await apiGet('/api/dependentes');
+    return Array.isArray(data) ? data.map(normalizeDependent) : [];
   },
   
   async create(nickname, birthYear) {
-    return apiPost('/api/dependents', { nickname, birthYear });
+    const data = await apiPost('/api/dependentes', {
+      apelido: nickname,
+      anoNascimento: birthYear,
+    });
+    return normalizeDependent(data);
   },
   
   async get(id) {
-    return apiGet(`/api/dependents/${id}`);
+    const data = await apiGet(`/api/dependentes/${id}`);
+    return normalizeDependent(data);
   },
 };
 
 // ========== Devices ==========
 const devices = {
   async list() {
-    return apiGet('/api/devices');
+    const data = await apiGet('/api/dispositivos');
+    return Array.isArray(data) ? data.map(normalizeDevice) : [];
   },
   
   async generateCode(dependentId) {
-    return apiPost(`/api/devices/generate-code/${dependentId}`, {});
+    return apiPost(`/api/dispositivos/gerar-codigo/${dependentId}`, {});
   },
   
   async enroll(code, deviceInfo) {
-    return apiPost('/api/devices/enroll', { code, ...deviceInfo });
+    const payload = {
+      codigo: code,
+      nomeDispositivo: deviceInfo?.name || deviceInfo?.nomeDispositivo || 'Dispositivo',
+    };
+    const data = await apiPost('/api/dispositivos/vincular', payload);
+    return normalizeDevice(data);
   },
   
   async getByDependent(dependentId) {
@@ -202,29 +301,48 @@ const devices = {
 // ========== Policy ==========
 const policy = {
   async get(deviceId) {
-    return apiGet(`/api/policy/current?deviceId=${deviceId}`);
+    const params = new URLSearchParams({ dispositivoId: deviceId });
+    const data = await apiGet(`/api/politica/atual?${params}`);
+    return normalizePolicy(data);
   },
   
   async update(deviceId, policyData) {
-    return apiPut(`/api/policy?deviceId=${deviceId}`, policyData);
+    const blockedDomains = parseDomainList(policyData.blockedDomains ?? policyData.dominiosBloqueados);
+    const allowedDomains = parseDomainList(policyData.allowedDomains ?? policyData.dominiosPermitidos);
+
+    const payload = {
+      modo: policyData.mode,
+      limiteRisco: policyData.riskThreshold,
+      dominiosBloqueados: blockedDomains,
+      dominiosPermitidos: allowedDomains,
+      modoEscolaAtivo: Boolean(policyData.schoolModeEnabled),
+      escolaInicio: policyData.schoolStart || null,
+      escolaFim: policyData.schoolEnd || null,
+    };
+
+    const params = new URLSearchParams({ dispositivoId: deviceId });
+    const data = await apiPut(`/api/politica?${params}`, payload);
+    return normalizePolicy(data);
   },
 };
 
 // ========== Dashboard ==========
 const dashboard = {
   async getSummary(deviceId, from, to) {
-    const params = new URLSearchParams({ deviceId, from, to });
-    return apiGet(`/api/dashboard/summary?${params}`);
+    const params = new URLSearchParams({ dispositivoId: deviceId, from, to });
+    const data = await apiGet(`/api/painel/resumo?${params}`);
+    return normalizeSummary(data);
   },
   
   async getTopDomains(deviceId, from, to) {
-    const params = new URLSearchParams({ deviceId, from, to });
-    return apiGet(`/api/dashboard/top-domains?${params}`);
+    const params = new URLSearchParams({ dispositivoId: deviceId, from, to });
+    return apiGet(`/api/painel/top-dominios?${params}`);
   },
   
   async getVulnerability(dependentId, from, to) {
-    const params = new URLSearchParams({ dependentId, from, to });
-    return apiGet(`/api/dashboard/vulnerability?${params}`);
+    const params = new URLSearchParams({ dependenteId: dependentId, from, to });
+    const data = await apiGet(`/api/painel/vulnerabilidade?${params}`);
+    return Array.isArray(data) ? data.map(normalizeVulnerabilityItem) : [];
   },
 };
 
