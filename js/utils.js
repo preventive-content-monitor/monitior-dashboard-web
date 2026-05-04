@@ -59,7 +59,6 @@
   };
 
   const EMOJI_TONE_MAP = {
-    "📊": "primary",
     "⚠️": "warning",
     "⚠": "warning",
     "🚫": "danger",
