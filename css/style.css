@@ -286,6 +286,27 @@ a:hover {
   flex: 1;
   padding: var(--space-md);
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #7d41c4 var(--surface-muted);
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: var(--surface-muted);
+  border-radius: var(--radius-full);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #7d41c4;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--surface-muted);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #6c35ad;
 }
 
 .nav-section {
