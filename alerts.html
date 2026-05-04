@@ -1,197 +1,300 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guardian - Alertas</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script>
-    if (!localStorage.getItem('guardian_token')) {
-      window.location.replace('login.html');
-    }
-  </script>
-</head>
-<body>
-  <div class="dashboard-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="assets/logo.png" alt="Monitor Dashboard" class="brand-logo">
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Principal</div>
-          <a href="index.html" class="nav-item">
-            <span class="nav-icon">📊</span>
-            <span>Dashboard</span>
-          </a>
-          <a href="dependents.html" class="nav-item">
-            <span class="nav-icon">👨‍👩‍👧‍👦</span>
-            <span>Dependentes</span>
-          </a>
-          <a href="devices.html" class="nav-item">
-            <span class="nav-icon">💻</span>
-            <span>Dispositivos</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Relatórios</div>
-          <a href="activity.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Atividades</span>
-          </a>
-          <a href="alerts.html" class="nav-item active">
-            <span class="nav-icon">🔔</span>
-            <span>Alertas</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Configurações</div>
-          <a href="policies.html" class="nav-item">
-            <span class="nav-icon">⚙️</span>
-            <span>Políticas</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="user-info" id="userInfo">
-          <div class="user-avatar">👤</div>
-          <div class="user-details">
-            <div class="user-name" id="userName">Carregando...</div>
-            <div class="user-role">Responsável</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guardian - Alertas</title>
+    <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      if (!localStorage.getItem("guardian_token")) {
+        window.location.replace("login.html");
+      }
+    </script>
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <img
+              src="assets/logo.png"
+              alt="Monitor Dashboard"
+              class="brand-logo"
+            />
           </div>
         </div>
-        <button class="btn btn-ghost btn-full" id="logoutBtn" style="margin-top: var(--space-sm);">
-          <span class="btn-icon">🚪</span>
-          Sair
-        </button>
-      </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Alertas</h1>
-        <p>Notificações sobre atividades importantes</p>
-      </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-title">Principal</div>
+            <a href="index.html" class="nav-item">
+              <span class="nav-icon">📊</span>
+              <span>Dashboard</span>
+            </a>
+            <a href="dependents.html" class="nav-item">
+              <span class="nav-icon">👨‍👩‍👧‍👦</span>
+              <span>Dependentes</span>
+            </a>
+            <a href="devices.html" class="nav-item">
+              <span class="nav-icon">💻</span>
+              <span>Dispositivos</span>
+            </a>
+          </div>
 
-      <!-- Coming Soon -->
-      <div class="card">
-        <div class="card-body">
-          <div class="empty-state">
-            <div class="empty-state-icon">🔔</div>
-            <div class="empty-state-title">Central de Alertas</div>
-            <div class="empty-state-text">
-              Você receberá notificações aqui quando:<br><br>
-              • Um dependente tentar acessar conteúdo bloqueado<br>
-              • Conteúdo sensível for detectado<br>
-              • Padrões incomuns de navegação forem identificados
+          <div class="nav-section">
+            <div class="nav-section-title">Relatórios</div>
+            <a href="activity.html" class="nav-item">
+              <span class="nav-icon">📋</span>
+              <span>Atividades</span>
+            </a>
+            <a href="alerts.html" class="nav-item active">
+              <span class="nav-icon">🔔</span>
+              <span>Alertas</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">Configurações</div>
+            <a href="policies.html" class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              <span>Políticas</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info" id="userInfo">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <div class="user-name" id="userName">Carregando...</div>
+              <div class="user-role">Responsável</div>
             </div>
           </div>
+          <button
+            class="btn btn-ghost btn-full"
+            id="logoutBtn"
+            style="margin-top: var(--space-sm)"
+          >
+            <span class="btn-icon">🚪</span>
+            Sair
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <!-- Example Alerts (mockup) -->
-      <div class="card" style="margin-top: var(--space-lg);">
-        <div class="card-header">
-          <h3 class="card-title">📬 Alertas Recentes (Exemplo)</h3>
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1>Alertas</h1>
+          <p>Notificações sobre atividades importantes</p>
         </div>
-        <div class="card-body" style="padding: 0;">
-          <div class="list-item">
-            <div class="list-item-icon" style="background: var(--danger-light);">🚫</div>
-            <div class="list-item-content">
-              <div class="list-item-title">Tentativa de acesso bloqueado</div>
-              <div class="list-item-subtitle">João tentou acessar um site bloqueado</div>
-            </div>
-            <span class="badge badge-danger">Crítico</span>
-          </div>
-          <div class="list-item">
-            <div class="list-item-icon" style="background: var(--warning-light);">⚠️</div>
-            <div class="list-item-content">
-              <div class="list-item-title">Conteúdo sensível detectado</div>
-              <div class="list-item-subtitle">Navegação com risco médio identificada</div>
-            </div>
-            <span class="badge badge-warning">Atenção</span>
-          </div>
-          <div class="list-item">
-            <div class="list-item-icon" style="background: var(--primary-light);">💻</div>
-            <div class="list-item-content">
-              <div class="list-item-title">Novo dispositivo conectado</div>
-              <div class="list-item-subtitle">Chrome - Windows foi vinculado a João</div>
-            </div>
-            <span class="badge badge-info">Info</span>
-          </div>
-          <div class="list-item">
-            <div class="list-item-icon" style="background: var(--success-light);">✅</div>
-            <div class="list-item-content">
-              <div class="list-item-title">Semana segura!</div>
-              <div class="list-item-subtitle">Nenhum incidente nos últimos 7 dias</div>
-            </div>
-            <span class="badge badge-success">Positivo</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Alert Settings Preview -->
-      <div class="card" style="margin-top: var(--space-lg);">
-        <div class="card-header">
-          <h3 class="card-title">⚙️ Configurações de Alertas (Em breve)</h3>
-        </div>
-        <div class="card-body">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-md);">
-            <label style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-md); background: var(--surface-muted); border-radius: var(--radius-sm); cursor: not-allowed; opacity: 0.7;">
-              <input type="checkbox" checked disabled />
-              <div>
-                <div style="font-weight: 500;">Tentativas de bloqueio</div>
-                <div style="font-size: 0.875rem; color: var(--text-secondary);">Quando um site bloqueado for acessado</div>
+        <!-- Coming Soon -->
+        <div class="card">
+          <div class="card-body">
+            <div class="empty-state">
+              <div class="empty-state-icon">🔔</div>
+              <div class="empty-state-title">Central de Alertas</div>
+              <div class="empty-state-text">
+                Você receberá notificações aqui quando:<br /><br />
+                • Um dependente tentar acessar conteúdo bloqueado<br />
+                • Conteúdo sensível for detectado<br />
+                • Padrões incomuns de navegação forem identificados
               </div>
-            </label>
-            <label style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-md); background: var(--surface-muted); border-radius: var(--radius-sm); cursor: not-allowed; opacity: 0.7;">
-              <input type="checkbox" checked disabled />
-              <div>
-                <div style="font-weight: 500;">Conteúdo sensível</div>
-                <div style="font-size: 0.875rem; color: var(--text-secondary);">Quando conteúdo de risco for detectado</div>
-              </div>
-            </label>
-            <label style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-md); background: var(--surface-muted); border-radius: var(--radius-sm); cursor: not-allowed; opacity: 0.7;">
-              <input type="checkbox" disabled />
-              <div>
-                <div style="font-weight: 500;">Resumo diário</div>
-                <div style="font-size: 0.875rem; color: var(--text-secondary);">Receba um resumo por email</div>
-              </div>
-            </label>
-            <label style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-md); background: var(--surface-muted); border-radius: var(--radius-sm); cursor: not-allowed; opacity: 0.7;">
-              <input type="checkbox" disabled />
-              <div>
-                <div style="font-weight: 500;">Push notifications</div>
-                <div style="font-size: 0.875rem; color: var(--text-secondary);">Alertas em tempo real no celular</div>
-              </div>
-            </label>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
-  </div>
 
-  <script src="js/api.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    const { $, requireAuth } = GuardianUtils;
-    const { auth } = GuardianAPI;
+        <!-- Example Alerts (mockup) -->
+        <div class="card" style="margin-top: var(--space-lg)">
+          <div class="card-header">
+            <h3 class="card-title">📬 Alertas Recentes (Exemplo)</h3>
+          </div>
+          <div class="card-body" style="padding: 0">
+            <div class="list-item">
+              <div
+                class="list-item-icon"
+                style="background: var(--danger-light)"
+              >
+                🚫
+              </div>
+              <div class="list-item-content">
+                <div class="list-item-title">Tentativa de acesso bloqueado</div>
+                <div class="list-item-subtitle">
+                  João tentou acessar um site bloqueado
+                </div>
+              </div>
+              <span class="badge badge-danger">Crítico</span>
+            </div>
+            <div class="list-item">
+              <div
+                class="list-item-icon"
+                style="background: var(--warning-light)"
+              >
+                ⚠️
+              </div>
+              <div class="list-item-content">
+                <div class="list-item-title">Conteúdo sensível detectado</div>
+                <div class="list-item-subtitle">
+                  Navegação com risco médio identificada
+                </div>
+              </div>
+              <span class="badge badge-warning">Atenção</span>
+            </div>
+            <div class="list-item">
+              <div
+                class="list-item-icon"
+                style="background: var(--primary-light)"
+              >
+                💻
+              </div>
+              <div class="list-item-content">
+                <div class="list-item-title">Novo dispositivo conectado</div>
+                <div class="list-item-subtitle">
+                  Chrome - Windows foi vinculado a João
+                </div>
+              </div>
+              <span class="badge badge-info">Info</span>
+            </div>
+            <div class="list-item">
+              <div
+                class="list-item-icon"
+                style="background: var(--success-light)"
+              >
+                ✅
+              </div>
+              <div class="list-item-content">
+                <div class="list-item-title">Semana segura!</div>
+                <div class="list-item-subtitle">
+                  Nenhum incidente nos últimos 7 dias
+                </div>
+              </div>
+              <span class="badge badge-success">Positivo</span>
+            </div>
+          </div>
+        </div>
 
-    if (!requireAuth()) {
-      throw new Error('Not authenticated');
-    }
+        <!-- Alert Settings Preview -->
+        <div class="card" style="margin-top: var(--space-lg)">
+          <div class="card-header">
+            <h3 class="card-title">⚙️ Configurações de Alertas (Em breve)</h3>
+          </div>
+          <div class="card-body">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: var(--space-md);
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: var(--space-sm);
+                  padding: var(--space-md);
+                  background: var(--surface-muted);
+                  border-radius: var(--radius-sm);
+                  cursor: not-allowed;
+                  opacity: 0.7;
+                "
+              >
+                <input type="checkbox" checked disabled />
+                <div>
+                  <div style="font-weight: 500">Tentativas de bloqueio</div>
+                  <div
+                    style="font-size: 0.875rem; color: var(--text-secondary)"
+                  >
+                    Quando um site bloqueado for acessado
+                  </div>
+                </div>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: var(--space-sm);
+                  padding: var(--space-md);
+                  background: var(--surface-muted);
+                  border-radius: var(--radius-sm);
+                  cursor: not-allowed;
+                  opacity: 0.7;
+                "
+              >
+                <input type="checkbox" checked disabled />
+                <div>
+                  <div style="font-weight: 500">Conteúdo sensível</div>
+                  <div
+                    style="font-size: 0.875rem; color: var(--text-secondary)"
+                  >
+                    Quando conteúdo de risco for detectado
+                  </div>
+                </div>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: var(--space-sm);
+                  padding: var(--space-md);
+                  background: var(--surface-muted);
+                  border-radius: var(--radius-sm);
+                  cursor: not-allowed;
+                  opacity: 0.7;
+                "
+              >
+                <input type="checkbox" disabled />
+                <div>
+                  <div style="font-weight: 500">Resumo diário</div>
+                  <div
+                    style="font-size: 0.875rem; color: var(--text-secondary)"
+                  >
+                    Receba um resumo por email
+                  </div>
+                </div>
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: var(--space-sm);
+                  padding: var(--space-md);
+                  background: var(--surface-muted);
+                  border-radius: var(--radius-sm);
+                  cursor: not-allowed;
+                  opacity: 0.7;
+                "
+              >
+                <input type="checkbox" disabled />
+                <div>
+                  <div style="font-weight: 500">Push notifications</div>
+                  <div
+                    style="font-size: 0.875rem; color: var(--text-secondary)"
+                  >
+                    Alertas em tempo real no celular
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
 
-    $('#userName').textContent = auth.getEmail() || 'Responsável';
-    $('#logoutBtn').addEventListener('click', () => auth.logout());
-  </script>
-</body>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+      const { $, requireAuth } = GuardianUtils;
+      const { auth } = GuardianAPI;
+
+      if (!requireAuth()) {
+        throw new Error("Not authenticated");
+      }
+
+      $("#userName").textContent = auth.getEmail() || "Responsável";
+      $("#logoutBtn").addEventListener("click", () => auth.logout());
+    </script>
+  </body>
 </html>

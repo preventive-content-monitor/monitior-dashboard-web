@@ -15,32 +15,47 @@
   --secondary-soft: #e7ecff;
   --tertiary-soft: #f3e8ff;
 
-  --brand-gradient: linear-gradient(118deg, #1d7cce 0%, #7d41c4 52%, #1e3a8a 100%);
-  --brand-gradient-soft: linear-gradient(140deg, rgba(29, 124, 206, 0.12) 0%, rgba(125, 65, 196, 0.1) 52%, rgba(30, 58, 138, 0.12) 100%);
-  --brand-gradient-strong: linear-gradient(128deg, #1e3a8a 0%, #1d7cce 42%, #7d41c4 100%);
-  
+  --brand-gradient: linear-gradient(
+    118deg,
+    #1d7cce 0%,
+    #7d41c4 52%,
+    #1e3a8a 100%
+  );
+  --brand-gradient-soft: linear-gradient(
+    140deg,
+    rgba(29, 124, 206, 0.12) 0%,
+    rgba(125, 65, 196, 0.1) 52%,
+    rgba(30, 58, 138, 0.12) 100%
+  );
+  --brand-gradient-strong: linear-gradient(
+    128deg,
+    #1e3a8a 0%,
+    #1d7cce 42%,
+    #7d41c4 100%
+  );
+
   --success: #10b981;
   --success-light: #d1fae5;
-  
+
   --warning: #f59e0b;
   --warning-light: #fef3c7;
-  
+
   --danger: #ef4444;
   --danger-light: #fee2e2;
-  
+
   /* Neutros */
   --bg: #f5f7ff;
   --bg-warm: #f7f7ff;
   --surface: #ffffff;
   --surface-muted: #edf2ff;
-  
+
   --text: #111b3a;
   --text-secondary: #425081;
   --text-muted: #7280a6;
-  
+
   --border: #d7dff6;
   --border-light: #e9edfa;
-  
+
   /* Espaçamentos */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -48,25 +63,25 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
-  
+
   /* Bordas */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 9999px;
-  
+
   /* Sombras */
   --shadow-sm: 0 4px 12px rgba(20, 40, 96, 0.08);
   --shadow-md: 0 10px 24px rgba(20, 40, 96, 0.12);
   --shadow-lg: 0 16px 36px rgba(20, 40, 96, 0.16);
   --shadow-xl: 0 30px 54px rgba(20, 40, 96, 0.2);
-  
+
   /* Transições */
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
-  
+
   /* Sidebar */
   --sidebar-width: 260px;
   --sidebar-collapsed: 70px;

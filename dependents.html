@@ -1,289 +1,361 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guardian - Dependentes</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script>
-    if (!localStorage.getItem('guardian_token')) {
-      window.location.replace('login.html');
-    }
-  </script>
-</head>
-<body>
-  <div class="dashboard-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="assets/logo.png" alt="Monitor Dashboard" class="brand-logo">
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Principal</div>
-          <a href="index.html" class="nav-item">
-            <span class="nav-icon">📊</span>
-            <span>Dashboard</span>
-          </a>
-          <a href="dependents.html" class="nav-item active">
-            <span class="nav-icon">👨‍👩‍👧‍👦</span>
-            <span>Dependentes</span>
-          </a>
-          <a href="devices.html" class="nav-item">
-            <span class="nav-icon">💻</span>
-            <span>Dispositivos</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Relatórios</div>
-          <a href="activity.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Atividades</span>
-          </a>
-          <a href="alerts.html" class="nav-item">
-            <span class="nav-icon">🔔</span>
-            <span>Alertas</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Configurações</div>
-          <a href="policies.html" class="nav-item">
-            <span class="nav-icon">⚙️</span>
-            <span>Políticas</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="user-info" id="userInfo">
-          <div class="user-avatar">👤</div>
-          <div class="user-details">
-            <div class="user-name" id="userName">Carregando...</div>
-            <div class="user-role">Responsável</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guardian - Dependentes</title>
+    <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      if (!localStorage.getItem("guardian_token")) {
+        window.location.replace("login.html");
+      }
+    </script>
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <img
+              src="assets/logo.png"
+              alt="Monitor Dashboard"
+              class="brand-logo"
+            />
           </div>
         </div>
-        <button class="btn btn-ghost btn-full" id="logoutBtn" style="margin-top: var(--space-sm);">
-          <span class="btn-icon">🚪</span>
-          Sair
-        </button>
-      </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Page Header -->
-      <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-          <h1>Dependentes</h1>
-          <p>Gerencie os perfis das crianças monitoradas</p>
-        </div>
-        <button class="btn btn-primary btn-large" id="addDependentBtn">
-          <span class="btn-icon">➕</span>
-          Adicionar Dependente
-        </button>
-      </div>
-
-      <!-- Loading State -->
-      <div class="card" id="loadingState">
-        <div class="card-body">
-          <div class="empty-state">
-            <div class="loading-spinner" style="margin: 0 auto;"></div>
-            <div class="empty-state-text" style="margin-top: var(--space-md);">Carregando dependentes...</div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-title">Principal</div>
+            <a href="index.html" class="nav-item">
+              <span class="nav-icon">📊</span>
+              <span>Dashboard</span>
+            </a>
+            <a href="dependents.html" class="nav-item active">
+              <span class="nav-icon">👨‍👩‍👧‍👦</span>
+              <span>Dependentes</span>
+            </a>
+            <a href="devices.html" class="nav-item">
+              <span class="nav-icon">💻</span>
+              <span>Dispositivos</span>
+            </a>
           </div>
-        </div>
-      </div>
 
-      <!-- Dependents Grid -->
-      <div class="dependents-grid" id="dependentsGrid"></div>
+          <div class="nav-section">
+            <div class="nav-section-title">Relatórios</div>
+            <a href="activity.html" class="nav-item">
+              <span class="nav-icon">📋</span>
+              <span>Atividades</span>
+            </a>
+            <a href="alerts.html" class="nav-item">
+              <span class="nav-icon">🔔</span>
+              <span>Alertas</span>
+            </a>
+          </div>
 
-      <!-- Empty State -->
-      <div class="card" id="emptyState" style="display: none;">
-        <div class="card-body">
-          <div class="empty-state">
-            <div class="empty-state-icon">👨‍👩‍👧‍👦</div>
-            <div class="empty-state-title">Nenhum dependente cadastrado</div>
-            <div class="empty-state-text">Adicione o perfil do seu filho para começar a protegê-lo.</div>
-            <button class="btn btn-primary" id="addFirstDependentBtn">
-              <span class="btn-icon">➕</span>
-              Adicionar Primeiro Dependente
-            </button>
+          <div class="nav-section">
+            <div class="nav-section-title">Configurações</div>
+            <a href="policies.html" class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              <span>Políticas</span>
+            </a>
           </div>
-        </div>
-      </div>
-    </main>
-  </div>
+        </nav>
 
-  <!-- Add Dependent Modal -->
-  <div class="modal-overlay" id="addModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Adicionar Dependente</h3>
-        <button class="modal-close" type="button">&times;</button>
-      </div>
-      <form id="addForm">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="nickname">Nome ou Apelido</label>
-            <input type="text" id="nickname" placeholder="Ex: João" required />
+        <div class="sidebar-footer">
+          <div class="user-info" id="userInfo">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <div class="user-name" id="userName">Carregando...</div>
+              <div class="user-role">Responsável</div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="birthYear">Ano de Nascimento</label>
-            <select id="birthYear" required>
-              <option value="">Selecione...</option>
-            </select>
-          </div>
-          <p class="error-message" id="addError"></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-          <button type="submit" class="btn btn-primary" id="addSubmitBtn">
-            <span class="btn-icon">➕</span>
-            Adicionar
+          <button
+            class="btn btn-ghost btn-full"
+            id="logoutBtn"
+            style="margin-top: var(--space-sm)"
+          >
+            <span class="btn-icon">🚪</span>
+            Sair
           </button>
         </div>
-      </form>
-    </div>
-  </div>
+      </aside>
 
-  <!-- Generate Code Modal -->
-  <div class="modal-overlay" id="codeModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">Código de Vinculação</h3>
-        <button class="modal-close" type="button">&times;</button>
-      </div>
-      <div class="modal-body" style="text-align: center;">
-        <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
-          Digite este código na extensão do navegador para vincular o dispositivo.
-        </p>
-        <div id="codeDisplay" style="font-size: 3rem; font-weight: 700; letter-spacing: 0.5rem; color: var(--primary); font-family: monospace; padding: var(--space-lg); background: var(--primary-soft); border-radius: var(--radius-md);">
-          ------
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Page Header -->
+        <div
+          class="page-header"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+          "
+        >
+          <div>
+            <h1>Dependentes</h1>
+            <p>Gerencie os perfis das crianças monitoradas</p>
+          </div>
+          <button class="btn btn-primary btn-large" id="addDependentBtn">
+            <span class="btn-icon">➕</span>
+            Adicionar Dependente
+          </button>
         </div>
-        <p style="color: var(--text-muted); margin-top: var(--space-md); font-size: 0.875rem;">
-          ⏱️ O código expira em 5 minutos
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary modal-close-btn">Fechar</button>
-        <button type="button" class="btn btn-primary" id="regenerateCodeBtn">
-          <span class="btn-icon">🔄</span>
-          Gerar Novo Código
-        </button>
+
+        <!-- Loading State -->
+        <div class="card" id="loadingState">
+          <div class="card-body">
+            <div class="empty-state">
+              <div class="loading-spinner" style="margin: 0 auto"></div>
+              <div class="empty-state-text" style="margin-top: var(--space-md)">
+                Carregando dependentes...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dependents Grid -->
+        <div class="dependents-grid" id="dependentsGrid"></div>
+
+        <!-- Empty State -->
+        <div class="card" id="emptyState" style="display: none">
+          <div class="card-body">
+            <div class="empty-state">
+              <div class="empty-state-icon">👨‍👩‍👧‍👦</div>
+              <div class="empty-state-title">Nenhum dependente cadastrado</div>
+              <div class="empty-state-text">
+                Adicione o perfil do seu filho para começar a protegê-lo.
+              </div>
+              <button class="btn btn-primary" id="addFirstDependentBtn">
+                <span class="btn-icon">➕</span>
+                Adicionar Primeiro Dependente
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Add Dependent Modal -->
+    <div class="modal-overlay" id="addModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">Adicionar Dependente</h3>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <form id="addForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="nickname">Nome ou Apelido</label>
+              <input
+                type="text"
+                id="nickname"
+                placeholder="Ex: João"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="birthYear">Ano de Nascimento</label>
+              <select id="birthYear" required>
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+            <p class="error-message" id="addError"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-cancel">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" id="addSubmitBtn">
+              <span class="btn-icon">➕</span>
+              Adicionar
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
 
-  <script src="js/api.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    const { $, $$, showToast, showLoading, hideLoading, calculateAge, requireAuth, formatDate } = GuardianUtils;
-    const { auth, dependents, devices } = GuardianAPI;
+    <!-- Generate Code Modal -->
+    <div class="modal-overlay" id="codeModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">Código de Vinculação</h3>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align: center">
+          <p
+            style="color: var(--text-secondary); margin-bottom: var(--space-lg)"
+          >
+            Digite este código na extensão do navegador para vincular o
+            dispositivo.
+          </p>
+          <div
+            id="codeDisplay"
+            style="
+              font-size: 3rem;
+              font-weight: 700;
+              letter-spacing: 0.5rem;
+              color: var(--primary);
+              font-family: monospace;
+              padding: var(--space-lg);
+              background: var(--primary-soft);
+              border-radius: var(--radius-md);
+            "
+          >
+            ------
+          </div>
+          <p
+            style="
+              color: var(--text-muted);
+              margin-top: var(--space-md);
+              font-size: 0.875rem;
+            "
+          >
+            ⏱️ O código expira em 5 minutos
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-btn">
+            Fechar
+          </button>
+          <button type="button" class="btn btn-primary" id="regenerateCodeBtn">
+            <span class="btn-icon">🔄</span>
+            Gerar Novo Código
+          </button>
+        </div>
+      </div>
+    </div>
 
-    // Check auth
-    if (!requireAuth()) {
-      throw new Error('Not authenticated');
-    }
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+      const {
+        $,
+        $$,
+        showToast,
+        showLoading,
+        hideLoading,
+        calculateAge,
+        requireAuth,
+        formatDate,
+      } = GuardianUtils;
+      const { auth, dependents, devices } = GuardianAPI;
 
-    // State
-    let dependentsList = [];
-    let currentDependentId = null;
-
-    // Populate birth year options
-    function populateBirthYearOptions() {
-      const select = $('#birthYear');
-      const currentYear = new Date().getFullYear();
-      
-      for (let year = currentYear - 3; year >= currentYear - 18; year--) {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = `${year} (${currentYear - year} anos)`;
-        select.appendChild(option);
+      // Check auth
+      if (!requireAuth()) {
+        throw new Error("Not authenticated");
       }
-    }
 
-    // Init
-    async function init() {
-      $('#userName').textContent = auth.getEmail() || 'Responsável';
-      $('#logoutBtn').addEventListener('click', () => auth.logout());
-      
-      populateBirthYearOptions();
-      setupModals();
-      
-      await loadDependents();
-    }
+      // State
+      let dependentsList = [];
+      let currentDependentId = null;
 
-    function setupModals() {
-      // Add modal
-      $('#addDependentBtn').addEventListener('click', () => openAddModal());
-      $('#addFirstDependentBtn').addEventListener('click', () => openAddModal());
-      
-      $('#addModal .modal-close').addEventListener('click', () => closeModal('#addModal'));
-      $('#addModal .modal-cancel').addEventListener('click', () => closeModal('#addModal'));
-      $('#addModal').addEventListener('click', (e) => {
-        if (e.target === $('#addModal')) closeModal('#addModal');
-      });
-      
-      $('#addForm').addEventListener('submit', handleAddDependent);
-      
-      // Code modal
-      $('#codeModal .modal-close').addEventListener('click', () => closeModal('#codeModal'));
-      $('#codeModal .modal-close-btn').addEventListener('click', () => closeModal('#codeModal'));
-      $('#codeModal').addEventListener('click', (e) => {
-        if (e.target === $('#codeModal')) closeModal('#codeModal');
-      });
-      
-      $('#regenerateCodeBtn').addEventListener('click', () => generateCode(currentDependentId));
-    }
+      // Populate birth year options
+      function populateBirthYearOptions() {
+        const select = $("#birthYear");
+        const currentYear = new Date().getFullYear();
 
-    function openAddModal() {
-      $('#nickname').value = '';
-      $('#birthYear').value = '';
-      $('#addError').textContent = '';
-      $('#addModal').classList.add('show');
-      $('#nickname').focus();
-    }
-
-    function closeModal(selector) {
-      $(selector).classList.remove('show');
-    }
-
-    async function loadDependents() {
-      try {
-        dependentsList = await dependents.list();
-        renderDependents();
-      } catch (error) {
-        showToast('Erro ao carregar dependentes: ' + error.message, 'error');
+        for (let year = currentYear - 3; year >= currentYear - 18; year--) {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = `${year} (${currentYear - year} anos)`;
+          select.appendChild(option);
+        }
       }
-    }
 
-    function renderDependents() {
-      const grid = $('#dependentsGrid');
-      const emptyState = $('#emptyState');
-      const loadingState = $('#loadingState');
-      
-      loadingState.style.display = 'none';
-      
-      if (dependentsList.length === 0) {
-        grid.style.display = 'none';
-        grid.innerHTML = '';
-        emptyState.style.display = 'block';
-        return;
+      // Init
+      async function init() {
+        $("#userName").textContent = auth.getEmail() || "Responsável";
+        $("#logoutBtn").addEventListener("click", () => auth.logout());
+
+        populateBirthYearOptions();
+        setupModals();
+
+        await loadDependents();
       }
-      
-      emptyState.style.display = 'none';
-      grid.style.display = '';
-      
-      grid.innerHTML = dependentsList.map(dep => {
-        const age = calculateAge(dep.birthYear);
-        const avatars = ['👦', '👧', '🧒', '👶'];
-        const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-        
-        return `
+
+      function setupModals() {
+        // Add modal
+        $("#addDependentBtn").addEventListener("click", () => openAddModal());
+        $("#addFirstDependentBtn").addEventListener("click", () =>
+          openAddModal(),
+        );
+
+        $("#addModal .modal-close").addEventListener("click", () =>
+          closeModal("#addModal"),
+        );
+        $("#addModal .modal-cancel").addEventListener("click", () =>
+          closeModal("#addModal"),
+        );
+        $("#addModal").addEventListener("click", (e) => {
+          if (e.target === $("#addModal")) closeModal("#addModal");
+        });
+
+        $("#addForm").addEventListener("submit", handleAddDependent);
+
+        // Code modal
+        $("#codeModal .modal-close").addEventListener("click", () =>
+          closeModal("#codeModal"),
+        );
+        $("#codeModal .modal-close-btn").addEventListener("click", () =>
+          closeModal("#codeModal"),
+        );
+        $("#codeModal").addEventListener("click", (e) => {
+          if (e.target === $("#codeModal")) closeModal("#codeModal");
+        });
+
+        $("#regenerateCodeBtn").addEventListener("click", () =>
+          generateCode(currentDependentId),
+        );
+      }
+
+      function openAddModal() {
+        $("#nickname").value = "";
+        $("#birthYear").value = "";
+        $("#addError").textContent = "";
+        $("#addModal").classList.add("show");
+        $("#nickname").focus();
+      }
+
+      function closeModal(selector) {
+        $(selector).classList.remove("show");
+      }
+
+      async function loadDependents() {
+        try {
+          dependentsList = await dependents.list();
+          renderDependents();
+        } catch (error) {
+          showToast("Erro ao carregar dependentes: " + error.message, "error");
+        }
+      }
+
+      function renderDependents() {
+        const grid = $("#dependentsGrid");
+        const emptyState = $("#emptyState");
+        const loadingState = $("#loadingState");
+
+        loadingState.style.display = "none";
+
+        if (dependentsList.length === 0) {
+          grid.style.display = "none";
+          grid.innerHTML = "";
+          emptyState.style.display = "block";
+          return;
+        }
+
+        emptyState.style.display = "none";
+        grid.style.display = "";
+
+        grid.innerHTML = dependentsList
+          .map((dep) => {
+            const age = calculateAge(dep.birthYear);
+            const avatars = ["👦", "👧", "🧒", "👶"];
+            const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+
+            return `
           <div class="dependent-card" data-id="${dep.id}">
             <div class="dependent-header">
               <div class="dependent-avatar">${avatar}</div>
@@ -312,89 +384,90 @@
             </div>
           </div>
         `;
-      }).join('');
-      
-      // Add event listeners
-      $$('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          window.location.href = `index.html?dependent=${btn.dataset.id}`;
+          })
+          .join("");
+
+        // Add event listeners
+        $$(".view-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            window.location.href = `index.html?dependent=${btn.dataset.id}`;
+          });
         });
-      });
-      
-      $$('.code-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          currentDependentId = btn.dataset.id;
-          generateCode(btn.dataset.id);
+
+        $$(".code-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            currentDependentId = btn.dataset.id;
+            generateCode(btn.dataset.id);
+          });
         });
-      });
-    }
-
-    async function handleAddDependent(e) {
-      e.preventDefault();
-      
-      const nickname = $('#nickname').value.trim();
-      const birthYear = parseInt($('#birthYear').value);
-      const errorEl = $('#addError');
-      const btn = $('#addSubmitBtn');
-      
-      errorEl.textContent = '';
-      
-      if (!nickname) {
-        errorEl.textContent = 'Informe o nome ou apelido';
-        return;
       }
-      
-      if (!birthYear) {
-        errorEl.textContent = 'Selecione o ano de nascimento';
-        return;
-      }
-      
-      btn.disabled = true;
-      btn.innerHTML = '<span class="btn-icon">⏳</span> Adicionando...';
-      
-      try {
-        await dependents.create(nickname, birthYear);
-        showToast('Dependente adicionado com sucesso!', 'success');
-        closeModal('#addModal');
-        await loadDependents();
-      } catch (error) {
-        errorEl.textContent = error.message;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="btn-icon">➕</span> Adicionar';
-      }
-    }
 
-    async function generateCode(dependentId) {
-      const codeDisplay = $('#codeDisplay');
-      const btn = $('#regenerateCodeBtn');
-      
-      codeDisplay.textContent = '------';
-      $('#codeModal').classList.add('show');
-      
-      btn.disabled = true;
-      btn.innerHTML = '<span class="btn-icon">⏳</span> Gerando...';
-      
-      try {
-        const result = await devices.generateCode(dependentId);
-        const code = result?.code ?? result?.codigo;
+      async function handleAddDependent(e) {
+        e.preventDefault();
 
-        if (!code) {
-          throw new Error('Resposta da API sem o campo de código');
+        const nickname = $("#nickname").value.trim();
+        const birthYear = parseInt($("#birthYear").value);
+        const errorEl = $("#addError");
+        const btn = $("#addSubmitBtn");
+
+        errorEl.textContent = "";
+
+        if (!nickname) {
+          errorEl.textContent = "Informe o nome ou apelido";
+          return;
         }
 
-        codeDisplay.textContent = String(code).toUpperCase();
-      } catch (error) {
-        showToast('Erro ao gerar código: ' + error.message, 'error');
-        codeDisplay.textContent = 'ERRO';
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="btn-icon">🔄</span> Gerar Novo Código';
-      }
-    }
+        if (!birthYear) {
+          errorEl.textContent = "Selecione o ano de nascimento";
+          return;
+        }
 
-    // Start
-    init();
-  </script>
-</body>
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-icon">⏳</span> Adicionando...';
+
+        try {
+          await dependents.create(nickname, birthYear);
+          showToast("Dependente adicionado com sucesso!", "success");
+          closeModal("#addModal");
+          await loadDependents();
+        } catch (error) {
+          errorEl.textContent = error.message;
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="btn-icon">➕</span> Adicionar';
+        }
+      }
+
+      async function generateCode(dependentId) {
+        const codeDisplay = $("#codeDisplay");
+        const btn = $("#regenerateCodeBtn");
+
+        codeDisplay.textContent = "------";
+        $("#codeModal").classList.add("show");
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-icon">⏳</span> Gerando...';
+
+        try {
+          const result = await devices.generateCode(dependentId);
+          const code = result?.code ?? result?.codigo;
+
+          if (!code) {
+            throw new Error("Resposta da API sem o campo de código");
+          }
+
+          codeDisplay.textContent = String(code).toUpperCase();
+        } catch (error) {
+          showToast("Erro ao gerar código: " + error.message, "error");
+          codeDisplay.textContent = "ERRO";
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="btn-icon">🔄</span> Gerar Novo Código';
+        }
+      }
+
+      // Start
+      init();
+    </script>
+  </body>
 </html>

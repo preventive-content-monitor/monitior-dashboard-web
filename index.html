@@ -1,367 +1,434 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guardian - Dashboard</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // Auth check imediato
-    if (!localStorage.getItem('guardian_token')) {
-      window.location.replace('login.html');
-    }
-  </script>
-</head>
-<body>
-  <div class="dashboard-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="assets/logo.png" alt="Monitor Dashboard" class="brand-logo">
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Principal</div>
-          <a href="index.html" class="nav-item active">
-            <span class="nav-icon">📊</span>
-            <span>Dashboard</span>
-          </a>
-          <a href="dependents.html" class="nav-item">
-            <span class="nav-icon">👨‍👩‍👧‍👦</span>
-            <span>Dependentes</span>
-          </a>
-          <a href="devices.html" class="nav-item">
-            <span class="nav-icon">💻</span>
-            <span>Dispositivos</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Relatórios</div>
-          <a href="activity.html" class="nav-item">
-            <span class="nav-icon">📋</span>
-            <span>Atividades</span>
-          </a>
-          <a href="alerts.html" class="nav-item">
-            <span class="nav-icon">🔔</span>
-            <span>Alertas</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Configurações</div>
-          <a href="policies.html" class="nav-item">
-            <span class="nav-icon">⚙️</span>
-            <span>Políticas</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="user-info" id="userInfo">
-          <div class="user-avatar">👤</div>
-          <div class="user-details">
-            <div class="user-name" id="userName">Carregando...</div>
-            <div class="user-role">Responsável</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guardian - Dashboard</title>
+    <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      // Auth check imediato
+      if (!localStorage.getItem("guardian_token")) {
+        window.location.replace("login.html");
+      }
+    </script>
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <img
+              src="assets/logo.png"
+              alt="Monitor Dashboard"
+              class="brand-logo"
+            />
           </div>
         </div>
-        <button class="btn btn-ghost btn-full" id="logoutBtn" style="margin-top: var(--space-sm);">
-          <span class="btn-icon">🚪</span>
-          Sair
-        </button>
-      </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Dashboard</h1>
-        <p>Visão geral da atividade dos seus dependentes</p>
-      </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-title">Principal</div>
+            <a href="index.html" class="nav-item active">
+              <span class="nav-icon">📊</span>
+              <span>Dashboard</span>
+            </a>
+            <a href="dependents.html" class="nav-item">
+              <span class="nav-icon">👨‍👩‍👧‍👦</span>
+              <span>Dependentes</span>
+            </a>
+            <a href="devices.html" class="nav-item">
+              <span class="nav-icon">💻</span>
+              <span>Dispositivos</span>
+            </a>
+          </div>
 
-      <!-- Dependent Selector -->
-      <div class="card" style="margin-bottom: var(--space-lg);">
-        <div class="card-body" style="padding: var(--space-md) var(--space-lg);">
-          <div style="display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap;">
-            <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
-              <label for="dependentSelect" style="margin-bottom: var(--space-xs);">Selecionar Dependente</label>
-              <select id="dependentSelect" style="width: 100%;">
-                <option value="">Carregando...</option>
-              </select>
+          <div class="nav-section">
+            <div class="nav-section-title">Relatórios</div>
+            <a href="activity.html" class="nav-item">
+              <span class="nav-icon">📋</span>
+              <span>Atividades</span>
+            </a>
+            <a href="alerts.html" class="nav-item">
+              <span class="nav-icon">🔔</span>
+              <span>Alertas</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">Configurações</div>
+            <a href="policies.html" class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              <span>Políticas</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info" id="userInfo">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <div class="user-name" id="userName">Carregando...</div>
+              <div class="user-role">Responsável</div>
             </div>
-            <div class="form-group" style="margin: 0; min-width: 200px;">
-              <label for="deviceSelect" style="margin-bottom: var(--space-xs);">Dispositivo</label>
-              <select id="deviceSelect" style="width: 100%;">
-                <option value="">Selecione um dependente</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin: 0; min-width: 150px;">
-              <label for="periodSelect" style="margin-bottom: var(--space-xs);">Período</label>
-              <select id="periodSelect" style="width: 100%;">
-                <option value="today">Hoje</option>
-                <option value="week" selected>Última Semana</option>
-                <option value="month">Último Mês</option>
-              </select>
-            </div>
-            <button class="btn btn-primary" id="refreshBtn" style="margin-top: 1.25rem;">
-              <span class="btn-icon">🔄</span>
-              Atualizar
-            </button>
           </div>
+          <button
+            class="btn btn-ghost btn-full"
+            id="logoutBtn"
+            style="margin-top: var(--space-sm)"
+          >
+            <span class="btn-icon">🚪</span>
+            Sair
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <!-- Stats Grid -->
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-card">
-          <div class="stat-icon blue">📊</div>
-          <div class="stat-content">
-            <div class="stat-value" id="statTotal">-</div>
-            <div class="stat-label">Total de Eventos</div>
-          </div>
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Visão geral da atividade dos seus dependentes</p>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon yellow">⚠️</div>
-          <div class="stat-content">
-            <div class="stat-value" id="statSensitive">-</div>
-            <div class="stat-label">Conteúdo Sensível</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon red">🚫</div>
-          <div class="stat-content">
-            <div class="stat-value" id="statBlocks">-</div>
-            <div class="stat-label">Bloqueios</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon green">✅</div>
-          <div class="stat-content">
-            <div class="stat-value" id="statSafe">-</div>
-            <div class="stat-label">Navegação Segura</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Charts Row -->
-      <div class="grid-2" style="margin-bottom: var(--space-lg);">
-        <!-- Top Domains -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">🌐 Sites Mais Acessados</h3>
+        <!-- Dependent Selector -->
+        <div class="card" style="margin-bottom: var(--space-lg)">
+          <div
+            class="card-body"
+            style="padding: var(--space-md) var(--space-lg)"
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+              "
+            >
+              <div
+                class="form-group"
+                style="margin: 0; flex: 1; min-width: 200px"
+              >
+                <label
+                  for="dependentSelect"
+                  style="margin-bottom: var(--space-xs)"
+                  >Selecionar Dependente</label
+                >
+                <select id="dependentSelect" style="width: 100%">
+                  <option value="">Carregando...</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin: 0; min-width: 200px">
+                <label for="deviceSelect" style="margin-bottom: var(--space-xs)"
+                  >Dispositivo</label
+                >
+                <select id="deviceSelect" style="width: 100%">
+                  <option value="">Selecione um dependente</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin: 0; min-width: 150px">
+                <label for="periodSelect" style="margin-bottom: var(--space-xs)"
+                  >Período</label
+                >
+                <select id="periodSelect" style="width: 100%">
+                  <option value="today">Hoje</option>
+                  <option value="week" selected>Última Semana</option>
+                  <option value="month">Último Mês</option>
+                </select>
+              </div>
+              <button
+                class="btn btn-primary"
+                id="refreshBtn"
+                style="margin-top: 1.25rem"
+              >
+                <span class="btn-icon">🔄</span>
+                Atualizar
+              </button>
+            </div>
           </div>
-          <div class="card-body">
-            <div id="topDomainsList">
-              <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <div class="empty-state-text">Selecione um dispositivo para ver os dados</div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-icon blue">📊</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statTotal">-</div>
+              <div class="stat-label">Total de Eventos</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">⚠️</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statSensitive">-</div>
+              <div class="stat-label">Conteúdo Sensível</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">🚫</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statBlocks">-</div>
+              <div class="stat-label">Bloqueios</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statSafe">-</div>
+              <div class="stat-label">Navegação Segura</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid-2" style="margin-bottom: var(--space-lg)">
+          <!-- Top Domains -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🌐 Sites Mais Acessados</h3>
+            </div>
+            <div class="card-body">
+              <div id="topDomainsList">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div class="empty-state-text">
+                    Selecione um dispositivo para ver os dados
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vulnerability Chart -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📈 Índice de Vulnerabilidade</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="vulnerabilityChart"></canvas>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Vulnerability Chart -->
+        <!-- Recent Activity -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">📈 Índice de Vulnerabilidade</h3>
+            <h3 class="card-title">🕐 Resumo do Período</h3>
           </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="vulnerabilityChart"></canvas>
+          <div class="card-body" id="activitySummary">
+            <div class="empty-state">
+              <div class="empty-state-icon">📊</div>
+              <div class="empty-state-title">
+                Selecione um dependente e dispositivo
+              </div>
+              <div class="empty-state-text">
+                Os dados de atividade serão exibidos aqui
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+    </div>
 
-      <!-- Recent Activity -->
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">🕐 Resumo do Período</h3>
-        </div>
-        <div class="card-body" id="activitySummary">
-          <div class="empty-state">
-            <div class="empty-state-icon">📊</div>
-            <div class="empty-state-title">Selecione um dependente e dispositivo</div>
-            <div class="empty-state-text">Os dados de atividade serão exibidos aqui</div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+      const {
+        $,
+        $$,
+        showToast,
+        showLoading,
+        hideLoading,
+        formatNumber,
+        getDateRangeForPeriod,
+        requireAuth,
+        calculateAge,
+      } = GuardianUtils;
+      const { auth, dependents, devices, dashboard } = GuardianAPI;
 
-  <script src="js/api.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    const { $, $$, showToast, showLoading, hideLoading, formatNumber, getDateRangeForPeriod, requireAuth, calculateAge } = GuardianUtils;
-    const { auth, dependents, devices, dashboard } = GuardianAPI;
+      // Check auth
+      if (!requireAuth()) {
+        throw new Error("Not authenticated");
+      }
 
-    // Check auth
-    if (!requireAuth()) {
-      throw new Error('Not authenticated');
-    }
+      // State
+      let dependentsList = [];
+      let devicesList = [];
+      let selectedDependent = null;
+      let selectedDevice = null;
+      let vulnerabilityChart = null;
 
-    // State
-    let dependentsList = [];
-    let devicesList = [];
-    let selectedDependent = null;
-    let selectedDevice = null;
-    let vulnerabilityChart = null;
+      // Init
+      async function init() {
+        $("#userName").textContent = auth.getEmail() || "Responsável";
+        $("#logoutBtn").addEventListener("click", () => auth.logout());
 
-    // Init
-    async function init() {
-      $('#userName').textContent = auth.getEmail() || 'Responsável';
-      $('#logoutBtn').addEventListener('click', () => auth.logout());
-      
-      $('#dependentSelect').addEventListener('change', onDependentChange);
-      $('#deviceSelect').addEventListener('change', onDeviceChange);
-      $('#periodSelect').addEventListener('change', loadDashboardData);
-      $('#refreshBtn').addEventListener('click', loadDashboardData);
-      
-      await loadDependents();
-    }
+        $("#dependentSelect").addEventListener("change", onDependentChange);
+        $("#deviceSelect").addEventListener("change", onDeviceChange);
+        $("#periodSelect").addEventListener("change", loadDashboardData);
+        $("#refreshBtn").addEventListener("click", loadDashboardData);
 
-    async function loadDependents() {
-      try {
-        dependentsList = await dependents.list();
-        
-        const select = $('#dependentSelect');
-        select.innerHTML = '';
-        
-        if (dependentsList.length === 0) {
-          select.innerHTML = '<option value="">Nenhum dependente cadastrado</option>';
+        await loadDependents();
+      }
+
+      async function loadDependents() {
+        try {
+          dependentsList = await dependents.list();
+
+          const select = $("#dependentSelect");
+          select.innerHTML = "";
+
+          if (dependentsList.length === 0) {
+            select.innerHTML =
+              '<option value="">Nenhum dependente cadastrado</option>';
+            showEmptyState();
+            return;
+          }
+
+          dependentsList.forEach((dep) => {
+            const option = document.createElement("option");
+            option.value = dep.id;
+            option.textContent = `${dep.nickname} (${calculateAge(dep.birthYear)} anos)`;
+            select.appendChild(option);
+          });
+
+          // Select first
+          select.value = dependentsList[0].id;
+          await onDependentChange();
+        } catch (error) {
+          showToast("Erro ao carregar dependentes: " + error.message, "error");
+        }
+      }
+
+      async function onDependentChange() {
+        const dependentId = $("#dependentSelect").value;
+        selectedDependent = dependentsList.find((d) => d.id === dependentId);
+
+        if (!dependentId) {
+          $("#deviceSelect").innerHTML =
+            '<option value="">Selecione um dependente</option>';
           showEmptyState();
           return;
         }
-        
-        dependentsList.forEach(dep => {
-          const option = document.createElement('option');
-          option.value = dep.id;
-          option.textContent = `${dep.nickname} (${calculateAge(dep.birthYear)} anos)`;
-          select.appendChild(option);
-        });
-        
-        // Select first
-        select.value = dependentsList[0].id;
-        await onDependentChange();
-      } catch (error) {
-        showToast('Erro ao carregar dependentes: ' + error.message, 'error');
-      }
-    }
 
-    async function onDependentChange() {
-      const dependentId = $('#dependentSelect').value;
-      selectedDependent = dependentsList.find(d => d.id === dependentId);
-      
-      if (!dependentId) {
-        $('#deviceSelect').innerHTML = '<option value="">Selecione um dependente</option>';
-        showEmptyState();
-        return;
+        // Load devices for this dependent
+        try {
+          devicesList = await devices.getByDependent(dependentId);
+
+          const select = $("#deviceSelect");
+          select.innerHTML = "";
+
+          if (devicesList.length === 0) {
+            select.innerHTML =
+              '<option value="">Nenhum dispositivo vinculado</option>';
+            showEmptyState();
+            return;
+          }
+
+          devicesList.forEach((dev) => {
+            const option = document.createElement("option");
+            option.value = dev.id;
+            option.textContent = dev.name;
+            select.appendChild(option);
+          });
+
+          // Select first
+          select.value = devicesList[0].id;
+          await onDeviceChange();
+        } catch (error) {
+          showToast("Erro ao carregar dispositivos: " + error.message, "error");
+        }
       }
-      
-      // Load devices for this dependent
-      try {
-        devicesList = await devices.getByDependent(dependentId);
-        
-        const select = $('#deviceSelect');
-        select.innerHTML = '';
-        
-        if (devicesList.length === 0) {
-          select.innerHTML = '<option value="">Nenhum dispositivo vinculado</option>';
+
+      async function onDeviceChange() {
+        const deviceId = $("#deviceSelect").value;
+        selectedDevice = devicesList.find((d) => d.id === deviceId);
+
+        if (deviceId) {
+          await loadDashboardData();
+        } else {
+          showEmptyState();
+        }
+      }
+
+      async function loadDashboardData() {
+        if (!selectedDevice) {
           showEmptyState();
           return;
         }
-        
-        devicesList.forEach(dev => {
-          const option = document.createElement('option');
-          option.value = dev.id;
-          option.textContent = dev.name;
-          select.appendChild(option);
-        });
-        
-        // Select first
-        select.value = devicesList[0].id;
-        await onDeviceChange();
-      } catch (error) {
-        showToast('Erro ao carregar dispositivos: ' + error.message, 'error');
-      }
-    }
 
-    async function onDeviceChange() {
-      const deviceId = $('#deviceSelect').value;
-      selectedDevice = devicesList.find(d => d.id === deviceId);
-      
-      if (deviceId) {
-        await loadDashboardData();
-      } else {
-        showEmptyState();
-      }
-    }
+        const period = $("#periodSelect").value;
+        const { from, to } = getDateRangeForPeriod(period);
 
-    async function loadDashboardData() {
-      if (!selectedDevice) {
-        showEmptyState();
-        return;
-      }
-      
-      const period = $('#periodSelect').value;
-      const { from, to } = getDateRangeForPeriod(period);
-      
-      showLoading('Carregando dados...');
-      
-      try {
-        // Load summary
-        const summary = await dashboard.getSummary(selectedDevice.id, from, to);
-        
-        $('#statTotal').textContent = formatNumber(summary.totalEvents || 0);
-        $('#statSensitive').textContent = formatNumber(summary.sensitiveEvents || 0);
-        $('#statBlocks').textContent = formatNumber(summary.blockAttempts || 0);
-        
-        const safeEvents = Math.max(0, (summary.totalEvents || 0) - (summary.sensitiveEvents || 0) - (summary.blockAttempts || 0));
-        $('#statSafe').textContent = formatNumber(safeEvents);
-        
-        // Load top domains
-        await loadTopDomains(selectedDevice.id, from, to);
-        
-        // Load vulnerability chart
-        await loadVulnerabilityChart(selectedDependent.id, from, to);
-        
-        // Update activity summary
-        updateActivitySummary(summary);
-        
-      } catch (error) {
-        showToast('Erro ao carregar dados: ' + error.message, 'error');
-      } finally {
-        hideLoading();
-      }
-    }
+        showLoading("Carregando dados...");
 
-    async function loadTopDomains(deviceId, from, to) {
-      try {
-        const data = await dashboard.getTopDomains(deviceId, from, to);
-        
-        const container = $('#topDomainsList');
-        
-        if (!data || data.length === 0) {
-          container.innerHTML = `
+        try {
+          // Load summary
+          const summary = await dashboard.getSummary(
+            selectedDevice.id,
+            from,
+            to,
+          );
+
+          $("#statTotal").textContent = formatNumber(summary.totalEvents || 0);
+          $("#statSensitive").textContent = formatNumber(
+            summary.sensitiveEvents || 0,
+          );
+          $("#statBlocks").textContent = formatNumber(
+            summary.blockAttempts || 0,
+          );
+
+          const safeEvents = Math.max(
+            0,
+            (summary.totalEvents || 0) -
+              (summary.sensitiveEvents || 0) -
+              (summary.blockAttempts || 0),
+          );
+          $("#statSafe").textContent = formatNumber(safeEvents);
+
+          // Load top domains
+          await loadTopDomains(selectedDevice.id, from, to);
+
+          // Load vulnerability chart
+          await loadVulnerabilityChart(selectedDependent.id, from, to);
+
+          // Update activity summary
+          updateActivitySummary(summary);
+        } catch (error) {
+          showToast("Erro ao carregar dados: " + error.message, "error");
+        } finally {
+          hideLoading();
+        }
+      }
+
+      async function loadTopDomains(deviceId, from, to) {
+        try {
+          const data = await dashboard.getTopDomains(deviceId, from, to);
+
+          const container = $("#topDomainsList");
+
+          if (!data || data.length === 0) {
+            container.innerHTML = `
             <div class="empty-state">
               <div class="empty-state-icon">🌐</div>
               <div class="empty-state-text">Nenhum site acessado neste período</div>
             </div>
           `;
-          return;
-        }
-        
-        // Data is array of [domain, count]
-        const maxCount = Math.max(...data.map(d => d[1]));
-        
-        container.innerHTML = data.slice(0, 10).map(([domain, count], index) => {
-          const percentage = (count / maxCount) * 100;
-          return `
+            return;
+          }
+
+          // Data is array of [domain, count]
+          const maxCount = Math.max(...data.map((d) => d[1]));
+
+          container.innerHTML = data
+            .slice(0, 10)
+            .map(([domain, count], index) => {
+              const percentage = (count / maxCount) * 100;
+              return `
             <div class="list-item" style="padding: var(--space-sm);">
               <span style="width: 24px; text-align: center; color: var(--text-muted);">${index + 1}</span>
               <div class="list-item-content">
@@ -373,127 +440,146 @@
               <span class="badge badge-info">${formatNumber(count)}</span>
             </div>
           `;
-        }).join('');
-      } catch (error) {
-        console.warn('Error loading top domains:', error);
-      }
-    }
-
-    async function loadVulnerabilityChart(dependentId, from, to) {
-      try {
-        // Convert ISO to YYYY-MM-DD format
-        const fromDate = from.split('T')[0];
-        const toDate = to.split('T')[0];
-        
-        const data = await dashboard.getVulnerability(dependentId, fromDate, toDate);
-        
-        const ctx = $('#vulnerabilityChart').getContext('2d');
-        
-        if (vulnerabilityChart) {
-          vulnerabilityChart.destroy();
+            })
+            .join("");
+        } catch (error) {
+          console.warn("Error loading top domains:", error);
         }
-        
-        if (!data || data.length === 0) {
-          // Show empty chart
+      }
+
+      async function loadVulnerabilityChart(dependentId, from, to) {
+        try {
+          // Convert ISO to YYYY-MM-DD format
+          const fromDate = from.split("T")[0];
+          const toDate = to.split("T")[0];
+
+          const data = await dashboard.getVulnerability(
+            dependentId,
+            fromDate,
+            toDate,
+          );
+
+          const ctx = $("#vulnerabilityChart").getContext("2d");
+
+          if (vulnerabilityChart) {
+            vulnerabilityChart.destroy();
+          }
+
+          if (!data || data.length === 0) {
+            // Show empty chart
+            vulnerabilityChart = new Chart(ctx, {
+              type: "line",
+              data: {
+                labels: ["Sem dados"],
+                datasets: [
+                  {
+                    label: "Índice",
+                    data: [0],
+                    borderColor: "#3b82f6",
+                    backgroundColor: "rgba(59, 130, 246, 0.1)",
+                    fill: true,
+                    tension: 0.4,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                },
+                scales: {
+                  y: { beginAtZero: true, max: 100 },
+                },
+              },
+            });
+            return;
+          }
+
+          const labels = data.map((d) => {
+            const date = new Date(d.day);
+            return date.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+            });
+          });
+          const scores = data.map((d) => d.score);
+
           vulnerabilityChart = new Chart(ctx, {
-            type: 'line',
+            type: "line",
             data: {
-              labels: ['Sem dados'],
-              datasets: [{
-                label: 'Índice',
-                data: [0],
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                fill: true,
-                tension: 0.4,
-              }]
+              labels,
+              datasets: [
+                {
+                  label: "Índice de Vulnerabilidade",
+                  data: scores,
+                  borderColor: "#3b82f6",
+                  backgroundColor: "rgba(59, 130, 246, 0.1)",
+                  fill: true,
+                  tension: 0.4,
+                  pointBackgroundColor: "#3b82f6",
+                  pointBorderColor: "#fff",
+                  pointBorderWidth: 2,
+                },
+              ],
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (context) => `Índice: ${context.parsed.y}`,
+                  },
+                },
               },
               scales: {
-                y: { beginAtZero: true, max: 100 }
-              }
-            }
-          });
-          return;
-        }
-        
-        const labels = data.map(d => {
-          const date = new Date(d.day);
-          return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        });
-        const scores = data.map(d => d.score);
-        
-        vulnerabilityChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [{
-              label: 'Índice de Vulnerabilidade',
-              data: scores,
-              borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              fill: true,
-              tension: 0.4,
-              pointBackgroundColor: '#3b82f6',
-              pointBorderColor: '#fff',
-              pointBorderWidth: 2,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: (context) => `Índice: ${context.parsed.y}`
-                }
-              }
+                y: {
+                  beginAtZero: true,
+                  max: 100,
+                  ticks: {
+                    callback: (value) => value + "%",
+                  },
+                },
+              },
             },
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                  callback: (value) => value + '%'
-                }
-              }
-            }
-          }
-        });
-      } catch (error) {
-        console.warn('Error loading vulnerability chart:', error);
+          });
+        } catch (error) {
+          console.warn("Error loading vulnerability chart:", error);
+        }
       }
-    }
 
-    function updateActivitySummary(summary) {
-      const container = $('#activitySummary');
-      
-      const rawPercentage = summary.totalEvents > 0 
-        ? Math.round(((summary.totalEvents - summary.sensitiveEvents - summary.blockAttempts) / summary.totalEvents) * 100)
-        : 100;
-      const safePercentage = Math.max(0, Math.min(100, rawPercentage));
-      
-      let statusColor = 'success';
-      let statusText = 'Excelente';
-      let statusIcon = '✅';
-      
-      if (safePercentage < 70) {
-        statusColor = 'danger';
-        statusText = 'Atenção Necessária';
-        statusIcon = '⚠️';
-      } else if (safePercentage < 90) {
-        statusColor = 'warning';
-        statusText = 'Bom';
-        statusIcon = '👍';
-      }
-      
-      container.innerHTML = `
+      function updateActivitySummary(summary) {
+        const container = $("#activitySummary");
+
+        const rawPercentage =
+          summary.totalEvents > 0
+            ? Math.round(
+                ((summary.totalEvents -
+                  summary.sensitiveEvents -
+                  summary.blockAttempts) /
+                  summary.totalEvents) *
+                  100,
+              )
+            : 100;
+        const safePercentage = Math.max(0, Math.min(100, rawPercentage));
+
+        let statusColor = "success";
+        let statusText = "Excelente";
+        let statusIcon = "✅";
+
+        if (safePercentage < 70) {
+          statusColor = "danger";
+          statusText = "Atenção Necessária";
+          statusIcon = "⚠️";
+        } else if (safePercentage < 90) {
+          statusColor = "warning";
+          statusText = "Bom";
+          statusIcon = "👍";
+        }
+
+        container.innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg);">
           <div style="text-align: center; padding: var(--space-lg);">
             <div style="font-size: 3rem; margin-bottom: var(--space-sm);">${statusIcon}</div>
@@ -535,32 +621,32 @@
           </div>
         </div>
       `;
-    }
+      }
 
-    function showEmptyState() {
-      $('#statTotal').textContent = '-';
-      $('#statSensitive').textContent = '-';
-      $('#statBlocks').textContent = '-';
-      $('#statSafe').textContent = '-';
-      
-      $('#topDomainsList').innerHTML = `
+      function showEmptyState() {
+        $("#statTotal").textContent = "-";
+        $("#statSensitive").textContent = "-";
+        $("#statBlocks").textContent = "-";
+        $("#statSafe").textContent = "-";
+
+        $("#topDomainsList").innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📭</div>
           <div class="empty-state-text">Selecione um dispositivo para ver os dados</div>
         </div>
       `;
-      
-      $('#activitySummary').innerHTML = `
+
+        $("#activitySummary").innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📊</div>
           <div class="empty-state-title">Selecione um dependente e dispositivo</div>
           <div class="empty-state-text">Os dados de atividade serão exibidos aqui</div>
         </div>
       `;
-    }
+      }
 
-    // Start
-    init();
-  </script>
-</body>
+      // Start
+      init();
+    </script>
+  </body>
 </html>

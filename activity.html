@@ -1,150 +1,182 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guardian - Atividades</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script>
-    if (!localStorage.getItem('guardian_token')) {
-      window.location.replace('login.html');
-    }
-  </script>
-</head>
-<body>
-  <div class="dashboard-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="assets/logo.png" alt="Monitor Dashboard" class="brand-logo">
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Principal</div>
-          <a href="index.html" class="nav-item">
-            <span class="nav-icon">📊</span>
-            <span>Dashboard</span>
-          </a>
-          <a href="dependents.html" class="nav-item">
-            <span class="nav-icon">👨‍👩‍👧‍👦</span>
-            <span>Dependentes</span>
-          </a>
-          <a href="devices.html" class="nav-item">
-            <span class="nav-icon">💻</span>
-            <span>Dispositivos</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Relatórios</div>
-          <a href="activity.html" class="nav-item active">
-            <span class="nav-icon">📋</span>
-            <span>Atividades</span>
-          </a>
-          <a href="alerts.html" class="nav-item">
-            <span class="nav-icon">🔔</span>
-            <span>Alertas</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Configurações</div>
-          <a href="policies.html" class="nav-item">
-            <span class="nav-icon">⚙️</span>
-            <span>Políticas</span>
-          </a>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="user-info" id="userInfo">
-          <div class="user-avatar">👤</div>
-          <div class="user-details">
-            <div class="user-name" id="userName">Carregando...</div>
-            <div class="user-role">Responsável</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guardian - Atividades</title>
+    <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      if (!localStorage.getItem("guardian_token")) {
+        window.location.replace("login.html");
+      }
+    </script>
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <img
+              src="assets/logo.png"
+              alt="Monitor Dashboard"
+              class="brand-logo"
+            />
           </div>
         </div>
-        <button class="btn btn-ghost btn-full" id="logoutBtn" style="margin-top: var(--space-sm);">
-          <span class="btn-icon">🚪</span>
-          Sair
-        </button>
-      </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Page Header -->
-      <div class="page-header">
-        <h1>Atividades</h1>
-        <p>Histórico de navegação dos seus dependentes</p>
-      </div>
-
-      <!-- Coming Soon -->
-      <div class="card">
-        <div class="card-body">
-          <div class="empty-state">
-            <div class="empty-state-icon">🚧</div>
-            <div class="empty-state-title">Em Desenvolvimento</div>
-            <div class="empty-state-text">
-              O histórico detalhado de atividades estará disponível em breve.<br>
-              Por enquanto, use o Dashboard para ver um resumo das atividades.
-            </div>
-            <a href="index.html" class="btn btn-primary">
-              <span class="btn-icon">📊</span>
-              Ir para Dashboard
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-title">Principal</div>
+            <a href="index.html" class="nav-item">
+              <span class="nav-icon">📊</span>
+              <span>Dashboard</span>
+            </a>
+            <a href="dependents.html" class="nav-item">
+              <span class="nav-icon">👨‍👩‍👧‍👦</span>
+              <span>Dependentes</span>
+            </a>
+            <a href="devices.html" class="nav-item">
+              <span class="nav-icon">💻</span>
+              <span>Dispositivos</span>
             </a>
           </div>
-        </div>
-      </div>
 
-      <!-- Preview of what's coming -->
-      <div class="card" style="margin-top: var(--space-lg);">
-        <div class="card-header">
-          <h3 class="card-title">🔮 O que virá nesta página</h3>
+          <div class="nav-section">
+            <div class="nav-section-title">Relatórios</div>
+            <a href="activity.html" class="nav-item active">
+              <span class="nav-icon">📋</span>
+              <span>Atividades</span>
+            </a>
+            <a href="alerts.html" class="nav-item">
+              <span class="nav-icon">🔔</span>
+              <span>Alertas</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">Configurações</div>
+            <a href="policies.html" class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              <span>Políticas</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info" id="userInfo">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <div class="user-name" id="userName">Carregando...</div>
+              <div class="user-role">Responsável</div>
+            </div>
+          </div>
+          <button
+            class="btn btn-ghost btn-full"
+            id="logoutBtn"
+            style="margin-top: var(--space-sm)"
+          >
+            <span class="btn-icon">🚪</span>
+            Sair
+          </button>
         </div>
-        <div class="card-body">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-lg);">
-            <div style="text-align: center; padding: var(--space-md);">
-              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">📋</div>
-              <h4>Histórico Completo</h4>
-              <p style="font-size: 0.875rem; color: var(--text-secondary);">Lista de todos os sites visitados com data e hora</p>
-            </div>
-            <div style="text-align: center; padding: var(--space-md);">
-              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">🔍</div>
-              <h4>Busca e Filtros</h4>
-              <p style="font-size: 0.875rem; color: var(--text-secondary);">Pesquise por site, data ou tipo de conteúdo</p>
-            </div>
-            <div style="text-align: center; padding: var(--space-md);">
-              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">📊</div>
-              <h4>Análise de Risco</h4>
-              <p style="font-size: 0.875rem; color: var(--text-secondary);">Veja a classificação de risco de cada acesso</p>
-            </div>
-            <div style="text-align: center; padding: var(--space-md);">
-              <div style="font-size: 2rem; margin-bottom: var(--space-sm);">📥</div>
-              <h4>Exportar Dados</h4>
-              <p style="font-size: 0.875rem; color: var(--text-secondary);">Baixe relatórios em PDF ou CSV</p>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1>Atividades</h1>
+          <p>Histórico de navegação dos seus dependentes</p>
+        </div>
+
+        <!-- Coming Soon -->
+        <div class="card">
+          <div class="card-body">
+            <div class="empty-state">
+              <div class="empty-state-icon">🚧</div>
+              <div class="empty-state-title">Em Desenvolvimento</div>
+              <div class="empty-state-text">
+                O histórico detalhado de atividades estará disponível em
+                breve.<br />
+                Por enquanto, use o Dashboard para ver um resumo das atividades.
+              </div>
+              <a href="index.html" class="btn btn-primary">
+                <span class="btn-icon">📊</span>
+                Ir para Dashboard
+              </a>
             </div>
           </div>
         </div>
-      </div>
-    </main>
-  </div>
 
-  <script src="js/api.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    const { $, requireAuth } = GuardianUtils;
-    const { auth } = GuardianAPI;
+        <!-- Preview of what's coming -->
+        <div class="card" style="margin-top: var(--space-lg)">
+          <div class="card-header">
+            <h3 class="card-title">🔮 O que virá nesta página</h3>
+          </div>
+          <div class="card-body">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: var(--space-lg);
+              "
+            >
+              <div style="text-align: center; padding: var(--space-md)">
+                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
+                  📋
+                </div>
+                <h4>Histórico Completo</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary)">
+                  Lista de todos os sites visitados com data e hora
+                </p>
+              </div>
+              <div style="text-align: center; padding: var(--space-md)">
+                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
+                  🔍
+                </div>
+                <h4>Busca e Filtros</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary)">
+                  Pesquise por site, data ou tipo de conteúdo
+                </p>
+              </div>
+              <div style="text-align: center; padding: var(--space-md)">
+                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
+                  📊
+                </div>
+                <h4>Análise de Risco</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary)">
+                  Veja a classificação de risco de cada acesso
+                </p>
+              </div>
+              <div style="text-align: center; padding: var(--space-md)">
+                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
+                  📥
+                </div>
+                <h4>Exportar Dados</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary)">
+                  Baixe relatórios em PDF ou CSV
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
 
-    if (!requireAuth()) {
-      throw new Error('Not authenticated');
-    }
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+      const { $, requireAuth } = GuardianUtils;
+      const { auth } = GuardianAPI;
 
-    $('#userName').textContent = auth.getEmail() || 'Responsável';
-    $('#logoutBtn').addEventListener('click', () => auth.logout());
-  </script>
-</body>
+      if (!requireAuth()) {
+        throw new Error("Not authenticated");
+      }
+
+      $("#userName").textContent = auth.getEmail() || "Responsável";
+      $("#logoutBtn").addEventListener("click", () => auth.logout());
+    </script>
+  </body>
 </html>
