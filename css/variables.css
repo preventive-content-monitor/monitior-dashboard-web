@@ -77,6 +77,94 @@
   --shadow-lg: 0 16px 36px rgba(20, 40, 96, 0.16);
   --shadow-xl: 0 30px 54px rgba(20, 40, 96, 0.2);
 
+  /* Theming */
+  --text-on-primary: #ffffff;
+  --app-background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(125, 65, 196, 0.1) 0%,
+      rgba(125, 65, 196, 0) 30%
+    ),
+    radial-gradient(
+      circle at 85% 5%,
+      rgba(29, 124, 206, 0.14) 0%,
+      rgba(29, 124, 206, 0) 28%
+    ),
+    linear-gradient(180deg, #f7f9ff 0%, var(--bg) 45%, #f4f7ff 100%);
+  --dashboard-overlay: linear-gradient(
+    120deg,
+    rgba(29, 124, 206, 0.03) 0%,
+    rgba(30, 58, 138, 0.02) 40%,
+    rgba(125, 65, 196, 0.04) 100%
+  );
+  --auth-background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(29, 124, 206, 0.2) 0%,
+      rgba(29, 124, 206, 0) 35%
+    ),
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(125, 65, 196, 0.26) 0%,
+      rgba(125, 65, 196, 0) 40%
+    ),
+    linear-gradient(145deg, #f4f9ff 0%, #edf3ff 100%);
+
+  --sidebar-background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.93) 0%,
+      rgba(241, 246, 255, 0.94) 100%
+    ),
+    var(--brand-gradient-soft);
+  --sidebar-border: rgba(30, 58, 138, 0.12);
+  --sidebar-shadow: 8px 0 24px rgba(19, 34, 63, 0.08);
+
+  --logo-surface: #ffffff;
+  --logo-border: rgba(30, 58, 138, 0.14);
+
+  --nav-hover-bg: rgba(255, 255, 255, 0.9);
+  --nav-hover-border: rgba(30, 58, 138, 0.1);
+  --nav-active-bg: linear-gradient(
+    110deg,
+    rgba(29, 124, 206, 0.16) 0%,
+    rgba(125, 65, 196, 0.16) 100%
+  );
+  --nav-active-color: var(--secondary);
+  --nav-active-border: rgba(30, 58, 138, 0.2);
+  --nav-active-accent: var(--primary);
+
+  --btn-secondary-bg: linear-gradient(145deg, #ffffff 0%, #eaf1ff 100%);
+  --btn-ghost-hover-bg: rgba(29, 124, 206, 0.1);
+
+  --input-bg: #ffffff;
+  --input-focus-ring: rgba(29, 124, 206, 0.16);
+  --card-border-strong: rgba(29, 124, 206, 0.1);
+  --card-header-bg: linear-gradient(
+    100deg,
+    rgba(29, 124, 206, 0.07) 0%,
+    rgba(125, 65, 196, 0.06) 100%
+  );
+  --table-head-bg: rgba(29, 124, 206, 0.06);
+  --table-row-hover-bg: linear-gradient(
+    90deg,
+    rgba(29, 124, 206, 0.06) 0%,
+    rgba(125, 65, 196, 0.05) 100%
+  );
+  --empty-state-bg: linear-gradient(
+    120deg,
+    rgba(29, 124, 206, 0.05) 0%,
+    rgba(125, 65, 196, 0.04) 100%
+  );
+
+  --modal-backdrop: rgba(12, 22, 42, 0.5);
+  --loading-overlay-bg: rgba(245, 248, 255, 0.9);
+
+  --chart-line: #3b82f6;
+  --chart-fill: rgba(59, 130, 246, 0.1);
+  --chart-grid: rgba(66, 80, 129, 0.2);
+  --chart-text: var(--text-secondary);
+
   /* Transições */
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
@@ -85,4 +173,149 @@
   /* Sidebar */
   --sidebar-width: 260px;
   --sidebar-collapsed: 70px;
+}
+
+:root[data-theme="dark"] {
+  --primary: #49a2ff;
+  --secondary: #b3c7ff;
+  --tertiary: #b38cff;
+
+  --primary-dark: #2f86de;
+  --primary-light: #173255;
+  --primary-soft: #132745;
+  --secondary-soft: #1f2f54;
+  --tertiary-soft: #352049;
+
+  --brand-gradient: linear-gradient(
+    118deg,
+    #3f95ed 0%,
+    #9a6be3 52%,
+    #6a92ff 100%
+  );
+  --brand-gradient-soft: linear-gradient(
+    140deg,
+    rgba(63, 149, 237, 0.2) 0%,
+    rgba(154, 107, 227, 0.14) 52%,
+    rgba(106, 146, 255, 0.18) 100%
+  );
+  --brand-gradient-strong: linear-gradient(
+    128deg,
+    #2f64d1 0%,
+    #3f95ed 42%,
+    #9a6be3 100%
+  );
+
+  --success: #34d399;
+  --success-light: rgba(52, 211, 153, 0.2);
+
+  --warning: #fbbf24;
+  --warning-light: rgba(251, 191, 36, 0.2);
+
+  --danger: #f87171;
+  --danger-light: rgba(248, 113, 113, 0.2);
+
+  --bg: #0a1327;
+  --bg-warm: #0f1a33;
+  --surface: #121f3c;
+  --surface-muted: #1b2b50;
+
+  --text: #edf3ff;
+  --text-secondary: #b7c7ea;
+  --text-muted: #90a4ce;
+
+  --border: #2b426e;
+  --border-light: #253a62;
+
+  --shadow-sm: 0 4px 12px rgba(4, 10, 24, 0.35);
+  --shadow-md: 0 12px 26px rgba(4, 10, 24, 0.42);
+  --shadow-lg: 0 18px 38px rgba(4, 10, 24, 0.5);
+  --shadow-xl: 0 32px 56px rgba(4, 10, 24, 0.56);
+
+  --app-background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(154, 107, 227, 0.18) 0%,
+      rgba(154, 107, 227, 0) 34%
+    ),
+    radial-gradient(
+      circle at 85% 5%,
+      rgba(63, 149, 237, 0.22) 0%,
+      rgba(63, 149, 237, 0) 32%
+    ),
+    linear-gradient(180deg, #091124 0%, #0a1327 45%, #0d1730 100%);
+
+  --dashboard-overlay: linear-gradient(
+    120deg,
+    rgba(63, 149, 237, 0.08) 0%,
+    rgba(106, 146, 255, 0.06) 40%,
+    rgba(154, 107, 227, 0.08) 100%
+  );
+
+  --auth-background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(63, 149, 237, 0.24) 0%,
+      rgba(63, 149, 237, 0) 38%
+    ),
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(154, 107, 227, 0.24) 0%,
+      rgba(154, 107, 227, 0) 42%
+    ),
+    linear-gradient(145deg, #0d1730 0%, #101d39 100%);
+
+  --sidebar-background:
+    linear-gradient(
+      180deg,
+      rgba(15, 26, 51, 0.94) 0%,
+      rgba(14, 24, 47, 0.96) 100%
+    ),
+    var(--brand-gradient-soft);
+  --sidebar-border: rgba(106, 146, 255, 0.18);
+  --sidebar-shadow: 10px 0 30px rgba(3, 8, 20, 0.55);
+
+  --logo-surface: #0e1b36;
+  --logo-border: rgba(106, 146, 255, 0.25);
+
+  --nav-hover-bg: rgba(63, 149, 237, 0.16);
+  --nav-hover-border: rgba(106, 146, 255, 0.2);
+  --nav-active-bg: linear-gradient(
+    110deg,
+    rgba(63, 149, 237, 0.28) 0%,
+    rgba(154, 107, 227, 0.24) 100%
+  );
+  --nav-active-color: #dbe8ff;
+  --nav-active-border: rgba(106, 146, 255, 0.34);
+  --nav-active-accent: #7cb4ff;
+
+  --btn-secondary-bg: linear-gradient(145deg, #1c2d53 0%, #1a2849 100%);
+  --btn-ghost-hover-bg: rgba(63, 149, 237, 0.18);
+
+  --input-bg: #16264a;
+  --input-focus-ring: rgba(73, 162, 255, 0.24);
+  --card-border-strong: rgba(106, 146, 255, 0.22);
+  --card-header-bg: linear-gradient(
+    100deg,
+    rgba(63, 149, 237, 0.16) 0%,
+    rgba(154, 107, 227, 0.14) 100%
+  );
+  --table-head-bg: rgba(63, 149, 237, 0.16);
+  --table-row-hover-bg: linear-gradient(
+    90deg,
+    rgba(63, 149, 237, 0.16) 0%,
+    rgba(154, 107, 227, 0.12) 100%
+  );
+  --empty-state-bg: linear-gradient(
+    120deg,
+    rgba(63, 149, 237, 0.12) 0%,
+    rgba(154, 107, 227, 0.1) 100%
+  );
+
+  --modal-backdrop: rgba(2, 8, 20, 0.75);
+  --loading-overlay-bg: rgba(10, 19, 39, 0.9);
+
+  --chart-line: #7cb4ff;
+  --chart-fill: rgba(124, 180, 255, 0.18);
+  --chart-grid: rgba(151, 173, 217, 0.18);
+  --chart-text: #b7c7ea;
 }

@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guardian - Dispositivos</title>
     <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("guardian_theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const initialTheme =
+          savedTheme === "dark" || savedTheme === "light"
+            ? savedTheme
+            : prefersDark
+              ? "dark"
+              : "light";
+        document.documentElement.setAttribute("data-theme", initialTheme);
+      })();
+    </script>
     <link rel="stylesheet" href="css/style.css" />
     <script>
       if (!localStorage.getItem("guardian_token")) {

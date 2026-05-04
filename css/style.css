@@ -701,7 +701,7 @@ tbody tr:last-child td {
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--loading-overlay-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -760,7 +760,7 @@ tbody tr:last-child td {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--modal-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -947,18 +947,7 @@ tbody tr:last-child td {
 /* ========== Brand Refresh 2026 ========== */
 body {
   font-family: "Open Sans", "Segoe UI", Tahoma, sans-serif;
-  background:
-    radial-gradient(
-      circle at 15% 10%,
-      rgba(125, 65, 196, 0.1) 0%,
-      rgba(125, 65, 196, 0) 30%
-    ),
-    radial-gradient(
-      circle at 85% 5%,
-      rgba(29, 124, 206, 0.14) 0%,
-      rgba(29, 124, 206, 0) 28%
-    ),
-    linear-gradient(180deg, #f7f9ff 0%, var(--bg) 45%, #f4f7ff 100%);
+  background: var(--app-background);
 }
 
 h1,
@@ -986,28 +975,12 @@ h6,
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(
-    120deg,
-    rgba(29, 124, 206, 0.03) 0%,
-    rgba(30, 58, 138, 0.02) 40%,
-    rgba(125, 65, 196, 0.04) 100%
-  );
+  background: var(--dashboard-overlay);
   z-index: -1;
 }
 
 .auth-layout {
-  background:
-    radial-gradient(
-      circle at 20% 20%,
-      rgba(29, 124, 206, 0.2) 0%,
-      rgba(29, 124, 206, 0) 35%
-    ),
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(125, 65, 196, 0.26) 0%,
-      rgba(125, 65, 196, 0) 40%
-    ),
-    linear-gradient(145deg, #f4f9ff 0%, #edf3ff 100%);
+  background: var(--auth-background);
 }
 
 .auth-card,
@@ -1023,18 +996,21 @@ h6,
 }
 
 .sidebar {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.93) 0%,
-      rgba(241, 246, 255, 0.94) 100%
-    ),
-    var(--brand-gradient-soft);
-  border-right: 1px solid rgba(30, 58, 138, 0.12);
-  box-shadow: 8px 0 24px rgba(19, 34, 63, 0.08);
+  background: var(--sidebar-background);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: var(--sidebar-shadow);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
 }
 
 .sidebar-logo {
+  flex: 1;
+  min-width: 0;
   gap: var(--space-md);
 }
 
@@ -1044,11 +1020,50 @@ h6,
   height: 44px;
   border-radius: 14px;
   object-fit: contain;
-  background: #ffffff;
+  background: var(--logo-surface);
   padding: 6px;
-  border: 1px solid rgba(30, 58, 138, 0.14);
+  border: 1px solid var(--logo-border);
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal),
+    transform var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--btn-ghost-hover-bg);
+  color: var(--text);
+  border-color: var(--nav-hover-border);
+}
+
+.theme-toggle-btn:active {
+  transform: translateY(1px);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.theme-toggle-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .sidebar-logo .brand-logo {
@@ -1106,19 +1121,15 @@ h6,
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(30, 58, 138, 0.1);
+  background: var(--nav-hover-bg);
+  border-color: var(--nav-hover-border);
 }
 
 .nav-item.active {
-  background: linear-gradient(
-    110deg,
-    rgba(29, 124, 206, 0.16) 0%,
-    rgba(125, 65, 196, 0.16) 100%
-  );
-  color: var(--secondary);
-  border-color: rgba(30, 58, 138, 0.2);
-  box-shadow: inset 4px 0 0 var(--primary);
+  background: var(--nav-active-bg);
+  color: var(--nav-active-color);
+  border-color: var(--nav-active-border);
+  box-shadow: inset 4px 0 0 var(--nav-active-accent);
 }
 
 .nav-item .nav-icon {
@@ -1151,12 +1162,12 @@ h6,
 }
 
 .btn-secondary {
-  background: linear-gradient(145deg, #ffffff 0%, #eaf1ff 100%);
+  background: var(--btn-secondary-bg);
   border: 1px solid var(--border);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: rgba(29, 124, 206, 0.1);
+  background: var(--btn-ghost-hover-bg);
   color: var(--secondary);
 }
 
@@ -1166,7 +1177,19 @@ h6,
 textarea {
   border-radius: 10px;
   border-color: var(--border);
-  background: #ffffff;
+  background: var(--input-bg);
+}
+
+input,
+select,
+textarea {
+  color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 .form-group input:focus,
@@ -1174,20 +1197,16 @@ textarea {
 .form-group textarea:focus,
 textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(29, 124, 206, 0.16);
+  box-shadow: 0 0 0 4px var(--input-focus-ring);
 }
 
 .card {
   border-radius: var(--radius-lg);
-  border-color: rgba(29, 124, 206, 0.1);
+  border-color: var(--card-border-strong);
 }
 
 .card-header {
-  background: linear-gradient(
-    100deg,
-    rgba(29, 124, 206, 0.07) 0%,
-    rgba(125, 65, 196, 0.06) 100%
-  );
+  background: var(--card-header-bg);
 }
 
 .stat-card {
@@ -1276,24 +1295,16 @@ textarea:focus {
 }
 
 thead th {
-  background: rgba(29, 124, 206, 0.06);
+  background: var(--table-head-bg);
   color: var(--secondary);
 }
 
 tbody tr:hover {
-  background: linear-gradient(
-    90deg,
-    rgba(29, 124, 206, 0.06) 0%,
-    rgba(125, 65, 196, 0.05) 100%
-  );
+  background: var(--table-row-hover-bg);
 }
 
 .empty-state {
-  background: linear-gradient(
-    120deg,
-    rgba(29, 124, 206, 0.05) 0%,
-    rgba(125, 65, 196, 0.04) 100%
-  );
+  background: var(--empty-state-bg);
   border-radius: var(--radius-md);
 }
 
@@ -1304,12 +1315,12 @@ tbody tr:hover {
 }
 
 .modal-overlay {
-  background: rgba(12, 22, 42, 0.5);
+  background: var(--modal-backdrop);
   backdrop-filter: blur(3px);
 }
 
 .loading-overlay {
-  background: rgba(245, 248, 255, 0.9);
+  background: var(--loading-overlay-bg);
 }
 
 @media (max-width: 768px) {
@@ -1319,6 +1330,11 @@ tbody tr:hover {
 
   .sidebar-header {
     padding-top: var(--space-md);
+  }
+
+  .theme-toggle-btn {
+    min-width: 40px;
+    padding: 0;
   }
 
   .auth-logo .brand-logo {

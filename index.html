@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guardian - Dashboard</title>
     <link rel="icon" type="image/png" href="assets/icon128.png" />
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("guardian_theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const initialTheme =
+          savedTheme === "dark" || savedTheme === "light"
+            ? savedTheme
+            : prefersDark
+              ? "dark"
+              : "light";
+        document.documentElement.setAttribute("data-theme", initialTheme);
+      })();
+    </script>
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -262,10 +277,80 @@
       let selectedDevice = null;
       let vulnerabilityChart = null;
 
+      function getChartColors() {
+        const rootStyles = getComputedStyle(document.documentElement);
+        const getVar = (name, fallback) =>
+          (rootStyles.getPropertyValue(name) || fallback).trim();
+
+        return {
+          line: getVar("--chart-line", "#3b82f6"),
+          fill: getVar("--chart-fill", "rgba(59, 130, 246, 0.1)"),
+          grid: getVar("--chart-grid", "rgba(66, 80, 129, 0.2)"),
+          text: getVar("--chart-text", "#425081"),
+          pointBorder: getVar("--surface", "#ffffff"),
+        };
+      }
+
+      function refreshVulnerabilityChartTheme() {
+        if (!vulnerabilityChart) return;
+
+        const colors = getChartColors();
+        const dataset = vulnerabilityChart.data?.datasets?.[0];
+        if (dataset) {
+          dataset.borderColor = colors.line;
+          dataset.backgroundColor = colors.fill;
+
+          if (
+            Object.prototype.hasOwnProperty.call(
+              dataset,
+              "pointBackgroundColor",
+            )
+          ) {
+            dataset.pointBackgroundColor = colors.line;
+          }
+
+          if (
+            Object.prototype.hasOwnProperty.call(dataset, "pointBorderColor")
+          ) {
+            dataset.pointBorderColor = colors.pointBorder;
+          }
+        }
+
+        const xScale = vulnerabilityChart.options?.scales?.x;
+        if (xScale) {
+          xScale.ticks = {
+            ...(xScale.ticks || {}),
+            color: colors.text,
+          };
+          xScale.grid = {
+            ...(xScale.grid || {}),
+            color: colors.grid,
+          };
+        }
+
+        const yScale = vulnerabilityChart.options?.scales?.y;
+        if (yScale) {
+          yScale.ticks = {
+            ...(yScale.ticks || {}),
+            color: colors.text,
+          };
+          yScale.grid = {
+            ...(yScale.grid || {}),
+            color: colors.grid,
+          };
+        }
+
+        vulnerabilityChart.update("none");
+      }
+
       // Init
       async function init() {
         $("#userName").textContent = auth.getEmail() || "Responsável";
         $("#logoutBtn").addEventListener("click", () => auth.logout());
+        window.addEventListener(
+          "guardian-theme-change",
+          refreshVulnerabilityChartTheme,
+        );
 
         $("#dependentSelect").addEventListener("change", onDependentChange);
         $("#deviceSelect").addEventListener("change", onDeviceChange);
@@ -408,6 +493,7 @@
       async function loadTopDomains(deviceId, from, to) {
         try {
           const data = await dashboard.getTopDomains(deviceId, from, to);
+          const TOP_DOMAINS_LIMIT = 10;
 
           const container = $("#topDomainsList");
 
@@ -422,12 +508,30 @@
           }
 
           // Data is array of [domain, count]
-          const maxCount = Math.max(...data.map((d) => d[1]));
+          const topDomains = data
+            .filter((entry) => Array.isArray(entry) && entry.length >= 2)
+            .sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0))
+            .slice(0, TOP_DOMAINS_LIMIT);
 
-          container.innerHTML = data
-            .slice(0, 10)
+          if (topDomains.length === 0) {
+            container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🌐</div>
+              <div class="empty-state-text">Nenhum site acessado neste período</div>
+            </div>
+          `;
+            return;
+          }
+
+          const maxCount = Math.max(
+            ...topDomains.map((d) => Number(d[1] || 0)),
+          );
+
+          container.innerHTML = topDomains
             .map(([domain, count], index) => {
-              const percentage = (count / maxCount) * 100;
+              const safeCount = Number(count || 0);
+              const percentage =
+                maxCount > 0 ? (safeCount / maxCount) * 100 : 0;
               return `
             <div class="list-item" style="padding: var(--space-sm);">
               <span style="width: 24px; text-align: center; color: var(--text-muted);">${index + 1}</span>
@@ -437,7 +541,7 @@
                   <div class="progress-fill blue" style="width: ${percentage}%;"></div>
                 </div>
               </div>
-              <span class="badge badge-info">${formatNumber(count)}</span>
+              <span class="badge badge-info">${formatNumber(safeCount)}</span>
             </div>
           `;
             })
@@ -449,6 +553,8 @@
 
       async function loadVulnerabilityChart(dependentId, from, to) {
         try {
+          const colors = getChartColors();
+
           // Convert ISO to YYYY-MM-DD format
           const fromDate = from.split("T")[0];
           const toDate = to.split("T")[0];
@@ -475,8 +581,8 @@
                   {
                     label: "Índice",
                     data: [0],
-                    borderColor: "#3b82f6",
-                    backgroundColor: "rgba(59, 130, 246, 0.1)",
+                    borderColor: colors.line,
+                    backgroundColor: colors.fill,
                     fill: true,
                     tension: 0.4,
                   },
@@ -489,7 +595,16 @@
                   legend: { display: false },
                 },
                 scales: {
-                  y: { beginAtZero: true, max: 100 },
+                  x: {
+                    ticks: { color: colors.text },
+                    grid: { color: colors.grid },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { color: colors.text },
+                    grid: { color: colors.grid },
+                  },
                 },
               },
             });
@@ -513,12 +628,12 @@
                 {
                   label: "Índice de Vulnerabilidade",
                   data: scores,
-                  borderColor: "#3b82f6",
-                  backgroundColor: "rgba(59, 130, 246, 0.1)",
+                  borderColor: colors.line,
+                  backgroundColor: colors.fill,
                   fill: true,
                   tension: 0.4,
-                  pointBackgroundColor: "#3b82f6",
-                  pointBorderColor: "#fff",
+                  pointBackgroundColor: colors.line,
+                  pointBorderColor: colors.pointBorder,
                   pointBorderWidth: 2,
                 },
               ],
@@ -535,11 +650,23 @@
                 },
               },
               scales: {
+                x: {
+                  ticks: {
+                    color: colors.text,
+                  },
+                  grid: {
+                    color: colors.grid,
+                  },
+                },
                 y: {
                   beginAtZero: true,
                   max: 100,
                   ticks: {
+                    color: colors.text,
                     callback: (value) => value + "%",
+                  },
+                  grid: {
+                    color: colors.grid,
                   },
                 },
               },
