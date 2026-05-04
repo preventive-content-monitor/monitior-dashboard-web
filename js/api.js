@@ -46,10 +46,19 @@
   }
 
   function normalizeDependent(dependent = {}) {
+    const birthDate = dependent.birthDate ?? dependent.dataNascimento ?? null;
+    const birthYearFromDate =
+      typeof birthDate === "string" && birthDate.length >= 4
+        ? Number(birthDate.slice(0, 4))
+        : null;
+
     return {
       ...dependent,
       nickname: dependent.nickname ?? dependent.apelido,
-      birthYear: dependent.birthYear ?? dependent.anoNascimento,
+      birthDate,
+      sex: dependent.sex ?? dependent.sexo ?? null,
+      birthYear:
+        dependent.birthYear ?? dependent.anoNascimento ?? birthYearFromDate,
       createdAt: dependent.createdAt ?? dependent.criadoEm,
     };
   }
@@ -273,10 +282,11 @@
       return Array.isArray(data) ? data.map(normalizeDependent) : [];
     },
 
-    async create(nickname, birthYear) {
+    async create({ nickname, birthDate, sex }) {
       const data = await apiPost("/api/dependentes", {
         apelido: nickname,
-        anoNascimento: birthYear,
+        dataNascimento: birthDate,
+        sexo: sex,
       });
       return normalizeDependent(data);
     },

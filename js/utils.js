@@ -7,6 +7,166 @@
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => document.querySelectorAll(selector);
 
+  // ========== Icon System ==========
+  const EMOJI_ICON_MAP = {
+    "📊": "fa-chart-column",
+    "👨‍👩‍👧‍👦": "fa-people-group",
+    "💻": "fa-laptop",
+    "📋": "fa-clipboard-list",
+    "🔔": "fa-bell",
+    "⚙️": "fa-gear",
+    "👤": "fa-user",
+    "🚪": "fa-right-from-bracket",
+    "🔄": "fa-rotate-right",
+    "⚠️": "fa-triangle-exclamation",
+    "🚫": "fa-ban",
+    "✅": "fa-circle-check",
+    "🌐": "fa-globe",
+    "📭": "fa-inbox",
+    "📈": "fa-chart-line",
+    "🕐": "fa-clock",
+    "👍": "fa-thumbs-up",
+    "🚧": "fa-screwdriver-wrench",
+    "🔮": "fa-wand-magic-sparkles",
+    "🔍": "fa-magnifying-glass",
+    "📥": "fa-download",
+    "📬": "fa-envelope-open-text",
+    "➕": "fa-plus",
+    "👦": "fa-child",
+    "👧": "fa-child-dress",
+    "🧒": "fa-child",
+    "👶": "fa-baby",
+    "⏳": "fa-hourglass-half",
+    "🔗": "fa-link",
+    "📝": "fa-pen-to-square",
+    "💾": "fa-floppy-disk",
+    "🦊": "fa-globe",
+    "🔷": "fa-globe",
+    "🧭": "fa-compass",
+    "🪟": "fa-display",
+    "🍎": "fa-laptop",
+    "🐧": "fa-terminal",
+    "🤖": "fa-mobile-screen-button",
+    "📱": "fa-mobile-screen-button",
+    "📚": "fa-book-open",
+    "🚨": "fa-triangle-exclamation",
+    "🏫": "fa-school",
+    "🔓": "fa-lock-open",
+    "✓": "fa-check",
+    "✕": "fa-xmark",
+    "⚠": "fa-triangle-exclamation",
+    ℹ: "fa-circle-info",
+  };
+
+  const EMOJI_TONE_MAP = {
+    "📊": "primary",
+    "⚠️": "warning",
+    "⚠": "warning",
+    "🚫": "danger",
+    "✅": "success",
+    "👍": "success",
+    ℹ: "info",
+    "✓": "success",
+    "✕": "danger",
+    "🌐": "primary",
+    "🔄": "primary",
+    "📈": "primary",
+    "🕐": "info",
+    "➕": "primary",
+    "💾": "primary",
+    "🔗": "primary",
+    "🔓": "primary",
+  };
+
+  const EMOJI_REGEX = new RegExp(
+    Object.keys(EMOJI_ICON_MAP)
+      .sort((a, b) => b.length - a.length)
+      .map((emoji) => emoji.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|"),
+    "g",
+  );
+
+  function hasMappedEmoji(value) {
+    EMOJI_REGEX.lastIndex = 0;
+    return EMOJI_REGEX.test(value);
+  }
+
+  function createIconHTMLByEmoji(emoji) {
+    const iconClass = EMOJI_ICON_MAP[emoji];
+    if (!iconClass) {
+      return emoji;
+    }
+    const tone = EMOJI_TONE_MAP[emoji];
+    const toneClass = tone ? ` ui-icon-tone-${tone}` : "";
+    return `<i class="fa-solid ${iconClass} ui-icon${toneClass}" aria-hidden="true"></i>`;
+  }
+
+  function replaceEmojisInElement(root) {
+    if (!root || root.closest?.("script, style")) return;
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const textNodes = [];
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (!node.nodeValue || !hasMappedEmoji(node.nodeValue)) continue;
+      if (node.parentElement?.closest("script, style")) continue;
+      if (node.parentElement?.closest(".dependent-avatar")) continue;
+      textNodes.push(node);
+    }
+
+    textNodes.forEach((textNode) => {
+      const content = textNode.nodeValue;
+      if (!content || !hasMappedEmoji(content)) return;
+
+      const replaced = content.replace(EMOJI_REGEX, (match) =>
+        createIconHTMLByEmoji(match),
+      );
+
+      if (replaced === content) return;
+
+      const span = document.createElement("span");
+      span.innerHTML = replaced;
+
+      const fragment = document.createDocumentFragment();
+      while (span.firstChild) {
+        fragment.appendChild(span.firstChild);
+      }
+
+      textNode.parentNode?.replaceChild(fragment, textNode);
+    });
+  }
+
+  function initIconSystem() {
+    const body = document.body;
+    if (!body) return;
+
+    replaceEmojisInElement(body);
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            replaceEmojisInElement(node);
+          }
+        });
+
+        if (
+          mutation.type === "characterData" &&
+          mutation.target.parentElement
+        ) {
+          replaceEmojisInElement(mutation.target.parentElement);
+        }
+      });
+    });
+
+    observer.observe(body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
   // ========== Theme ==========
   const THEME_STORAGE_KEY = "guardian_theme";
 
@@ -35,7 +195,8 @@
 
     const icon = btn.querySelector(".theme-toggle-icon");
     if (icon) {
-      icon.textContent = isDark ? "☀️" : "🌙";
+      const iconClass = isDark ? "fa-sun" : "fa-moon";
+      icon.innerHTML = `<i class="fa-solid ${iconClass} ui-icon" aria-hidden="true"></i>`;
     }
   }
 
@@ -118,14 +279,14 @@
     toast.className = `toast ${type}`;
 
     const icons = {
-      success: "✓",
-      error: "✕",
-      warning: "⚠",
-      info: "ℹ",
+      success: "fa-circle-check",
+      error: "fa-circle-xmark",
+      warning: "fa-triangle-exclamation",
+      info: "fa-circle-info",
     };
 
     toast.innerHTML = `
-    <span class="toast-icon">${icons[type] || icons.info}</span>
+    <span class="toast-icon"><i class="fa-solid ${icons[type] || icons.info} ui-icon" aria-hidden="true"></i></span>
     <span class="toast-message">${message}</span>
   `;
 
@@ -345,4 +506,5 @@
   };
 
   initTheme();
+  initIconSystem();
 })();

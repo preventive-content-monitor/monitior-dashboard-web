@@ -21,6 +21,10 @@
       })();
     </script>
     <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       // Auth check imediato
@@ -695,6 +699,11 @@
         let statusColor = "success";
         let statusText = "Excelente";
         let statusIcon = "✅";
+        const statusColorMap = {
+          success: "var(--success)",
+          warning: "var(--warning)",
+          danger: "var(--danger)",
+        };
 
         if (safePercentage < 70) {
           statusColor = "danger";
@@ -709,7 +718,7 @@
         container.innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg);">
           <div style="text-align: center; padding: var(--space-lg);">
-            <div style="font-size: 3rem; margin-bottom: var(--space-sm);">${statusIcon}</div>
+            <div style="font-size: 3rem; margin-bottom: var(--space-sm); color: ${statusColorMap[statusColor]};">${statusIcon}</div>
             <div class="badge badge-${statusColor}" style="font-size: 1rem; padding: var(--space-sm) var(--space-md);">
               ${statusText}
             </div>

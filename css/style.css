@@ -240,6 +240,46 @@ a:hover {
   font-size: 1.1em;
 }
 
+.ui-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.ui-icon-tone-primary {
+  color: var(--primary);
+}
+
+.ui-icon-tone-info {
+  color: var(--secondary);
+}
+
+.ui-icon-tone-success {
+  color: var(--success);
+}
+
+.ui-icon-tone-warning {
+  color: var(--warning);
+}
+
+.ui-icon-tone-danger {
+  color: var(--danger);
+}
+
+.btn-primary .ui-icon {
+  color: #ffffff;
+}
+
+.nav-icon .ui-icon,
+.btn-icon .ui-icon,
+.empty-state-icon .ui-icon,
+.stat-icon .ui-icon,
+.user-avatar .ui-icon,
+.theme-toggle-icon .ui-icon {
+  font-size: 1em;
+}
+
 /* ========== Dashboard Layout ========== */
 .dashboard-layout {
   display: flex;
@@ -493,18 +533,22 @@ a:hover {
 
 .stat-icon.blue {
   background: var(--primary-light);
+  color: #1d7cce;
 }
 
 .stat-icon.green {
   background: var(--success-light);
+  color: #10b981;
 }
 
 .stat-icon.yellow {
   background: var(--warning-light);
+  color: #f59e0b;
 }
 
 .stat-icon.red {
   background: var(--danger-light);
+  color: #ef4444;
 }
 
 .stat-content {
@@ -879,6 +923,35 @@ tbody tr:last-child td {
 
 .dependent-card:hover {
   box-shadow: var(--shadow-md);
+}
+
+.dependent-card-birthday {
+  border-color: rgba(125, 65, 196, 0.45);
+  box-shadow: 0 10px 26px rgba(125, 65, 196, 0.2);
+}
+
+.dependent-card-birthday .dependent-header {
+  background: linear-gradient(
+    135deg,
+    rgba(125, 65, 196, 0.2) 0%,
+    rgba(29, 124, 206, 0.18) 100%
+  );
+}
+
+.dependent-birthday-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--tertiary);
+  background: rgba(125, 65, 196, 0.12);
+  border: 1px solid rgba(125, 65, 196, 0.3);
 }
 
 .dependent-header {
@@ -1281,6 +1354,7 @@ textarea:focus {
     rgba(29, 124, 206, 0.22) 0%,
     rgba(30, 58, 138, 0.18) 100%
   );
+  color: #1d7cce;
 }
 
 .stat-icon.green {
@@ -1289,6 +1363,7 @@ textarea:focus {
     rgba(16, 185, 129, 0.24) 0%,
     rgba(14, 159, 110, 0.18) 100%
   );
+  color: #10b981;
 }
 
 .stat-icon.yellow {
@@ -1297,6 +1372,7 @@ textarea:focus {
     rgba(217, 119, 6, 0.22) 0%,
     rgba(245, 158, 11, 0.16) 100%
   );
+  color: #f59e0b;
 }
 
 .stat-icon.red {
@@ -1305,6 +1381,7 @@ textarea:focus {
     rgba(220, 38, 38, 0.2) 0%,
     rgba(185, 28, 28, 0.16) 100%
   );
+  color: #ef4444;
 }
 
 .badge-info {

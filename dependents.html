@@ -21,6 +21,10 @@
       })();
     </script>
     <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
     <script>
       if (!localStorage.getItem("guardian_token")) {
         window.location.replace("login.html");
@@ -172,10 +176,38 @@
               />
             </div>
             <div class="form-group">
-              <label for="birthYear">Ano de Nascimento</label>
-              <select id="birthYear" required>
+              <label for="sex">Sexo</label>
+              <select id="sex" required>
                 <option value="">Selecione...</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="FEMININO">Feminino</option>
               </select>
+            </div>
+            <div class="form-group">
+              <label>Data de Nascimento</label>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr 1fr;
+                  gap: var(--space-sm);
+                "
+              >
+                <select id="birthDay" required>
+                  <option value="">Dia</option>
+                </select>
+                <select id="birthMonth" required>
+                  <option value="">Mês</option>
+                </select>
+                <select id="birthYear" required>
+                  <option value="">Ano</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <small style="color: var(--text-muted)">
+                Informe dia, mês e ano para identificarmos aniversário e faixa
+                etária corretamente.
+              </small>
             </div>
             <p class="error-message" id="addError"></p>
           </div>
@@ -266,18 +298,151 @@
       // State
       let dependentsList = [];
       let currentDependentId = null;
+      const monthNames = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+      ];
 
-      // Populate birth year options
-      function populateBirthYearOptions() {
-        const select = $("#birthYear");
+      // Populate birth date options
+      function populateBirthDateOptions() {
+        const daySelect = $("#birthDay");
+        const monthSelect = $("#birthMonth");
+        const yearSelect = $("#birthYear");
         const currentYear = new Date().getFullYear();
+
+        monthNames.forEach((month, index) => {
+          const option = document.createElement("option");
+          option.value = String(index + 1).padStart(2, "0");
+          option.textContent = month;
+          monthSelect.appendChild(option);
+        });
 
         for (let year = currentYear - 3; year >= currentYear - 18; year--) {
           const option = document.createElement("option");
           option.value = year;
           option.textContent = `${year} (${currentYear - year} anos)`;
-          select.appendChild(option);
+          yearSelect.appendChild(option);
         }
+
+        monthSelect.addEventListener("change", updateBirthDayOptions);
+        yearSelect.addEventListener("change", updateBirthDayOptions);
+        updateBirthDayOptions();
+      }
+
+      function updateBirthDayOptions() {
+        const daySelect = $("#birthDay");
+        const year = Number($("#birthYear").value);
+        const month = Number($("#birthMonth").value);
+        const today = new Date();
+        const currentValue = daySelect.value;
+
+        while (daySelect.options.length > 1) {
+          daySelect.remove(1);
+        }
+
+        // Mantém o campo usável mesmo sem mês/ano selecionados.
+        const effectiveMonth = month || 0;
+        const effectiveYear = year || today.getFullYear();
+        const daysInMonth =
+          effectiveMonth > 0
+            ? new Date(effectiveYear, effectiveMonth, 0).getDate()
+            : 31;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const option = document.createElement("option");
+          option.value = String(day).padStart(2, "0");
+          option.textContent = String(day).padStart(2, "0");
+          daySelect.appendChild(option);
+        }
+
+        if (currentValue && Number(currentValue) <= daysInMonth) {
+          daySelect.value = currentValue.padStart(2, "0");
+        } else {
+          daySelect.value = "";
+        }
+      }
+
+      function getBirthDateFromForm() {
+        const day = $("#birthDay").value;
+        const month = $("#birthMonth").value;
+        const year = $("#birthYear").value;
+
+        if (!day || !month || !year) {
+          return null;
+        }
+
+        return `${year}-${month}-${day}`;
+      }
+
+      function getAgeFromBirthDate(birthDate, fallbackBirthYear) {
+        if (birthDate) {
+          const [year, month, day] = birthDate.split("-").map(Number);
+          if (year && month && day) {
+            const today = new Date();
+            let age = today.getFullYear() - year;
+            const hasBirthdayPassed =
+              today.getMonth() + 1 > month ||
+              (today.getMonth() + 1 === month && today.getDate() >= day);
+            if (!hasBirthdayPassed) age -= 1;
+            return age;
+          }
+        }
+
+        if (fallbackBirthYear) {
+          return calculateAge(fallbackBirthYear);
+        }
+
+        return null;
+      }
+
+      function isBirthdayToday(birthDate) {
+        if (!birthDate) return false;
+
+        const [year, month, day] = birthDate.split("-").map(Number);
+        if (!year || !month || !day) return false;
+
+        const today = new Date();
+        return today.getMonth() + 1 === month && today.getDate() === day;
+      }
+
+      function formatBirthDateDisplay(birthDate, fallbackBirthYear) {
+        if (!birthDate) {
+          return fallbackBirthYear ? String(fallbackBirthYear) : "-";
+        }
+
+        const [year, month, day] = birthDate.split("-").map(Number);
+        if (!year || !month || !day) {
+          return fallbackBirthYear ? String(fallbackBirthYear) : "-";
+        }
+
+        return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+      }
+
+      function getAvatarByProfile(dep, age) {
+        if (age !== null && age <= 3) return "👶";
+
+        const sex = String(dep.sex || dep.sexo || "").toUpperCase();
+        if (sex === "FEMININO" || sex === "FEMALE") return "👧";
+        if (sex === "MASCULINO" || sex === "MALE") return "👦";
+
+        return "🧒";
+      }
+
+      function formatSexLabel(dep) {
+        const sex = String(dep.sex || dep.sexo || "").toUpperCase();
+        if (sex === "FEMININO" || sex === "FEMALE") return "Feminino";
+        if (sex === "MASCULINO" || sex === "MALE") return "Masculino";
+        return "Não informado";
       }
 
       // Init
@@ -285,7 +450,7 @@
         $("#userName").textContent = auth.getEmail() || "Responsável";
         $("#logoutBtn").addEventListener("click", () => auth.logout());
 
-        populateBirthYearOptions();
+        populateBirthDateOptions();
         setupModals();
 
         await loadDependents();
@@ -328,10 +493,14 @@
 
       function openAddModal() {
         $("#nickname").value = "";
+        $("#sex").value = "";
+        $("#birthDay").value = "";
+        $("#birthMonth").value = "";
         $("#birthYear").value = "";
+        updateBirthDayOptions();
         $("#addError").textContent = "";
         $("#addModal").classList.add("show");
-        $("#nickname").focus();
+        $("#sex").focus();
       }
 
       function closeModal(selector) {
@@ -366,21 +535,33 @@
 
         grid.innerHTML = dependentsList
           .map((dep) => {
-            const age = calculateAge(dep.birthYear);
-            const avatars = ["👦", "👧", "🧒", "👶"];
-            const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+            const age = getAgeFromBirthDate(dep.birthDate, dep.birthYear);
+            const avatar = getAvatarByProfile(dep, age);
+            const birthdayToday = isBirthdayToday(dep.birthDate);
+            const birthDateLabel = formatBirthDateDisplay(
+              dep.birthDate,
+              dep.birthYear,
+            );
+            const sexLabel = formatSexLabel(dep);
+            const ageLabel =
+              age !== null ? `${age} anos` : "Idade não informada";
 
             return `
-          <div class="dependent-card" data-id="${dep.id}">
+          <div class="dependent-card ${birthdayToday ? "dependent-card-birthday" : ""}" data-id="${dep.id}">
             <div class="dependent-header">
+              ${birthdayToday ? '<div class="dependent-birthday-tag">Aniversário Hoje</div>' : ""}
               <div class="dependent-avatar">${avatar}</div>
               <div class="dependent-name">${dep.nickname}</div>
-              <div class="dependent-age">${age} anos</div>
+              <div class="dependent-age">${ageLabel}</div>
             </div>
             <div class="dependent-body">
               <div class="dependent-stat">
-                <span class="dependent-stat-label">Ano de Nascimento</span>
-                <span class="dependent-stat-value">${dep.birthYear}</span>
+                <span class="dependent-stat-label">Data de Nascimento</span>
+                <span class="dependent-stat-value">${birthDateLabel}</span>
+              </div>
+              <div class="dependent-stat">
+                <span class="dependent-stat-label">Sexo</span>
+                <span class="dependent-stat-value">${sexLabel}</span>
               </div>
               <div class="dependent-stat">
                 <span class="dependent-stat-label">Cadastrado em</span>
@@ -421,7 +602,8 @@
         e.preventDefault();
 
         const nickname = $("#nickname").value.trim();
-        const birthYear = parseInt($("#birthYear").value);
+        const sex = $("#sex").value;
+        const birthDate = getBirthDateFromForm();
         const errorEl = $("#addError");
         const btn = $("#addSubmitBtn");
 
@@ -432,8 +614,13 @@
           return;
         }
 
-        if (!birthYear) {
-          errorEl.textContent = "Selecione o ano de nascimento";
+        if (!sex) {
+          errorEl.textContent = "Selecione o sexo";
+          return;
+        }
+
+        if (!birthDate) {
+          errorEl.textContent = "Selecione a data de nascimento completa";
           return;
         }
 
@@ -441,7 +628,11 @@
         btn.innerHTML = '<span class="btn-icon">⏳</span> Adicionando...';
 
         try {
-          await dependents.create(nickname, birthYear);
+          await dependents.create({
+            nickname,
+            birthDate,
+            sex,
+          });
           showToast("Dependente adicionado com sucesso!", "success");
           closeModal("#addModal");
           await loadDependents();
