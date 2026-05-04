@@ -178,31 +178,31 @@
 :root[data-theme="dark"] {
   --primary: #49a2ff;
   --secondary: #b3c7ff;
-  --tertiary: #b38cff;
+  --tertiary: #c7a4ff;
 
   --primary-dark: #2f86de;
   --primary-light: #173255;
   --primary-soft: #132745;
   --secondary-soft: #1f2f54;
-  --tertiary-soft: #352049;
+  --tertiary-soft: #4a2f68;
 
   --brand-gradient: linear-gradient(
     118deg,
     #3f95ed 0%,
-    #9a6be3 52%,
+    #ba8ef6 52%,
     #6a92ff 100%
   );
   --brand-gradient-soft: linear-gradient(
     140deg,
     rgba(63, 149, 237, 0.2) 0%,
-    rgba(154, 107, 227, 0.14) 52%,
+    rgba(186, 142, 246, 0.22) 52%,
     rgba(106, 146, 255, 0.18) 100%
   );
   --brand-gradient-strong: linear-gradient(
     128deg,
     #2f64d1 0%,
     #3f95ed 42%,
-    #9a6be3 100%
+    #ba8ef6 100%
   );
 
   --success: #34d399;
@@ -234,8 +234,8 @@
   --app-background:
     radial-gradient(
       circle at 15% 10%,
-      rgba(154, 107, 227, 0.18) 0%,
-      rgba(154, 107, 227, 0) 34%
+      rgba(186, 142, 246, 0.24) 0%,
+      rgba(186, 142, 246, 0) 36%
     ),
     radial-gradient(
       circle at 85% 5%,
@@ -248,7 +248,7 @@
     120deg,
     rgba(63, 149, 237, 0.08) 0%,
     rgba(106, 146, 255, 0.06) 40%,
-    rgba(154, 107, 227, 0.08) 100%
+    rgba(186, 142, 246, 0.12) 100%
   );
 
   --auth-background:
@@ -259,8 +259,8 @@
     ),
     radial-gradient(
       circle at 80% 0%,
-      rgba(154, 107, 227, 0.24) 0%,
-      rgba(154, 107, 227, 0) 42%
+      rgba(186, 142, 246, 0.3) 0%,
+      rgba(186, 142, 246, 0) 45%
     ),
     linear-gradient(145deg, #0d1730 0%, #101d39 100%);
 
@@ -282,7 +282,7 @@
   --nav-active-bg: linear-gradient(
     110deg,
     rgba(63, 149, 237, 0.28) 0%,
-    rgba(154, 107, 227, 0.24) 100%
+    rgba(186, 142, 246, 0.32) 100%
   );
   --nav-active-color: #dbe8ff;
   --nav-active-border: rgba(106, 146, 255, 0.34);
@@ -297,18 +297,18 @@
   --card-header-bg: linear-gradient(
     100deg,
     rgba(63, 149, 237, 0.16) 0%,
-    rgba(154, 107, 227, 0.14) 100%
+    rgba(186, 142, 246, 0.2) 100%
   );
   --table-head-bg: rgba(63, 149, 237, 0.16);
   --table-row-hover-bg: linear-gradient(
     90deg,
     rgba(63, 149, 237, 0.16) 0%,
-    rgba(154, 107, 227, 0.12) 100%
+    rgba(186, 142, 246, 0.18) 100%
   );
   --empty-state-bg: linear-gradient(
     120deg,
     rgba(63, 149, 237, 0.12) 0%,
-    rgba(154, 107, 227, 0.1) 100%
+    rgba(186, 142, 246, 0.16) 100%
   );
 
   --modal-backdrop: rgba(2, 8, 20, 0.75);

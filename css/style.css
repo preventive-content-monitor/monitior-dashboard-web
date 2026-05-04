@@ -309,6 +309,18 @@ a:hover {
   background: #6c35ad;
 }
 
+:root[data-theme="dark"] .sidebar-nav {
+  scrollbar-color: #b98cff var(--surface-muted);
+}
+
+:root[data-theme="dark"] .sidebar-nav::-webkit-scrollbar-thumb {
+  background: #b98cff;
+}
+
+:root[data-theme="dark"] .sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #cda8ff;
+}
+
 .nav-section {
   margin-bottom: var(--space-lg);
 }
@@ -1106,6 +1118,12 @@ h6,
   padding: 0;
   box-shadow: none;
   margin: 0 auto var(--space-sm);
+}
+
+:root[data-theme="dark"] .sidebar-logo .brand-logo,
+:root[data-theme="dark"] .auth-logo .brand-logo {
+  filter: brightness(0) invert(1) contrast(1.08)
+    drop-shadow(0 2px 12px rgba(201, 170, 255, 0.32));
 }
 
 .auth-logo::after {
