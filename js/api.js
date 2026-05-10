@@ -4,7 +4,8 @@
  */
 
 (function () {
-  const API_BASE_URL = "http://localhost:8080";
+  // URL vazia = URL relativa. nginx faz proxy /api/ → Spring Boot :8080
+  const API_BASE_URL = "";
 
   // ========== Utils ==========
   function getToken() {
