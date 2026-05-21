@@ -5,7 +5,7 @@
 
 (function () {
   // URL vazia = URL relativa. nginx faz proxy /api/ → Spring Boot :8080
-  const API_BASE_URL = "";
+  const API_BASE_URL = "https://ceslc02jni.execute-api.us-east-1.amazonaws.com/";
 
   // ========== Utils ==========
   function getToken() {
