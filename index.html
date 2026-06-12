@@ -555,126 +555,189 @@
         }
       }
 
+      function getRiskColor(score) {
+        if (score >= 70) return "#ef2323";
+        if (score >= 40) return "#f59e0b";
+        return "#06d6a0";
+      }
+
+      function getRiskLabel(score) {
+        if (score >= 70) return "Alto Risco";
+        if (score >= 40) return "Risco Moderado";
+        return "Baixo Risco";
+      }
+
       async function loadVulnerabilityChart(dependentId, from, to) {
         try {
           const colors = getChartColors();
-
-          // Convert ISO to YYYY-MM-DD format
           const fromDate = from.split("T")[0];
-          const toDate = to.split("T")[0];
+          const toDate   = to.split("T")[0];
 
-          const data = await dashboard.getVulnerability(
-            dependentId,
-            fromDate,
-            toDate,
-          );
+          const data = await dashboard.getVulnerability(dependentId, fromDate, toDate);
 
           const ctx = $("#vulnerabilityChart").getContext("2d");
-
-          if (vulnerabilityChart) {
-            vulnerabilityChart.destroy();
-          }
+          if (vulnerabilityChart) vulnerabilityChart.destroy();
 
           if (!data || data.length === 0) {
-            // Show empty chart
-            vulnerabilityChart = new Chart(ctx, {
-              type: "line",
-              data: {
-                labels: ["Sem dados"],
-                datasets: [
-                  {
-                    label: "Índice",
-                    data: [0],
-                    borderColor: colors.line,
-                    backgroundColor: colors.fill,
-                    fill: true,
-                    tension: 0.4,
-                  },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { display: false },
-                },
-                scales: {
-                  x: {
-                    ticks: { color: colors.text },
-                    grid: { color: colors.grid },
-                  },
-                  y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: { color: colors.text },
-                    grid: { color: colors.grid },
-                  },
-                },
-              },
-            });
+            ctx.canvas.parentNode.innerHTML = `
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:8px;">
+                <span style="font-size:2rem;">📊</span>
+                <span>Nenhum dado de vulnerabilidade neste período</span>
+              </div>`;
             return;
           }
 
           const labels = data.map((d) => {
-            const date = new Date(d.day);
-            return date.toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-            });
+            const [year, month, day] = (d.day || "").split("-");
+            return `${day}/${month}`;
           });
-          const scores = data.map((d) => d.score);
+          const scores = data.map((d) => d.score ?? 0);
+
+          // Gradiente de cor dinâmico baseado nos scores
+          const pointColors = scores.map(getRiskColor);
+
+          // Gradiente de fundo: verde → amarelo → vermelho no canvas
+          const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.offsetHeight || 220);
+          gradient.addColorStop(0,   "rgba(239, 35,  35,  0.35)");
+          gradient.addColorStop(0.4, "rgba(245,158,  11,  0.20)");
+          gradient.addColorStop(1,   "rgba(  6,214, 160,  0.05)");
+
+          // Score médio para legenda
+          const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+          const maxScore = Math.max(...scores);
 
           vulnerabilityChart = new Chart(ctx, {
             type: "line",
             data: {
               labels,
-              datasets: [
-                {
-                  label: "Índice de Vulnerabilidade",
-                  data: scores,
-                  borderColor: colors.line,
-                  backgroundColor: colors.fill,
-                  fill: true,
-                  tension: 0.4,
-                  pointBackgroundColor: colors.line,
-                  pointBorderColor: colors.pointBorder,
-                  pointBorderWidth: 2,
-                },
-              ],
+              datasets: [{
+                label: "Índice de Vulnerabilidade",
+                data: scores,
+                borderColor: getRiskColor(maxScore),
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: "#fff",
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 9,
+              }],
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
+              interaction: { mode: "index", intersect: false },
               plugins: {
                 legend: { display: false },
                 tooltip: {
+                  backgroundColor: "rgba(15,15,30,0.9)",
+                  titleColor: "#e0e0e0",
+                  bodyColor: "#e0e0e0",
+                  padding: 12,
                   callbacks: {
-                    label: (context) => `Índice: ${context.parsed.y}`,
+                    title: (items) => `📅 ${items[0].label}`,
+                    label: (ctx) => {
+                      const v = ctx.parsed.y;
+                      return ` ${getRiskLabel(v)}: ${v}/100`;
+                    },
+                    labelColor: (ctx) => ({
+                      borderColor: getRiskColor(ctx.parsed.y),
+                      backgroundColor: getRiskColor(ctx.parsed.y),
+                    }),
                   },
                 },
+                // Linhas de referência de risco (annotation plugin nativo não disponível — uso workaround via afterDraw)
               },
               scales: {
                 x: {
-                  ticks: {
-                    color: colors.text,
-                  },
-                  grid: {
-                    color: colors.grid,
-                  },
+                  ticks: { color: colors.text, maxRotation: 0 },
+                  grid:  { color: colors.grid },
                 },
                 y: {
                   beginAtZero: true,
                   max: 100,
                   ticks: {
                     color: colors.text,
-                    callback: (value) => value + "%",
+                    stepSize: 20,
+                    callback: (v) => {
+                      if (v === 40)  return "⚠ 40";
+                      if (v === 70)  return "🔴 70";
+                      return v;
+                    },
                   },
-                  grid: {
-                    color: colors.grid,
-                  },
+                  grid: { color: colors.grid },
                 },
               },
             },
+            plugins: [{
+              // Desenha faixas de risco e badge de score médio
+              id: "riskZones",
+              beforeDraw(chart) {
+                const { ctx, chartArea, scales } = chart;
+                if (!chartArea) return;
+                const { left, right, top, bottom } = chartArea;
+                const yScale = scales.y;
+
+                const zones = [
+                  { from: 70, to: 100, color: "rgba(239,35,35,0.07)",  label: "Alto" },
+                  { from: 40, to: 70,  color: "rgba(245,158,11,0.07)", label: "Moderado" },
+                  { from: 0,  to: 40,  color: "rgba(6,214,160,0.07)",  label: "Baixo" },
+                ];
+
+                zones.forEach(({ from: f, to: t, color, label }) => {
+                  const y1 = yScale.getPixelForValue(t);
+                  const y2 = yScale.getPixelForValue(f);
+                  ctx.fillStyle = color;
+                  ctx.fillRect(left, y1, right - left, y2 - y1);
+
+                  ctx.fillStyle = "rgba(150,150,170,0.55)";
+                  ctx.font = "10px sans-serif";
+                  ctx.textAlign = "right";
+                  ctx.fillText(label, right - 4, y2 - 4);
+                });
+
+                // Linhas tracejadas de threshold
+                [[40, "#f59e0b"], [70, "#ef2323"]].forEach(([val, clr]) => {
+                  const y = yScale.getPixelForValue(val);
+                  ctx.save();
+                  ctx.setLineDash([4, 4]);
+                  ctx.strokeStyle = clr + "88";
+                  ctx.lineWidth = 1;
+                  ctx.beginPath();
+                  ctx.moveTo(left, y);
+                  ctx.lineTo(right, y);
+                  ctx.stroke();
+                  ctx.restore();
+                });
+              },
+              afterDraw(chart) {
+                // Badge de score médio no canto superior direito
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return;
+                const label = `Média: ${avgScore}`;
+                const color = getRiskColor(avgScore);
+                const x = chartArea.right - 8;
+                const y = chartArea.top + 8;
+                const w = ctx.measureText(label).width + 18;
+
+                ctx.save();
+                ctx.fillStyle = color + "22";
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(x - w, y, w, 22, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                ctx.font = "bold 11px sans-serif";
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                ctx.fillText(label, x - 6, y + 11);
+                ctx.restore();
+              },
+            }],
           });
         } catch (error) {
           console.warn("Error loading vulnerability chart:", error);

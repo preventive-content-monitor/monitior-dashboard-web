@@ -330,6 +330,10 @@
       const all = await this.list();
       return all.filter((d) => d.dependentId === dependentId);
     },
+
+    async remove(deviceId) {
+      return apiDelete(`/api/dispositivos/${deviceId}`);
+    },
   };
 
   // ========== Policy ==========

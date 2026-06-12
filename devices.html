@@ -419,6 +419,9 @@
               <button class="btn btn-ghost btn-small policy-btn" data-id="${device.id}" title="Configurar Política">
                 ⚙️
               </button>
+              <button class="btn btn-ghost btn-small delete-btn" data-id="${device.id}" data-name="${device.name || 'Dispositivo'}" title="Remover Dispositivo" style="color: var(--danger); margin-left: var(--space-xs);">
+                🗑️
+              </button>
             </td>
           </tr>
         `;
@@ -428,6 +431,10 @@
         // Add event listeners
         $$(".policy-btn").forEach((btn) => {
           btn.addEventListener("click", () => openPolicyModal(btn.dataset.id));
+        });
+
+        $$(".delete-btn").forEach((btn) => {
+          btn.addEventListener("click", () => confirmDeleteDevice(btn.dataset.id, btn.dataset.name));
         });
       }
 
@@ -546,6 +553,18 @@
         } finally {
           btn.disabled = false;
           btn.innerHTML = '<span class="btn-icon">💾</span> Salvar Política';
+        }
+      }
+
+      async function confirmDeleteDevice(deviceId, deviceName) {
+        if (!confirm(`Tem certeza que deseja remover o dispositivo "${deviceName}"?\n\nEsta ação não pode ser desfeita.`)) return;
+
+        try {
+          await devices.remove(deviceId);
+          showToast("Dispositivo removido com sucesso!", "success");
+          await loadData();
+        } catch (error) {
+          showToast("Erro ao remover dispositivo: " + error.message, "error");
         }
       }
 
