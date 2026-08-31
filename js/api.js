@@ -392,6 +392,62 @@
     },
   };
 
+  // ========== Activity ==========
+  // Histórico detalhado. Ao contrário do dashboard (que agrega por domínio),
+  // cada item traz urlConteudo — a chave granular que identifica o vídeo/página
+  // específica dentro de plataformas mistas como o YouTube.
+  const activity = {
+    async list(deviceId, options = {}) {
+      const {
+        from,
+        to,
+        page = 0,
+        size = 50,
+        search = "",
+        label = "",
+        type = "",
+        minRisk = null,
+      } = options;
+
+      const params = new URLSearchParams({
+        dispositivoId: deviceId,
+        from,
+        to,
+        pagina: page,
+        tamanho: size,
+      });
+
+      if (search) params.set("busca", search);
+      if (label) params.set("rotulo", label);
+      if (type) params.set("tipo", type);
+      if (minRisk !== null && minRisk !== "") {
+        params.set("riscoMinimo", minRisk);
+      }
+
+      const data = await apiGet(`/api/painel/atividades?${params}`);
+
+      return {
+        items: Array.isArray(data?.itens) ? data.itens : [],
+        page: data?.pagina ?? 0,
+        size: data?.tamanho ?? size,
+        totalItems: data?.totalItens ?? 0,
+        totalPages: data?.totalPaginas ?? 0,
+        summary: {
+          totalAccesses: data?.resumo?.totalAcessos ?? 0,
+          riskyAccesses: data?.resumo?.acessosRisco ?? 0,
+          blockAttempts: data?.resumo?.tentativasBloqueio ?? 0,
+          distinctDomains: data?.resumo?.dominiosDistintos ?? 0,
+        },
+      };
+    },
+
+    async labels(deviceId) {
+      const params = new URLSearchParams({ dispositivoId: deviceId });
+      const data = await apiGet(`/api/painel/atividades/rotulos?${params}`);
+      return Array.isArray(data) ? data : [];
+    },
+  };
+
   // ========== Exports ==========
   window.GuardianAPI = {
     auth,
@@ -399,5 +455,6 @@
     devices,
     policy,
     dashboard,
+    activity,
   };
 })();

@@ -30,6 +30,264 @@
         window.location.replace("login.html");
       }
     </script>
+    <style>
+      /* ===== Tabela de atividades ===== */
+      .activity-row {
+        cursor: pointer;
+      }
+
+      .activity-when {
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .activity-when-time {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .activity-when-date {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      /* Célula de conteúdo: domínio em destaque, título e chave granular abaixo */
+      .activity-content {
+        min-width: 260px;
+        max-width: 460px;
+      }
+
+      .activity-host {
+        font-weight: 600;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .activity-title {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* A chave de conteúdo é o dado que diferencia esta tela do dashboard:
+         mostra QUAL vídeo foi acessado, não apenas o domínio. */
+      .activity-key {
+        font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .platform-tag {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: var(--radius-full);
+        background: var(--primary-light);
+        color: var(--primary);
+        letter-spacing: 0.02em;
+      }
+
+      /* ===== Medidor de risco ===== */
+      .risk-cell {
+        min-width: 130px;
+      }
+
+      .risk-score {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .risk-score-max {
+        font-size: 0.6875rem;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+
+      .risk-bar {
+        height: 4px;
+        border-radius: var(--radius-full);
+        background: var(--border-light);
+        overflow: hidden;
+        margin-top: 5px;
+      }
+
+      .risk-bar-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+      }
+
+      .risk-low {
+        color: #10b981;
+      }
+      .risk-medium {
+        color: #f59e0b;
+      }
+      .risk-high {
+        color: #ef4444;
+      }
+
+      .risk-bar-fill.risk-low {
+        background: #10b981;
+      }
+      .risk-bar-fill.risk-medium {
+        background: #f59e0b;
+      }
+      .risk-bar-fill.risk-high {
+        background: #ef4444;
+      }
+
+      .label-name {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+
+      /* ===== Paginação ===== */
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+        padding: var(--space-md);
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+      }
+
+      .pagination-info {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+      }
+
+      .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .pagination-page {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        font-variant-numeric: tabular-nums;
+        min-width: 92px;
+        text-align: center;
+      }
+
+      /* ===== Modal de detalhes ===== */
+      .detail-grid {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .detail-label {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+      }
+
+      .detail-value {
+        font-size: 0.875rem;
+        color: var(--text);
+        word-break: break-word;
+      }
+
+      .detail-value.mono {
+        font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+        font-size: 0.8125rem;
+        background: var(--surface-muted);
+        padding: var(--space-sm);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-light);
+      }
+
+      .detail-reason {
+        background: var(--surface-muted);
+        border-left: 3px solid var(--primary);
+        padding: var(--space-md);
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        line-height: 1.55;
+        color: var(--text-secondary);
+      }
+
+      .detail-divider {
+        height: 1px;
+        background: var(--border-light);
+      }
+
+      /* ===== Filtros ===== */
+      .filters-row {
+        display: flex;
+        gap: var(--space-md);
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+
+      .filters-row .form-group {
+        margin: 0;
+      }
+
+      .search-field {
+        position: relative;
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .search-field input {
+        width: 100%;
+        padding-left: 2.25rem;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+        font-size: 0.875rem;
+      }
+
+      .table-loading {
+        padding: var(--space-xl);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+
+      @media (max-width: 768px) {
+        .activity-content {
+          min-width: 180px;
+        }
+        .col-optional {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="dashboard-layout">
@@ -104,80 +362,155 @@
 
       <!-- Main Content -->
       <main class="main-content">
-        <!-- Page Header -->
         <div class="page-header">
           <h1>Atividades</h1>
-          <p>Histórico de navegação dos seus dependentes</p>
+          <p>
+            Histórico detalhado de cada acesso, com o conteúdo específico e a
+            classificação de risco da IA
+          </p>
         </div>
 
-        <!-- Coming Soon -->
-        <div class="card">
+        <!-- Seleção -->
+        <div class="card" style="margin-bottom: var(--space-lg)">
           <div class="card-body">
-            <div class="empty-state">
-              <div class="empty-state-icon">🚧</div>
-              <div class="empty-state-title">Em Desenvolvimento</div>
-              <div class="empty-state-text">
-                O histórico detalhado de atividades estará disponível em
-                breve.<br />
-                Por enquanto, use o Dashboard para ver um resumo das atividades.
+            <div class="filters-row">
+              <div class="form-group" style="flex: 1; min-width: 200px">
+                <label for="dependentSelect">Dependente</label>
+                <select id="dependentSelect" style="width: 100%">
+                  <option value="">Carregando...</option>
+                </select>
               </div>
-              <a href="index.html" class="btn btn-primary">
-                <span class="btn-icon">📊</span>
-                Ir para Dashboard
-              </a>
+              <div class="form-group" style="min-width: 190px">
+                <label for="deviceSelect">Dispositivo</label>
+                <select id="deviceSelect" style="width: 100%">
+                  <option value="">Selecione um dependente</option>
+                </select>
+              </div>
+              <div class="form-group" style="min-width: 150px">
+                <label for="periodSelect">Período</label>
+                <select id="periodSelect" style="width: 100%">
+                  <option value="today">Hoje</option>
+                  <option value="week" selected>Última Semana</option>
+                  <option value="month">Último Mês</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" id="refreshBtn">
+                <span class="btn-icon">🔄</span>
+                Atualizar
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Preview of what's coming -->
-        <div class="card" style="margin-top: var(--space-lg)">
-          <div class="card-header">
-            <h3 class="card-title">🔮 O que virá nesta página</h3>
+        <!-- Resumo do filtro -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-icon blue">📋</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statTotal">-</div>
+              <div class="stat-label">Acessos no período</div>
+            </div>
           </div>
-          <div class="card-body">
-            <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: var(--space-lg);
-              "
-            >
-              <div style="text-align: center; padding: var(--space-md)">
-                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
-                  📋
-                </div>
-                <h4>Histórico Completo</h4>
-                <p style="font-size: 0.875rem; color: var(--text-secondary)">
-                  Lista de todos os sites visitados com data e hora
-                </p>
+          <div class="stat-card">
+            <div class="stat-icon yellow">⚠️</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statRisky">-</div>
+              <div class="stat-label">Conteúdo sensível</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">🚫</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statBlocks">-</div>
+              <div class="stat-label">Tentativas bloqueadas</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🌐</div>
+            <div class="stat-content">
+              <div class="stat-value" id="statDomains">-</div>
+              <div class="stat-label">Sites diferentes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histórico -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📋 Histórico Completo</h3>
+            <button class="btn btn-secondary" id="exportBtn">
+              <span class="btn-icon">📥</span>
+              Exportar CSV
+            </button>
+          </div>
+
+          <!-- Busca e filtros -->
+          <div
+            class="card-body"
+            style="
+              border-bottom: 1px solid var(--border-light);
+              padding-bottom: var(--space-md);
+            "
+          >
+            <div class="filters-row">
+              <div class="form-group search-field">
+                <label for="searchInput">Buscar</label>
+                <span class="search-icon">🔍</span>
+                <input
+                  type="search"
+                  id="searchInput"
+                  placeholder="Site, título do vídeo ou conteúdo..."
+                  autocomplete="off"
+                />
               </div>
-              <div style="text-align: center; padding: var(--space-md)">
-                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
-                  🔍
-                </div>
-                <h4>Busca e Filtros</h4>
-                <p style="font-size: 0.875rem; color: var(--text-secondary)">
-                  Pesquise por site, data ou tipo de conteúdo
-                </p>
+              <div class="form-group" style="min-width: 170px">
+                <label for="labelSelect">Classificação</label>
+                <select id="labelSelect" style="width: 100%">
+                  <option value="">Todas</option>
+                </select>
               </div>
-              <div style="text-align: center; padding: var(--space-md)">
-                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
-                  📊
-                </div>
-                <h4>Análise de Risco</h4>
-                <p style="font-size: 0.875rem; color: var(--text-secondary)">
-                  Veja a classificação de risco de cada acesso
-                </p>
+              <div class="form-group" style="min-width: 160px">
+                <label for="typeSelect">Tipo</label>
+                <select id="typeSelect" style="width: 100%">
+                  <option value="">Todos</option>
+                  <option value="NAVIGATION">Navegação</option>
+                  <option value="BLOCK_ATTEMPT">Bloqueio</option>
+                  <option value="PERMISSION_REQUEST">Pedido de acesso</option>
+                </select>
               </div>
-              <div style="text-align: center; padding: var(--space-md)">
-                <div style="font-size: 2rem; margin-bottom: var(--space-sm)">
-                  📥
-                </div>
-                <h4>Exportar Dados</h4>
-                <p style="font-size: 0.875rem; color: var(--text-secondary)">
-                  Baixe relatórios em PDF ou CSV
-                </p>
+              <div class="form-group" style="min-width: 160px">
+                <label for="riskSelect">Risco mínimo</label>
+                <select id="riskSelect" style="width: 100%">
+                  <option value="">Qualquer</option>
+                  <option value="40">40+ (moderado)</option>
+                  <option value="70">70+ (alto)</option>
+                  <option value="90">90+ (crítico)</option>
+                </select>
               </div>
+              <button class="btn btn-ghost" id="clearFiltersBtn">
+                <span class="btn-icon">✕</span>
+                Limpar
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container" id="tableContainer">
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <div class="empty-state-text">
+                Selecione um dispositivo para ver o histórico
+              </div>
+            </div>
+          </div>
+
+          <div class="pagination" id="pagination" hidden>
+            <div class="pagination-info" id="paginationInfo"></div>
+            <div class="pagination-controls">
+              <button class="btn btn-secondary" id="prevPageBtn">
+                Anterior
+              </button>
+              <span class="pagination-page" id="paginationPage"></span>
+              <button class="btn btn-secondary" id="nextPageBtn">Próxima</button>
             </div>
           </div>
         </div>
@@ -187,15 +520,561 @@
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script>
-      const { $, requireAuth } = GuardianUtils;
-      const { auth } = GuardianAPI;
+      const { $, requireAuth, showToast, formatDateTime, getDateRangeForPeriod } =
+        GuardianUtils;
+      const { auth, dependents, devices, activity } = GuardianAPI;
 
       if (!requireAuth()) {
         throw new Error("Not authenticated");
       }
 
-      $("#userName").textContent = auth.getEmail() || "Responsável";
-      $("#logoutBtn").addEventListener("click", () => auth.logout());
+      const PAGE_SIZE = 25;
+
+      let dependentsList = [];
+      let devicesList = [];
+      let selectedDevice = null;
+      let currentPage = 0;
+      let lastResult = null;
+      let searchDebounce = null;
+      // Evita que uma resposta lenta sobrescreva o resultado de um filtro mais recente.
+      let requestSeq = 0;
+
+      // ===== Rótulos da IA em português =====
+      const LABEL_TEXT = {
+        SAFE: "Seguro",
+        VIOLENCE: "Violência",
+        HORROR: "Terror",
+        EXPLICIT: "Conteúdo adulto",
+        GROOMING_RISK: "Risco de aliciamento",
+        DRUGS: "Drogas",
+        GAMBLING: "Apostas",
+      };
+
+      const ACTION_TEXT = {
+        ALLOW: { text: "Permitido", badge: "badge-success" },
+        BLOCK: { text: "Bloqueado", badge: "badge-danger" },
+        WARN: { text: "Avisado", badge: "badge-warning" },
+        EDUCATE: { text: "Educativo", badge: "badge-info" },
+        UNKNOWN: { text: "Não analisado", badge: "badge-info" },
+      };
+
+      const TYPE_TEXT = {
+        NAVIGATION: "Navegação",
+        BLOCK_ATTEMPT: "Bloqueio",
+        PERMISSION_REQUEST: "Pedido de acesso",
+      };
+
+      function labelText(label) {
+        if (!label) return "Não analisado";
+        return LABEL_TEXT[label] || label;
+      }
+
+      function riskClass(score) {
+        if (score === null || score === undefined) return "risk-low";
+        if (score >= 70) return "risk-high";
+        if (score >= 40) return "risk-medium";
+        return "risk-low";
+      }
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      // ===== Render =====
+      function renderTable(result) {
+        const container = $("#tableContainer");
+
+        if (!result.items.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🔍</div>
+              <div class="empty-state-title">Nenhuma atividade encontrada</div>
+              <div class="empty-state-text">
+                Nenhum acesso corresponde aos filtros selecionados neste período.
+              </div>
+            </div>`;
+          $("#pagination").hidden = true;
+          return;
+        }
+
+        const rows = result.items
+          .map((item) => {
+            const when = new Date(item.ocorridoEm);
+            const score = item.pontuacaoRisco;
+            const cls = riskClass(score);
+            const action = ACTION_TEXT[item.acao] || ACTION_TEXT.UNKNOWN;
+
+            // urlConteudo só acrescenta informação quando difere do domínio —
+            // é o caso das plataformas mistas, onde identifica o vídeo exato.
+            const showKey =
+              item.urlConteudo && item.urlConteudo !== item.urlHost;
+
+            return `
+              <tr class="activity-row" data-id="${escapeHtml(item.id)}">
+                <td class="activity-when">
+                  <div class="activity-when-time">
+                    ${when.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                  <div class="activity-when-date">
+                    ${when.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
+                  </div>
+                </td>
+                <td class="activity-content">
+                  <div class="activity-host">
+                    ${escapeHtml(item.urlHost)}
+                    ${item.plataformaMista ? '<span class="platform-tag">conteúdo específico</span>' : ""}
+                  </div>
+                  ${
+                    item.titulo
+                      ? `<div class="activity-title" title="${escapeHtml(item.titulo)}">${escapeHtml(item.titulo)}</div>`
+                      : ""
+                  }
+                  ${
+                    showKey
+                      ? `<div class="activity-key" title="${escapeHtml(item.urlConteudo)}">${escapeHtml(item.urlConteudo)}</div>`
+                      : ""
+                  }
+                </td>
+                <td class="risk-cell">
+                  ${
+                    score === null || score === undefined
+                      ? '<span style="color: var(--text-muted); font-size: 0.8125rem">Não analisado</span>'
+                      : `<div class="risk-score ${cls}">${score}<span class="risk-score-max">/100</span></div>
+                         <div class="risk-bar"><div class="risk-bar-fill ${cls}" style="width: ${score}%"></div></div>
+                         <div class="label-name">${escapeHtml(labelText(item.rotulo))}</div>`
+                  }
+                </td>
+                <td class="col-optional">
+                  <span class="badge ${action.badge}">${action.text}</span>
+                </td>
+                <td class="col-optional" style="color: var(--text-secondary); font-size: 0.8125rem">
+                  ${escapeHtml(TYPE_TEXT[item.tipo] || item.tipo)}
+                </td>
+              </tr>`;
+          })
+          .join("");
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Quando</th>
+                <th>Conteúdo acessado</th>
+                <th>Risco</th>
+                <th class="col-optional">Ação</th>
+                <th class="col-optional">Tipo</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+
+        container.querySelectorAll(".activity-row").forEach((row) => {
+          row.addEventListener("click", () => openDetail(row.dataset.id));
+        });
+
+        renderPagination(result);
+      }
+
+      function renderPagination(result) {
+        const pagination = $("#pagination");
+        pagination.hidden = false;
+
+        const first = result.page * result.size + 1;
+        const last = Math.min(first + result.items.length - 1, result.totalItems);
+
+        $("#paginationInfo").textContent =
+          `Mostrando ${first}–${last} de ${result.totalItems}`;
+        $("#paginationPage").textContent =
+          `${result.page + 1} de ${Math.max(result.totalPages, 1)}`;
+
+        $("#prevPageBtn").disabled = result.page <= 0;
+        $("#nextPageBtn").disabled = result.page >= result.totalPages - 1;
+      }
+
+      function renderSummary(summary) {
+        $("#statTotal").textContent = summary.totalAccesses;
+        $("#statRisky").textContent = summary.riskyAccesses;
+        $("#statBlocks").textContent = summary.blockAttempts;
+        $("#statDomains").textContent = summary.distinctDomains;
+      }
+
+      function clearSummary() {
+        ["#statTotal", "#statRisky", "#statBlocks", "#statDomains"].forEach(
+          (id) => {
+            $(id).textContent = "-";
+          },
+        );
+      }
+
+      // ===== Detalhe =====
+      function openDetail(eventId) {
+        const item = lastResult?.items.find((i) => i.id === eventId);
+        if (!item) return;
+
+        const score = item.pontuacaoRisco;
+        const cls = riskClass(score);
+        const action = ACTION_TEXT[item.acao] || ACTION_TEXT.UNKNOWN;
+        const showKey = item.urlConteudo && item.urlConteudo !== item.urlHost;
+
+        GuardianUtils.createModal({
+          title: "Detalhes do acesso",
+          footer: false,
+          content: `
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Quando</span>
+                <span class="detail-value">${escapeHtml(formatDateTime(item.ocorridoEm))}</span>
+              </div>
+
+              <div class="detail-item">
+                <span class="detail-label">Site</span>
+                <span class="detail-value">${escapeHtml(item.urlHost)}</span>
+              </div>
+
+              ${
+                item.titulo
+                  ? `<div class="detail-item">
+                       <span class="detail-label">Título da página / vídeo</span>
+                       <span class="detail-value">${escapeHtml(item.titulo)}</span>
+                     </div>`
+                  : ""
+              }
+
+              ${
+                showKey
+                  ? `<div class="detail-item">
+                       <span class="detail-label">Conteúdo específico acessado</span>
+                       <span class="detail-value mono">${escapeHtml(item.urlConteudo)}</span>
+                     </div>`
+                  : ""
+              }
+
+              <div class="detail-divider"></div>
+
+              <div class="detail-item">
+                <span class="detail-label">Classificação da IA</span>
+                <span class="detail-value">
+                  ${
+                    score === null || score === undefined
+                      ? "Ainda não analisado"
+                      : `<strong class="${cls}">${score}/100</strong> — ${escapeHtml(labelText(item.rotulo))}`
+                  }
+                </span>
+              </div>
+
+              ${
+                item.justificativa
+                  ? `<div class="detail-item">
+                       <span class="detail-label">Por que foi classificado assim</span>
+                       <div class="detail-reason">${escapeHtml(item.justificativa)}</div>
+                     </div>`
+                  : ""
+              }
+
+              <div class="detail-item">
+                <span class="detail-label">Ação aplicada</span>
+                <span class="detail-value">
+                  <span class="badge ${action.badge}">${action.text}</span>
+                </span>
+              </div>
+
+              <div class="detail-item">
+                <span class="detail-label">Tipo de evento</span>
+                <span class="detail-value">${escapeHtml(TYPE_TEXT[item.tipo] || item.tipo)}</span>
+              </div>
+
+              ${
+                item.modelo
+                  ? `<div class="detail-item">
+                       <span class="detail-label">Modelo classificador</span>
+                       <span class="detail-value" style="color: var(--text-muted); font-size: 0.8125rem">${escapeHtml(item.modelo)}</span>
+                     </div>`
+                  : ""
+              }
+            </div>`,
+        });
+      }
+
+      // ===== Carregamento =====
+      function currentFilters() {
+        return {
+          search: $("#searchInput").value.trim(),
+          label: $("#labelSelect").value,
+          type: $("#typeSelect").value,
+          minRisk: $("#riskSelect").value,
+        };
+      }
+
+      async function loadActivities() {
+        if (!selectedDevice) {
+          clearSummary();
+          $("#tableContainer").innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <div class="empty-state-text">
+                Selecione um dispositivo para ver o histórico
+              </div>
+            </div>`;
+          $("#pagination").hidden = true;
+          return;
+        }
+
+        const seq = ++requestSeq;
+        const { from, to } = getDateRangeForPeriod($("#periodSelect").value);
+
+        $("#tableContainer").innerHTML =
+          '<div class="table-loading">Carregando atividades...</div>';
+
+        try {
+          const result = await activity.list(selectedDevice.id, {
+            from,
+            to,
+            page: currentPage,
+            size: PAGE_SIZE,
+            ...currentFilters(),
+          });
+
+          // Descarta respostas de requisições já superadas
+          if (seq !== requestSeq) return;
+
+          lastResult = result;
+          renderSummary(result.summary);
+          renderTable(result);
+        } catch (error) {
+          if (seq !== requestSeq) return;
+          clearSummary();
+          $("#tableContainer").innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">⚠️</div>
+              <div class="empty-state-title">Não foi possível carregar</div>
+              <div class="empty-state-text">${escapeHtml(error.message)}</div>
+            </div>`;
+          $("#pagination").hidden = true;
+        }
+      }
+
+      async function loadLabels() {
+        const select = $("#labelSelect");
+        const previous = select.value;
+        select.innerHTML = '<option value="">Todas</option>';
+
+        if (!selectedDevice) return;
+
+        try {
+          const labels = await activity.labels(selectedDevice.id);
+          labels.forEach((label) => {
+            const option = document.createElement("option");
+            option.value = label;
+            option.textContent = labelText(label);
+            select.appendChild(option);
+          });
+
+          // Mantém o filtro se o rótulo ainda existir no novo dispositivo
+          if (previous && labels.includes(previous)) {
+            select.value = previous;
+          }
+        } catch {
+          // O filtro de classificação é opcional — a lista principal ainda funciona sem ele.
+        }
+      }
+
+      // ===== Exportação CSV =====
+      function exportCsv() {
+        if (!lastResult?.items.length) {
+          showToast("Nada para exportar nesta visualização", "warning");
+          return;
+        }
+
+        const header = [
+          "Data/Hora",
+          "Site",
+          "Conteudo especifico",
+          "Titulo",
+          "Rotulo",
+          "Pontuacao de risco",
+          "Acao",
+          "Tipo",
+          "Justificativa",
+        ];
+
+        const escapeCsv = (value) => {
+          const text = value === null || value === undefined ? "" : String(value);
+          return `"${text.replace(/"/g, '""')}"`;
+        };
+
+        const rows = lastResult.items.map((item) =>
+          [
+            formatDateTime(item.ocorridoEm),
+            item.urlHost,
+            item.urlConteudo || "",
+            item.titulo || "",
+            labelText(item.rotulo),
+            item.pontuacaoRisco ?? "",
+            (ACTION_TEXT[item.acao] || ACTION_TEXT.UNKNOWN).text,
+            TYPE_TEXT[item.tipo] || item.tipo,
+            item.justificativa || "",
+          ]
+            .map(escapeCsv)
+            .join(","),
+        );
+
+        // BOM (U+FEFF) para o Excel reconhecer UTF-8 e não quebrar os acentos
+        const BOM_UTF8 = String.fromCharCode(0xfeff);
+        const csv =
+          BOM_UTF8 + [header.map(escapeCsv).join(","), ...rows].join("\r\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+
+        const stamp = new Date().toISOString().slice(0, 10);
+        const deviceName = (selectedDevice?.name || "dispositivo").replace(
+          /[^a-zA-Z0-9]+/g,
+          "-",
+        );
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `guardian-atividades-${deviceName}-${stamp}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast(`${lastResult.items.length} atividades exportadas`, "success");
+      }
+
+      // ===== Seleções =====
+      async function onDependentChange() {
+        const dependentId = $("#dependentSelect").value;
+
+        if (!dependentId) {
+          $("#deviceSelect").innerHTML =
+            '<option value="">Selecione um dependente</option>';
+          selectedDevice = null;
+          await loadActivities();
+          return;
+        }
+
+        try {
+          devicesList = await devices.getByDependent(dependentId);
+          const select = $("#deviceSelect");
+          select.innerHTML = "";
+
+          if (!devicesList.length) {
+            select.innerHTML =
+              '<option value="">Nenhum dispositivo vinculado</option>';
+            selectedDevice = null;
+            await loadActivities();
+            return;
+          }
+
+          devicesList.forEach((device) => {
+            const option = document.createElement("option");
+            option.value = device.id;
+            option.textContent = device.name;
+            select.appendChild(option);
+          });
+
+          select.value = devicesList[0].id;
+          await onDeviceChange();
+        } catch (error) {
+          showToast("Erro ao carregar dispositivos: " + error.message, "error");
+        }
+      }
+
+      async function onDeviceChange() {
+        const deviceId = $("#deviceSelect").value;
+        selectedDevice = devicesList.find((d) => d.id === deviceId) || null;
+        currentPage = 0;
+
+        await loadLabels();
+        await loadActivities();
+      }
+
+      function onFilterChange() {
+        currentPage = 0;
+        loadActivities();
+      }
+
+      async function loadDependents() {
+        try {
+          dependentsList = await dependents.list();
+          const select = $("#dependentSelect");
+          select.innerHTML = "";
+
+          if (!dependentsList.length) {
+            select.innerHTML =
+              '<option value="">Nenhum dependente cadastrado</option>';
+            await loadActivities();
+            return;
+          }
+
+          dependentsList.forEach((dependent) => {
+            const option = document.createElement("option");
+            option.value = dependent.id;
+            option.textContent = dependent.nickname;
+            select.appendChild(option);
+          });
+
+          select.value = dependentsList[0].id;
+          await onDependentChange();
+        } catch (error) {
+          showToast("Erro ao carregar dependentes: " + error.message, "error");
+        }
+      }
+
+      // ===== Init =====
+      async function init() {
+        $("#userName").textContent = auth.getEmail() || "Responsável";
+        $("#logoutBtn").addEventListener("click", () => auth.logout());
+
+        $("#dependentSelect").addEventListener("change", onDependentChange);
+        $("#deviceSelect").addEventListener("change", onDeviceChange);
+        $("#periodSelect").addEventListener("change", onFilterChange);
+        $("#refreshBtn").addEventListener("click", () => loadActivities());
+
+        $("#labelSelect").addEventListener("change", onFilterChange);
+        $("#typeSelect").addEventListener("change", onFilterChange);
+        $("#riskSelect").addEventListener("change", onFilterChange);
+
+        $("#searchInput").addEventListener("input", () => {
+          clearTimeout(searchDebounce);
+          searchDebounce = setTimeout(onFilterChange, 350);
+        });
+
+        $("#clearFiltersBtn").addEventListener("click", () => {
+          $("#searchInput").value = "";
+          $("#labelSelect").value = "";
+          $("#typeSelect").value = "";
+          $("#riskSelect").value = "";
+          onFilterChange();
+        });
+
+        $("#prevPageBtn").addEventListener("click", () => {
+          if (currentPage > 0) {
+            currentPage -= 1;
+            loadActivities();
+          }
+        });
+
+        $("#nextPageBtn").addEventListener("click", () => {
+          if (lastResult && currentPage < lastResult.totalPages - 1) {
+            currentPage += 1;
+            loadActivities();
+          }
+        });
+
+        $("#exportBtn").addEventListener("click", exportCsv);
+
+        await loadDependents();
+      }
+
+      init();
     </script>
   </body>
 </html>
