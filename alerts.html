@@ -30,6 +30,261 @@
         window.location.replace("login.html");
       }
     </script>
+    <style>
+      /* O atributo hidden vem de uma regra de especificidade minima no UA
+         stylesheet, entao qualquer display: flex/inline-flex daqui o venceria.
+         Esta regra garante que hidden sempre esconda, inclusive sobre style inline. */
+      [hidden] {
+        display: none !important;
+      }
+
+      /* ===== Lista de alertas ===== */
+      .alert-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-md);
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--border-light);
+        transition: background var(--transition-normal);
+      }
+
+      .alert-item:last-child {
+        border-bottom: none;
+      }
+
+      .alert-item:hover {
+        background: var(--surface-muted);
+      }
+
+      /* Não lidos ganham uma faixa lateral — o peso visual some ao marcar como lido */
+      .alert-item.unread {
+        border-left: 3px solid var(--primary);
+        padding-left: calc(var(--space-lg) - 3px);
+      }
+
+      .alert-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+      }
+
+      .alert-icon.critico {
+        background: var(--danger-light);
+      }
+      .alert-icon.atencao {
+        background: var(--warning-light);
+      }
+      .alert-icon.info {
+        background: var(--primary-light);
+      }
+      .alert-icon.positivo {
+        background: var(--success-light);
+      }
+
+      .alert-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .alert-title {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.9375rem;
+      }
+
+      .alert-message {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 2px;
+        line-height: 1.45;
+      }
+
+      .alert-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+        margin-top: 6px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .alert-ref {
+        font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+        font-size: 0.7rem;
+        background: var(--surface-muted);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        padding: 1px 6px;
+        max-width: 320px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .alert-side {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: var(--space-sm);
+        flex-shrink: 0;
+      }
+
+      .alert-read-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 0.75rem;
+        padding: 2px 4px;
+        border-radius: var(--radius-sm);
+      }
+
+      .alert-read-btn:hover {
+        color: var(--primary);
+        background: var(--primary-light);
+      }
+
+      /* ===== Preferências (checkboxes) ===== */
+      .pref-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: var(--space-md);
+      }
+
+      .pref-option {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        padding: var(--space-md);
+        background: var(--surface-muted);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition:
+          border-color var(--transition-normal),
+          background var(--transition-normal);
+      }
+
+      .pref-option:hover {
+        border-color: var(--primary);
+      }
+
+      .pref-option.checked {
+        border-color: var(--primary);
+        background: var(--primary-light);
+      }
+
+      .pref-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        accent-color: var(--primary);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .pref-name {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.9375rem;
+      }
+
+      .pref-desc {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        margin-top: 2px;
+        line-height: 1.4;
+      }
+
+      .pref-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        flex-wrap: wrap;
+        margin-top: var(--space-lg);
+        padding-top: var(--space-md);
+        border-top: 1px solid var(--border-light);
+      }
+
+      .pref-target {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        flex: 1;
+        min-width: 180px;
+      }
+
+      .pref-target strong {
+        color: var(--text);
+      }
+
+      /* Aviso de SMTP não configurado */
+      .smtp-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        padding: var(--space-md);
+        background: var(--warning-light);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-lg);
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .badge-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--primary);
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .list-loading {
+        padding: var(--space-xl);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+
+      .card-header-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 2px;
+        background: var(--surface-muted);
+        border-radius: var(--radius-md);
+        padding: 3px;
+      }
+
+      .filter-tab {
+        border: none;
+        background: none;
+        padding: 5px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        cursor: pointer;
+      }
+
+      .filter-tab.active {
+        background: var(--surface);
+        color: var(--primary);
+        box-shadow: var(--shadow-sm);
+      }
+    </style>
   </head>
   <body>
     <div class="dashboard-layout">
@@ -104,198 +359,132 @@
 
       <!-- Main Content -->
       <main class="main-content">
-        <!-- Page Header -->
         <div class="page-header">
           <h1>Alertas</h1>
-          <p>Notificações sobre atividades importantes</p>
+          <p>Notificações sobre atividades importantes dos seus dependentes</p>
         </div>
 
-        <!-- Coming Soon -->
-        <div class="card">
-          <div class="card-body">
-            <div class="empty-state">
-              <div class="empty-state-icon">🔔</div>
-              <div class="empty-state-title">Central de Alertas</div>
-              <div class="empty-state-text">
-                Você receberá notificações aqui quando:<br /><br />
-                • Um dependente tentar acessar conteúdo bloqueado<br />
-                • Conteúdo sensível for detectado<br />
-                • Padrões incomuns de navegação forem identificados
-              </div>
-            </div>
+        <!-- Aviso quando o servidor não tem SMTP -->
+        <div class="smtp-warning" id="smtpWarning" hidden>
+          <span>⚠️</span>
+          <div>
+            <strong>Envio de email desativado neste servidor.</strong><br />
+            Os alertas continuam sendo registrados e aparecem nesta tela
+            normalmente, mas nenhum email será enviado até que as credenciais
+            SMTP sejam configuradas no deploy do backend.
           </div>
         </div>
 
-        <!-- Example Alerts (mockup) -->
-        <div class="card" style="margin-top: var(--space-lg)">
+        <!-- Preferências de notificação -->
+        <div class="card" style="margin-bottom: var(--space-lg)">
           <div class="card-header">
-            <h3 class="card-title">📬 Alertas Recentes (Exemplo)</h3>
-          </div>
-          <div class="card-body" style="padding: 0">
-            <div class="list-item">
-              <div
-                class="list-item-icon"
-                style="background: var(--danger-light)"
-              >
-                🚫
-              </div>
-              <div class="list-item-content">
-                <div class="list-item-title">Tentativa de acesso bloqueado</div>
-                <div class="list-item-subtitle">
-                  João tentou acessar um site bloqueado
-                </div>
-              </div>
-              <span class="badge badge-danger">Crítico</span>
-            </div>
-            <div class="list-item">
-              <div
-                class="list-item-icon"
-                style="background: var(--warning-light)"
-              >
-                ⚠️
-              </div>
-              <div class="list-item-content">
-                <div class="list-item-title">Conteúdo sensível detectado</div>
-                <div class="list-item-subtitle">
-                  Navegação com risco médio identificada
-                </div>
-              </div>
-              <span class="badge badge-warning">Atenção</span>
-            </div>
-            <div class="list-item">
-              <div
-                class="list-item-icon"
-                style="background: var(--primary-light)"
-              >
-                💻
-              </div>
-              <div class="list-item-content">
-                <div class="list-item-title">Novo dispositivo conectado</div>
-                <div class="list-item-subtitle">
-                  Chrome - Windows foi vinculado a João
-                </div>
-              </div>
-              <span class="badge badge-info">Info</span>
-            </div>
-            <div class="list-item">
-              <div
-                class="list-item-icon"
-                style="background: var(--success-light)"
-              >
-                ✅
-              </div>
-              <div class="list-item-content">
-                <div class="list-item-title">Semana segura!</div>
-                <div class="list-item-subtitle">
-                  Nenhum incidente nos últimos 7 dias
-                </div>
-              </div>
-              <span class="badge badge-success">Positivo</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Alert Settings Preview -->
-        <div class="card" style="margin-top: var(--space-lg)">
-          <div class="card-header">
-            <h3 class="card-title">⚙️ Configurações de Alertas (Em breve)</h3>
+            <h3 class="card-title">⚙️ Quando você quer ser notificado</h3>
           </div>
           <div class="card-body">
-            <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: var(--space-md);
-              "
-            >
-              <label
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: var(--space-sm);
-                  padding: var(--space-md);
-                  background: var(--surface-muted);
-                  border-radius: var(--radius-sm);
-                  cursor: not-allowed;
-                  opacity: 0.7;
-                "
-              >
-                <input type="checkbox" checked disabled />
+            <div class="pref-grid">
+              <label class="pref-option" id="optBlockAttempts">
+                <input type="checkbox" id="prefBlockAttempts" />
                 <div>
-                  <div style="font-weight: 500">Tentativas de bloqueio</div>
-                  <div
-                    style="font-size: 0.875rem; color: var(--text-secondary)"
-                  >
+                  <div class="pref-name">Tentativas de bloqueio</div>
+                  <div class="pref-desc">
                     Quando um site bloqueado for acessado
                   </div>
                 </div>
               </label>
-              <label
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: var(--space-sm);
-                  padding: var(--space-md);
-                  background: var(--surface-muted);
-                  border-radius: var(--radius-sm);
-                  cursor: not-allowed;
-                  opacity: 0.7;
-                "
-              >
-                <input type="checkbox" checked disabled />
+
+              <label class="pref-option" id="optSensitiveContent">
+                <input type="checkbox" id="prefSensitiveContent" />
                 <div>
-                  <div style="font-weight: 500">Conteúdo sensível</div>
-                  <div
-                    style="font-size: 0.875rem; color: var(--text-secondary)"
-                  >
+                  <div class="pref-name">Conteúdo sensível</div>
+                  <div class="pref-desc">
                     Quando conteúdo de risco for detectado
                   </div>
                 </div>
               </label>
-              <label
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: var(--space-sm);
-                  padding: var(--space-md);
-                  background: var(--surface-muted);
-                  border-radius: var(--radius-sm);
-                  cursor: not-allowed;
-                  opacity: 0.7;
-                "
-              >
-                <input type="checkbox" disabled />
+
+              <label class="pref-option" id="optDailySummary">
+                <input type="checkbox" id="prefDailySummary" />
                 <div>
-                  <div style="font-weight: 500">Resumo diário</div>
-                  <div
-                    style="font-size: 0.875rem; color: var(--text-secondary)"
-                  >
-                    Receba um resumo por email
+                  <div class="pref-name">Resumo diário</div>
+                  <div class="pref-desc">
+                    Receba um resumo por email todo dia às 8h
                   </div>
                 </div>
               </label>
-              <label
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: var(--space-sm);
-                  padding: var(--space-md);
-                  background: var(--surface-muted);
-                  border-radius: var(--radius-sm);
-                  cursor: not-allowed;
-                  opacity: 0.7;
-                "
-              >
-                <input type="checkbox" disabled />
-                <div>
-                  <div style="font-weight: 500">Push notifications</div>
-                  <div
-                    style="font-size: 0.875rem; color: var(--text-secondary)"
-                  >
-                    Alertas em tempo real no celular
-                  </div>
-                </div>
-              </label>
+            </div>
+
+            <div class="pref-actions">
+              <div class="pref-target" id="prefTarget">
+                Os emails serão enviados para <strong>—</strong>
+              </div>
+              <button class="btn btn-secondary" id="testEmailBtn">
+                <span class="btn-icon">📬</span>
+                Enviar email de teste
+              </button>
+              <button class="btn btn-secondary" id="sendSummaryBtn" hidden>
+                <span class="btn-icon">📥</span>
+                Enviar resumo agora
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Central de alertas -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              🔔 Central de Alertas
+              <span
+                id="unreadBadge"
+                class="badge badge-info"
+                style="margin-left: var(--space-sm)"
+                hidden
+              ></span>
+            </h3>
+            <div class="card-header-actions">
+              <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">
+                  Todos
+                </button>
+                <button class="filter-tab" data-filter="unread">
+                  Não lidos
+                </button>
+              </div>
+              <button class="btn btn-ghost" id="markAllBtn">
+                <span class="btn-icon">✅</span>
+                Marcar todos
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body" style="padding: 0" id="alertsList">
+            <div class="list-loading">Carregando alertas...</div>
+          </div>
+
+          <div
+            id="alertsPagination"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: var(--space-md);
+              padding: var(--space-md) var(--space-lg);
+              border-top: 1px solid var(--border-light);
+              flex-wrap: wrap;
+            "
+            hidden
+          >
+            <span
+              id="alertsPaginationInfo"
+              style="font-size: 0.875rem; color: var(--text-secondary)"
+            ></span>
+            <div style="display: flex; gap: var(--space-sm)">
+              <button class="btn btn-secondary" id="prevAlertsBtn">
+                Anterior
+              </button>
+              <button class="btn btn-secondary" id="nextAlertsBtn">
+                Próxima
+              </button>
             </div>
           </div>
         </div>
@@ -305,15 +494,344 @@
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script>
-      const { $, requireAuth } = GuardianUtils;
-      const { auth } = GuardianAPI;
+      const { $, $$, requireAuth, showToast, formatRelativeTime, formatDateTime } =
+        GuardianUtils;
+      const { auth, alerts } = GuardianAPI;
 
       if (!requireAuth()) {
         throw new Error("Not authenticated");
       }
 
-      $("#userName").textContent = auth.getEmail() || "Responsável";
-      $("#logoutBtn").addEventListener("click", () => auth.logout());
+      const PAGE_SIZE = 20;
+
+      let currentPage = 0;
+      let unreadOnly = false;
+      let lastResult = null;
+      let savingPrefs = false;
+      // Última resposta do servidor — emailTarget e emailEnabled vêm dela, nunca do DOM
+      let currentPrefs = {
+        blockAttempts: false,
+        sensitiveContent: false,
+        dailySummary: false,
+        emailTarget: "",
+        emailEnabled: false,
+      };
+
+      const SEVERITY = {
+        CRITICO: { icon: "🚫", cls: "critico", badge: "badge-danger", text: "Crítico" },
+        ATENCAO: { icon: "⚠️", cls: "atencao", badge: "badge-warning", text: "Atenção" },
+        INFO: { icon: "💻", cls: "info", badge: "badge-info", text: "Info" },
+        POSITIVO: { icon: "✅", cls: "positivo", badge: "badge-success", text: "Positivo" },
+      };
+
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      // ===== Alertas =====
+      function renderAlerts(result) {
+        const list = $("#alertsList");
+
+        if (!result.items.length) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">${unreadOnly ? "👍" : "🔔"}</div>
+              <div class="empty-state-title">
+                ${unreadOnly ? "Nenhum alerta não lido" : "Nenhum alerta ainda"}
+              </div>
+              <div class="empty-state-text">
+                ${
+                  unreadOnly
+                    ? "Você está em dia com todas as notificações."
+                    : "Você será notificado aqui quando um dependente tentar acessar conteúdo bloqueado ou quando conteúdo sensível for detectado."
+                }
+              </div>
+            </div>`;
+          $("#alertsPagination").hidden = true;
+          return;
+        }
+
+        list.innerHTML = result.items
+          .map((alert) => {
+            const sev = SEVERITY[alert.severidade] || SEVERITY.INFO;
+
+            const metaParts = [];
+            if (alert.dependente) metaParts.push(escapeHtml(alert.dependente));
+            metaParts.push(formatRelativeTime(alert.criadoEm));
+            if (alert.pontuacaoRisco !== null && alert.pontuacaoRisco !== undefined) {
+              metaParts.push(`risco ${alert.pontuacaoRisco}/100`);
+            }
+            if (alert.emailEnviado) metaParts.push("email enviado");
+
+            return `
+              <div class="alert-item ${alert.lido ? "" : "unread"}" data-id="${escapeHtml(alert.id)}">
+                <div class="alert-icon ${sev.cls}">${sev.icon}</div>
+                <div class="alert-body">
+                  <div class="alert-title">${escapeHtml(alert.titulo)}</div>
+                  <div class="alert-message">${escapeHtml(alert.mensagem)}</div>
+                  <div class="alert-meta">
+                    <span title="${escapeHtml(formatDateTime(alert.criadoEm))}">
+                      ${metaParts.join(" · ")}
+                    </span>
+                    ${
+                      alert.referencia && alert.tipo !== "NOVO_DISPOSITIVO"
+                        ? `<span class="alert-ref" title="${escapeHtml(alert.referencia)}">${escapeHtml(alert.referencia)}</span>`
+                        : ""
+                    }
+                  </div>
+                </div>
+                <div class="alert-side">
+                  <span class="badge ${sev.badge}">${sev.text}</span>
+                  ${
+                    alert.lido
+                      ? ""
+                      : `<button class="alert-read-btn" data-read="${escapeHtml(alert.id)}">Marcar como lido</button>`
+                  }
+                </div>
+              </div>`;
+          })
+          .join("");
+
+        list.querySelectorAll("[data-read]").forEach((btn) => {
+          btn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            markRead(btn.dataset.read);
+          });
+        });
+
+        renderAlertsPagination(result);
+      }
+
+      function renderAlertsPagination(result) {
+        const pagination = $("#alertsPagination");
+
+        if (result.totalPages <= 1) {
+          pagination.hidden = true;
+          return;
+        }
+
+        pagination.hidden = false;
+        const first = result.page * result.size + 1;
+        const last = Math.min(first + result.items.length - 1, result.totalItems);
+
+        $("#alertsPaginationInfo").textContent =
+          `Mostrando ${first}–${last} de ${result.totalItems}`;
+        $("#prevAlertsBtn").disabled = result.page <= 0;
+        $("#nextAlertsBtn").disabled = result.page >= result.totalPages - 1;
+      }
+
+      function renderUnreadBadge(count) {
+        const badge = $("#unreadBadge");
+        if (count > 0) {
+          badge.hidden = false;
+          badge.innerHTML = `<span class="badge-dot"></span>${count} não ${count === 1 ? "lido" : "lidos"}`;
+        } else {
+          badge.hidden = true;
+        }
+      }
+
+      async function loadAlerts() {
+        $("#alertsList").innerHTML =
+          '<div class="list-loading">Carregando alertas...</div>';
+
+        try {
+          const result = await alerts.list({
+            page: currentPage,
+            size: PAGE_SIZE,
+            unreadOnly,
+          });
+
+          lastResult = result;
+          renderUnreadBadge(result.unread);
+          renderAlerts(result);
+        } catch (error) {
+          $("#alertsList").innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">⚠️</div>
+              <div class="empty-state-title">Não foi possível carregar</div>
+              <div class="empty-state-text">${escapeHtml(error.message)}</div>
+            </div>`;
+          $("#alertsPagination").hidden = true;
+        }
+      }
+
+      async function markRead(alertId) {
+        try {
+          await alerts.markRead(alertId);
+          await loadAlerts();
+        } catch (error) {
+          showToast("Erro ao marcar como lido: " + error.message, "error");
+        }
+      }
+
+      async function markAllRead() {
+        try {
+          const count = await alerts.markAllRead();
+          showToast(
+            count > 0
+              ? `${count} ${count === 1 ? "alerta marcado" : "alertas marcados"} como ${count === 1 ? "lido" : "lidos"}`
+              : "Nenhum alerta pendente",
+            "success",
+          );
+          currentPage = 0;
+          await loadAlerts();
+        } catch (error) {
+          showToast("Erro: " + error.message, "error");
+        }
+      }
+
+      // ===== Preferências =====
+      function syncPrefUI(prefs) {
+        currentPrefs = prefs;
+
+        $("#prefBlockAttempts").checked = prefs.blockAttempts;
+        $("#prefSensitiveContent").checked = prefs.sensitiveContent;
+        $("#prefDailySummary").checked = prefs.dailySummary;
+
+        $("#optBlockAttempts").classList.toggle("checked", prefs.blockAttempts);
+        $("#optSensitiveContent").classList.toggle(
+          "checked",
+          prefs.sensitiveContent,
+        );
+        $("#optDailySummary").classList.toggle("checked", prefs.dailySummary);
+
+        $("#prefTarget").innerHTML = prefs.emailTarget
+          ? `Os emails serão enviados para <strong>${escapeHtml(prefs.emailTarget)}</strong>`
+          : "Nenhum email cadastrado nesta conta";
+
+        // O envio manual do resumo só faz sentido com a opção ligada
+        $("#sendSummaryBtn").hidden = !prefs.dailySummary;
+
+        $("#smtpWarning").hidden = prefs.emailEnabled;
+        $("#testEmailBtn").disabled = !prefs.emailEnabled;
+        $("#sendSummaryBtn").disabled = !prefs.emailEnabled;
+      }
+
+      function readPrefUI() {
+        return {
+          blockAttempts: $("#prefBlockAttempts").checked,
+          sensitiveContent: $("#prefSensitiveContent").checked,
+          dailySummary: $("#prefDailySummary").checked,
+        };
+      }
+
+      async function loadPreferences() {
+        try {
+          syncPrefUI(await alerts.getPreferences());
+        } catch (error) {
+          showToast("Erro ao carregar preferências: " + error.message, "error");
+        }
+      }
+
+      async function savePreferences() {
+        if (savingPrefs) return;
+        savingPrefs = true;
+
+        const desired = readPrefUI();
+
+        // Reflete a escolha imediatamente; o servidor confirma logo em seguida.
+        // emailTarget e emailEnabled são do servidor e não mudam aqui.
+        syncPrefUI({
+          ...currentPrefs,
+          ...desired,
+        });
+
+        try {
+          const saved = await alerts.updatePreferences(desired);
+          syncPrefUI(saved);
+          showToast("Preferências salvas", "success");
+        } catch (error) {
+          showToast("Erro ao salvar: " + error.message, "error");
+          // Reverte para o que o servidor realmente tem
+          await loadPreferences();
+        } finally {
+          savingPrefs = false;
+        }
+      }
+
+      async function sendTestEmail() {
+        const btn = $("#testEmailBtn");
+        btn.disabled = true;
+        const original = btn.innerHTML;
+        btn.innerHTML = "Enviando...";
+
+        try {
+          const result = await alerts.sendTestEmail();
+          showToast(result.message, result.sent ? "success" : "warning");
+        } catch (error) {
+          showToast("Erro ao enviar: " + error.message, "error");
+        } finally {
+          btn.innerHTML = original;
+          btn.disabled = false;
+        }
+      }
+
+      async function sendSummaryNow() {
+        const btn = $("#sendSummaryBtn");
+        btn.disabled = true;
+        const original = btn.innerHTML;
+        btn.innerHTML = "Enviando...";
+
+        try {
+          const result = await alerts.sendSummaryNow();
+          showToast(result.message, result.sent ? "success" : "warning");
+        } catch (error) {
+          showToast("Erro ao enviar: " + error.message, "error");
+        } finally {
+          btn.innerHTML = original;
+          btn.disabled = false;
+        }
+      }
+
+      // ===== Init =====
+      async function init() {
+        $("#userName").textContent = auth.getEmail() || "Responsável";
+        $("#logoutBtn").addEventListener("click", () => auth.logout());
+
+        ["#prefBlockAttempts", "#prefSensitiveContent", "#prefDailySummary"].forEach(
+          (id) => {
+            $(id).addEventListener("change", savePreferences);
+          },
+        );
+
+        $("#testEmailBtn").addEventListener("click", sendTestEmail);
+        $("#sendSummaryBtn").addEventListener("click", sendSummaryNow);
+        $("#markAllBtn").addEventListener("click", markAllRead);
+
+        $$(".filter-tab").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            $$(".filter-tab").forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            unreadOnly = tab.dataset.filter === "unread";
+            currentPage = 0;
+            loadAlerts();
+          });
+        });
+
+        $("#prevAlertsBtn").addEventListener("click", () => {
+          if (currentPage > 0) {
+            currentPage -= 1;
+            loadAlerts();
+          }
+        });
+
+        $("#nextAlertsBtn").addEventListener("click", () => {
+          if (lastResult && currentPage < lastResult.totalPages - 1) {
+            currentPage += 1;
+            loadAlerts();
+          }
+        });
+
+        await Promise.all([loadPreferences(), loadAlerts()]);
+      }
+
+      init();
     </script>
   </body>
 </html>

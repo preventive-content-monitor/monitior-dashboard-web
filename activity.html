@@ -31,6 +31,13 @@
       }
     </script>
     <style>
+      /* O atributo hidden vem de uma regra de especificidade minima no UA
+         stylesheet, entao qualquer display: flex daqui o venceria.
+         Esta regra garante que hidden sempre esconda. */
+      [hidden] {
+        display: none !important;
+      }
+
       /* ===== Tabela de atividades ===== */
       .activity-row {
         cursor: pointer;

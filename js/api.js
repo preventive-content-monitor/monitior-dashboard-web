@@ -103,6 +103,9 @@
   function normalizePolicy(data = {}) {
     return {
       ...data,
+      // O backend devolve "modo"; sem esta linha policies.html lia undefined
+      // e caia no fallback "BLOCK", ignorando o modo realmente salvo.
+      mode: data.mode ?? data.modo,
       riskThreshold: data.riskThreshold ?? data.limiteRisco,
       blockedDomains: data.blockedDomains ?? data.dominiosBloqueados,
       allowedDomains: data.allowedDomains ?? data.dominiosPermitidos,
@@ -448,6 +451,81 @@
     },
   };
 
+  // ========== Alerts ==========
+  const alerts = {
+    async list({ page = 0, size = 20, unreadOnly = false, type = "" } = {}) {
+      const params = new URLSearchParams({
+        pagina: page,
+        tamanho: size,
+        apenasNaoLidos: unreadOnly,
+      });
+      if (type) params.set("tipo", type);
+
+      const data = await apiGet(`/api/alertas?${params}`);
+
+      return {
+        items: Array.isArray(data?.itens) ? data.itens : [],
+        page: data?.pagina ?? 0,
+        size: data?.tamanho ?? size,
+        totalItems: data?.totalItens ?? 0,
+        totalPages: data?.totalPaginas ?? 0,
+        unread: data?.naoLidos ?? 0,
+      };
+    },
+
+    async markRead(alertId) {
+      const response = await apiFetch(`/api/alertas/${alertId}/lido`, {
+        method: "PATCH",
+      });
+      return response.ok;
+    },
+
+    async markAllRead() {
+      const response = await apiFetch("/api/alertas/lidos", {
+        method: "PATCH",
+      });
+      if (!response.ok) throw new Error("Não foi possível marcar como lidos");
+      const data = await parseJsonSafely(response);
+      return data?.marcados ?? 0;
+    },
+
+    async getPreferences() {
+      const data = await apiGet("/api/alertas/preferencias");
+      return {
+        blockAttempts: Boolean(data?.tentativasBloqueio),
+        sensitiveContent: Boolean(data?.conteudoSensivel),
+        dailySummary: Boolean(data?.resumoDiario),
+        emailTarget: data?.emailDestino ?? "",
+        emailEnabled: Boolean(data?.emailHabilitado),
+      };
+    },
+
+    async updatePreferences({ blockAttempts, sensitiveContent, dailySummary }) {
+      const data = await apiPut("/api/alertas/preferencias", {
+        tentativasBloqueio: Boolean(blockAttempts),
+        conteudoSensivel: Boolean(sensitiveContent),
+        resumoDiario: Boolean(dailySummary),
+      });
+      return {
+        blockAttempts: Boolean(data?.tentativasBloqueio),
+        sensitiveContent: Boolean(data?.conteudoSensivel),
+        dailySummary: Boolean(data?.resumoDiario),
+        emailTarget: data?.emailDestino ?? "",
+        emailEnabled: Boolean(data?.emailHabilitado),
+      };
+    },
+
+    async sendTestEmail() {
+      const data = await apiPost("/api/alertas/preferencias/testar-email", {});
+      return { sent: Boolean(data?.enviado), message: data?.mensagem ?? "" };
+    },
+
+    async sendSummaryNow() {
+      const data = await apiPost("/api/alertas/preferencias/enviar-resumo", {});
+      return { sent: Boolean(data?.enviado), message: data?.mensagem ?? "" };
+    },
+  };
+
   // ========== Exports ==========
   window.GuardianAPI = {
     auth,
@@ -456,5 +534,6 @@
     policy,
     dashboard,
     activity,
+    alerts,
   };
 })();
