@@ -30,6 +30,7 @@
       if (!localStorage.getItem("guardian_token")) {
         window.location.replace("login.html");
       }
+      try { var gE = (localStorage.getItem("guardian_email") || "").toLowerCase(); if ((JSON.parse(localStorage.getItem("guardian_flow:" + gE)) || {}).role === "minor") window.location.replace("/onboarding.html?restrito=1"); } catch (e) {}
     </script>
   </head>
   <body>
@@ -227,17 +228,18 @@
 
     <!-- Generate Code Modal -->
     <div class="modal-overlay" id="codeModal">
-      <div class="modal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="codeModalTitle">
         <div class="modal-header">
-          <h3 class="modal-title">Código de Vinculação</h3>
+          <h3 class="modal-title" id="codeModalTitle">Código de Vinculação</h3>
           <button class="modal-close" type="button">&times;</button>
         </div>
         <div class="modal-body" style="text-align: center">
           <p
             style="color: var(--text-secondary); margin-bottom: var(--space-lg)"
           >
-            Digite este código na extensão do navegador para vincular o
-            dispositivo.
+            Vincular o navegador de <strong id="codeDependentName"></strong>.
+            O código é gerado aqui no painel e digitado na extensão, no
+            computador que será protegido.
           </p>
           <div
             id="codeDisplay"
@@ -261,8 +263,65 @@
               font-size: 0.875rem;
             "
           >
-            ⏱️ O código expira em 5 minutos
+            ⏱️ O código expira em 5 minutos. Se você ainda estiver instalando
+            a extensão quando ele vencer, clique em “Gerar Novo Código”.
           </p>
+          <button type="button" class="btn btn-secondary" id="copyCodeBtn" disabled>
+            Copiar código
+          </button>
+          <section class="link-help" aria-labelledby="linkHelpTitle">
+            <h4 id="linkHelpTitle">Como vincular este ou outro computador</h4>
+            <ol>
+              <li>
+                <strong>Vá ao computador do filho que você está vinculando.</strong>
+                Use o Chrome ou Edge em que ele navega. Não faça o vínculo
+                no navegador do responsável se a intenção é proteger outro PC.
+                <details>
+                  <summary>A extensão ainda não está instalada nesse computador?</summary>
+                  <p>
+                    Nesse computador, acesse <code id="setupAddress"></code>,
+                    entre com a mesma conta do responsável e clique em
+                    <strong>“Instalar a extensão neste computador”</strong>.
+                    O guia ensina a baixar o ZIP, extrair e carregar a pasta
+                    no navegador.
+                  </p>
+                  <a class="btn btn-secondary" id="installationGuideLink"
+                     href="/onboarding.html" target="_blank" rel="noopener noreferrer">
+                    Abrir guia em outra aba
+                  </a>
+                  <p>
+                    Se fizer o vínculo pelo botão do guia, escolha o dependente
+                    correto: não precisa digitar este código. Esta aba do painel
+                    continua aberta.
+                  </p>
+                </details>
+              </li>
+              <li>
+                <strong>Clique no ícone do Guardian.</strong>
+                Ele fica ao lado da barra de endereço e abre uma janelinha,
+                sem precisar procurar “Opções”.
+                Se não aparecer, clique no ícone de extensões
+                (peça de quebra-cabeça) e em
+                <strong>Guardian - Proteção Familiar</strong>.
+                Use o alfinete para deixar o Guardian sempre visível na barra.
+              </li>
+              <li>
+                <strong>Entre e conecte.</strong>
+                Na extensão, faça login com <strong id="linkAccountEmail"></strong>,
+                a mesma conta usada aqui. Em <strong>“Vincular Dispositivo”</strong>,
+                digite o código acima e clique em <strong>“Conectar”</strong>.
+                Se for outro PC, você pode ler o código nesta tela e digitá-lo lá.
+                Confira o nome do filho em <strong>“Protegendo”</strong>.
+              </li>
+            </ol>
+            <p class="link-help-warning">
+              Cada perfil do navegador protege um dependente por vez. Para outro
+              filho, use outro computador ou um perfil separado do Chrome/Edge.
+              Não desconecte o primeiro filho para configurar o segundo.
+              Ao terminar no computador do filho, saia da conta do responsável
+              no site e na extensão, sem desconectar o dispositivo.
+            </p>
+          </section>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary modal-close-btn">
@@ -299,6 +358,7 @@
       // State
       let dependentsList = [];
       let currentDependentId = null;
+      let currentCode = null;
       const monthNames = [
         "Janeiro",
         "Fevereiro",
@@ -490,6 +550,15 @@
         $("#regenerateCodeBtn").addEventListener("click", () =>
           generateCode(currentDependentId),
         );
+        $("#copyCodeBtn").addEventListener("click", async () => {
+          if (!currentCode) return;
+          try {
+            await GuardianFlow.copyText(currentCode);
+            showToast("Código copiado! Cole na extensão do navegador que será protegido.", "success");
+          } catch (error) {
+            showToast("Não foi possível copiar o código: " + error.message, "error");
+          }
+        });
       }
 
       function openAddModal() {
@@ -634,7 +703,7 @@
             birthDate,
             sex,
           });
-          showToast("Dependente adicionado com sucesso!", "success");
+          showToast("Dependente adicionado! Clique em “Vincular” no cartão dele para conectar o navegador.", "success");
           closeModal("#addModal");
           await loadDependents();
         } catch (error) {
@@ -648,7 +717,14 @@
       async function generateCode(dependentId) {
         const codeDisplay = $("#codeDisplay");
         const btn = $("#regenerateCodeBtn");
+        const dependent = dependentsList.find((dep) => dep.id === dependentId);
 
+        currentCode = null;
+        $("#copyCodeBtn").disabled = true;
+        $("#codeDependentName").textContent = dependent?.nickname || "seu filho";
+        $("#linkAccountEmail").textContent = auth.getEmail() || "a conta do responsável";
+        $("#setupAddress").textContent = location.origin + GuardianFlow.URLS.onboarding;
+        $("#installationGuideLink").href = GuardianFlow.URLS.onboarding;
         codeDisplay.textContent = "------";
         $("#codeModal").classList.add("show");
 
@@ -663,7 +739,9 @@
             throw new Error("Resposta da API sem o campo de código");
           }
 
-          codeDisplay.textContent = String(code).toUpperCase();
+          currentCode = String(code).toUpperCase();
+          codeDisplay.textContent = currentCode;
+          $("#copyCodeBtn").disabled = false;
         } catch (error) {
           showToast("Erro ao gerar código: " + error.message, "error");
           codeDisplay.textContent = "ERRO";

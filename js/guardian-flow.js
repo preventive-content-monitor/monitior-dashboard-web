@@ -46,6 +46,12 @@
     localStorage.removeItem(EMAIL_KEY);
     if (redirectTo !== false) location.href = redirectTo || URLS.landing;
   }
+  // Sair do modo "computador do menor" exige e-mail e senha de novo: a sessão é
+  // encerrada e o novo papel só é aplicado depois do login (landing/auth.js).
+  function reauth(nextRole) {
+    localStorage.setItem("guardian_reauth", JSON.stringify({ email: email().toLowerCase(), role: nextRole || "" }));
+    logout(URLS.auth + "?reauth=1");
+  }
 
   // ---------- Estado do tutorial (por conta, compartilhado entre abas) ----------
   function stateKey() { return "guardian_flow:" + email().toLowerCase(); }
@@ -119,6 +125,14 @@
     }
     emit("status", lastStatus);
     return lastStatus;
+  }
+
+  async function createDependent(d) {
+    var data = await api("/api/dependentes", {
+      method: "POST",
+      body: JSON.stringify({ apelido: d.nickname, dataNascimento: d.birthDate, sexo: d.sex }),
+    });
+    return normDependent(data || {});
   }
 
   async function generateCode(dependentId) {
@@ -302,6 +316,8 @@
     status: status,
     lastStatus: function () { return lastStatus; },
     generateCode: generateCode,
+    createDependent: createDependent,
+    reauth: reauth,
     extension: {
       current: function () { return ext.status; },
       detect: detectExtension,

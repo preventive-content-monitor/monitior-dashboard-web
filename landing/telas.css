@@ -96,7 +96,7 @@
 .dots{display:flex;justify-content:center;gap:10px;margin-top:28px}
 .dots span{width:10px;height:10px;border-radius:50%;background:#d9dcee;transition:width .3s,background .3s}
 .dots span.on{width:28px;border-radius:6px;background:var(--roxo)}
-[data-role="minor"] .r-resp,[data-role="minor"] .r-same,[data-role="resp"] .r-minor,[data-role="resp"] .r-same,[data-role="same"] .r-minor,[data-role="same"] .r-resp{display:none}
+[data-role="minor"] .r-resp,[data-role="minor"] .r-same,[data-role="resp"] .r-minor,[data-role="resp"] .r-same,[data-role="same"] .r-minor,[data-role="same"] .r-resp,[data-role="minor"] .r-not-minor{display:none}
 
 .choice .t{display:block}
 
@@ -182,7 +182,7 @@
 .big-shield img{position:relative;width:96px;height:auto}
 
 /* Hub conectado (onboarding.js + /dashboard/js/guardian-flow.js) */
-#onb[data-cur="loading"] .vis-intro,#onb[data-cur="guide"] .vis-steps,#onb[data-cur="reinstall"] .vis-steps,#onb[data-cur="home"] .vis-done,#onb[data-cur="complete"] .vis-done{display:flex;animation:entra .4s ease}
+#onb[data-cur="loading"] .vis-intro,#onb[data-cur="guide"] .vis-steps,#onb[data-cur="handoff"] .vis-steps,#onb[data-cur="restricted"] .vis-done,#onb[data-cur="reinstall"] .vis-steps,#onb[data-cur="home"] .vis-done,#onb[data-cur="complete"] .vis-done{display:flex;animation:entra .4s ease}
 .status.on{background:rgba(34,181,115,.12);color:#17835a;border-color:rgba(34,181,115,.4)}
 .status.on i{background:#22b573}
 .onb .screen{text-align:left}
@@ -198,3 +198,10 @@
 .next-pc h2{font-size:1.05rem;color:var(--marinho);margin-bottom:8px}
 .next-pc ol{padding-left:20px;display:grid;gap:6px;color:var(--texto)}
 .next-pc code{background:#f3f4f9;padding:2px 8px;border-radius:6px;font-weight:700}
+details.next-pc{margin-top:18px}
+details.next-pc summary{cursor:pointer;color:var(--marinho)}
+details.next-pc[open] summary{margin-bottom:10px}
+.dep-form input[type=text],.dep-form input:not([type]),.dep-form input[type=date]{height:48px;padding:0 14px;font:inherit;border:2px solid #e3e6f4;border-radius:10px;background:#fff}
+.dep-form .field-row{margin:12px 0 4px}
+.dep-sex{display:flex;gap:18px}
+.dep-sex label{display:flex;align-items:center;gap:8px;cursor:pointer}

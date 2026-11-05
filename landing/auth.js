@@ -104,6 +104,7 @@
     }).then(function (data) {
       localStorage.setItem('guardian_token', data.token);
       localStorage.setItem('guardian_email', email);
+      applyReauth(email);
       window.location.href = 'onboarding.html';
     }).catch(function (error) {
       document.getElementById('geral').textContent = error.message;
@@ -113,6 +114,29 @@
   });
 
   setAba(new URLSearchParams(location.search).get('aba') === 'cadastro' ? 'cadastro' : 'entrar', false);
+
+  // Troca de papel pedida no "computador do menor": só vale após e-mail e senha corretos.
+  function pendingReauth() {
+    try { return JSON.parse(localStorage.getItem('guardian_reauth')); } catch (e) { return null; }
+  }
+  function applyReauth(email) {
+    var p = pendingReauth();
+    localStorage.removeItem('guardian_reauth');
+    if (!p || p.email !== email.toLowerCase()) return;
+    var key = 'guardian_flow:' + p.email, st = {};
+    try { st = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) {}
+    if (p.role) st.role = p.role; else delete st.role;
+    st.updatedAt = Date.now();
+    localStorage.setItem(key, JSON.stringify(st));
+  }
+  if (new URLSearchParams(location.search).get('reauth') && pendingReauth()) {
+    setAba('entrar', false);
+    seg.style.display = 'none';
+    document.getElementById('titulo').textContent = 'Confirme que você é o responsável';
+    document.getElementById('subtitulo').textContent = 'Este computador está protegido como computador do menor. Para mudar isso, entre com o e-mail e a senha do responsável.';
+    document.getElementById('email').value = pendingReauth().email || '';
+    document.getElementById('senha').focus();
+  }
 })();
 
 /* menu móvel */

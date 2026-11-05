@@ -201,6 +201,7 @@
       c.querySelectorAll("[data-role]").forEach(function (b) {
         b.addEventListener("click", function () {
           F.setState({ role: b.dataset.role, startedAt: Date.now() });
+          if (b.dataset.role === "minor") { location.replace("/onboarding.html"); return; }
           current.key = null;
           render();
         });
@@ -230,17 +231,20 @@
   function waitChildPanel() {
     var origin = location.origin;
     var html =
+      (F.extension.current()
+        ? '<div class="gf-wait ok"><span class="gf-spin"></span>A extensão já está instalada neste navegador. Se seu filho usa este computador, clique em “Na verdade, vou configurar os dois neste computador”.</div>'
+        : "") +
       "<p>Você já cadastrou <strong>" + esc(firstDependentName()) + "</strong>. Falta conectar o computador que ele usa:</p>" +
       '<ol class="gf-steps">' +
         '<li><span class="gf-n">1</span><div><h3>No computador do seu filho, abra o Chrome</h3><p>Acesse este endereço:</p>' +
           '<div class="gf-copy"><code>' + esc(origin) + '</code><button type="button" class="gf-btn" data-gf-copy="' + esc(origin) + '">Copiar endereço</button></div></div></li>' +
         '<li><span class="gf-n">2</span><div><h3>Entre com a sua conta</h3><p>Clique em <strong>Fazer login</strong> e use <strong>' + esc(F.email()) + "</strong>.</p></div></li>" +
-        '<li><span class="gf-n">3</span><div><h3>Escolha “computador de um menor de idade”</h3><p>O GuardIAn instala a extensão e vincula o computador com você. No final, ele mesmo pede para sair da sua conta lá.</p></div></li>' +
+        '<li><span class="gf-n">3</span><div><h3>Escolha “computador de um menor de idade”</h3><p>Lá o GuardIAn instala só a extensão (o painel não abre no computador dele) e você escolhe o filho para vincular com um clique. No final, ele mesmo pede para sair da sua conta lá.</p></div></li>' +
       "</ol>" +
       '<div class="gf-wait"><span class="gf-spin"></span>Aguardando o computador do seu filho se conectar… esta tela atualiza sozinha.</div>' +
       (manualCode
         ? '<p style="margin-top:14px">Código para digitar na extensão (vale 5 minutos):<br><span class="gt-code">' + esc(manualCode.code) + "</span><br>" +
-          "Na extensão: ícone 🧩 → GuardIAn → ⋮ → <strong>Opções</strong> → entre com sua conta → digite o código.</p>"
+          "Clique no ícone do <strong>Guardian</strong> ao lado da barra de endereço (ou em 🧩 → Guardian). Na janelinha, entre com sua conta, digite o código e clique em <strong>Conectar</strong>.</p>"
         : "");
     panel("wait-child:" + (manualCode ? manualCode.code : ""), {
       badge: "Passo 2 de 2",
@@ -264,6 +268,24 @@
       '<button class="gf-btn gf-btn-ghost" data-gt-same>Na verdade, vou configurar os dois neste computador</button></div>');
   }
 
+  function minorPanel() {
+    panel("minor", {
+      badge: "Computador do seu filho",
+      title: "O painel não é usado neste computador",
+      html:
+        "<p>Você marcou este computador como <strong>do seu filho</strong>. Nele, só instalamos a extensão GuardIAn; o painel com os alertas fica no <strong>seu</strong> computador.</p>" +
+        "<p>Volte para a instalação para terminar a vinculação, ou mude a escolha se este computador também é seu.</p>",
+    }, function (c) {
+      c.querySelector("[data-gt-back]").addEventListener("click", function () { location.href = "/onboarding.html"; });
+      c.querySelectorAll("[data-gt-role]").forEach(function (b) {
+        b.addEventListener("click", function () { F.reauth(b.dataset.gtRole); });
+      });
+    }, '<div class="gt-actions" style="flex-direction:column;align-items:stretch">' +
+      '<button class="gf-btn gf-btn-lg" data-gt-back>Voltar para a instalação da extensão</button>' +
+      '<button class="gf-btn gf-btn-soft" style="margin:0" data-gt-role="same">Usamos o mesmo computador (pede e-mail e senha)</button>' +
+      '<button class="gf-btn gf-btn-ghost" data-gt-role="resp">Sou o responsável (pede e-mail e senha)</button></div>');
+  }
+
   function codeCardHTML() {
     var parts = [];
     parts.push("<p>Não precisa digitar nada: clique no botão abaixo e o GuardIAn passa o código para a extensão automaticamente.</p>");
@@ -271,8 +293,8 @@
     parts.push('<div class="gt-actions"><button class="gf-btn gf-btn-lg" data-gt-enroll ' + (enroll.busy ? "disabled" : "") + ">" +
       (enroll.busy ? "Vinculando…" : enroll.error ? "Tentar novamente" : "Vincular este navegador agora") + "</button></div>");
     if (enroll.error || enroll.manual) {
-      parts.push('<p style="margin-top:12px;font-size:.88rem">Se preferir fazer manualmente: clique no ícone 🧩 ao lado da barra de endereço → <strong>GuardIAn</strong> → ⋮ → <strong>Opções</strong>, entre com <strong>' +
-        esc(F.email()) + "</strong> e digite o código <strong>" + esc(lastCode ? lastCode.code.toUpperCase() : "") + "</strong>.</p>");
+      parts.push('<p style="margin-top:12px;font-size:.88rem">Se preferir fazer manualmente: clique no ícone do <strong>Guardian</strong> ao lado da barra de endereço (ou em 🧩 → Guardian). Na janelinha, entre com <strong>' +
+        esc(F.email()) + "</strong>, digite o código <strong>" + esc(lastCode ? lastCode.code.toUpperCase() : "") + "</strong> e clique em <strong>Conectar</strong>.</p>");
     }
     return parts.join("");
   }
@@ -343,6 +365,7 @@
       return hide();
     }
     if (!role) return choosePanel();
+    if (role === "minor") return minorPanel();
 
     var total = totalFor(role);
 
@@ -367,7 +390,7 @@
       return spot("dep-add", addBtn, {
         badge: "Passo 1 de " + total, step: 1, total: total, placement: "bottom",
         title: "Adicione o perfil do seu filho",
-        text: "Clique em “Adicionar Dependente”.",
+        text: "Clique em “" + (addBtn.textContent.trim() || "Adicionar Dependente") + "”.",
       });
     }
 

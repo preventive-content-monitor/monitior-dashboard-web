@@ -41,6 +41,20 @@
 .gf-btn-ghost { background: transparent; color: var(--gf-purple); text-decoration: underline; text-underline-offset: 3px; padding: 0 6px; }
 .gf-btn-ghost:hover { box-shadow: none; }
 
+#codeModal .modal { max-width: 640px; }
+#codeModal .modal-footer { flex-wrap: wrap; }
+.link-help { margin-top: var(--space-lg); text-align: left; color: var(--text-secondary); font-size: .93rem; line-height: 1.6; }
+.link-help h4 { margin-bottom: var(--space-md); color: var(--text); font-size: 1rem; }
+.link-help ol { margin: 0; padding-left: 24px; }
+.link-help li + li { margin-top: var(--space-md); }
+.link-help strong { color: var(--text); }
+.link-help code { overflow-wrap: anywhere; user-select: all; }
+.link-help details { margin-top: var(--space-sm); padding: var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.link-help summary { cursor: pointer; color: var(--text); font-weight: 600; }
+.link-help details p { margin: var(--space-sm) 0; }
+.link-help .btn { white-space: normal; text-align: center; }
+.link-help-warning { margin-top: var(--space-md); padding: var(--space-sm); border-left: 3px solid var(--warning); background: var(--surface); }
+
 /* ---------- Checklist ao vivo ---------- */
 .gf-check { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 10px; text-align: left; }
 .gf-check li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--gf-line); font: 600 .95rem var(--gf-font); color: var(--gf-muted); }

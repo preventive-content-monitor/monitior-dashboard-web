@@ -46,7 +46,7 @@ Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar polít
 
 1. Em `dependents.html`: crie um dependente (apelido, data de nascimento)
 2. Em `devices.html`: registre um dispositivo para o dependente e gere o **código de vínculo**
-3. No Chrome do dependente: abra as Opções da extensão, insira o código
+3. No navegador do dependente: clique no ícone do Guardian, entre com a mesma conta do painel e insira o código na janelinha
 4. Em `policies.html`: configure a política do dispositivo (modo BLOCK/WARN/EDUCATE, threshold de risco, domínios manuais)
 
 ### 3. Monitoramento
@@ -77,6 +77,42 @@ GET  /api/alertas              → lista alertas de risco alto
 ```http
 Authorization: Bearer <jwt-token>
 ```
+
+---
+
+## Onboarding por tipo de computador
+
+Depois do login na landing, a escolha do computador define o tutorial:
+
+| Escolha | O que acontece |
+|---|---|
+| Computador do menor | Só baixa e instala a extensão; o painel **nunca** é aberto ali. Com a extensão detectada, o responsável escolhe o filho e vincula com um clique (ou usa um código gerado no próprio painel). Também oferece “usamos o mesmo computador” e “continuar no meu computador” (instruções + sair da conta). |
+| Computador do responsável | Abre o painel em outra aba e destaca o cadastro do dependente. A extensão é opcional; o tutorial ensina a terminar no computador do filho. |
+| Os dois no mesmo computador | Primeiro o painel (cadastrar o filho), depois baixar/instalar a extensão e vincular com um clique. |
+
+Se o painel for aberto com a escolha “menor”, o tour avisa que o painel fica no
+computador do responsável e oferece voltar para a instalação ou mudar a escolha.
+
+---
+
+## Vincular outros dependentes ou computadores
+
+O tutorial obrigatório termina após a primeira vinculação. Para os próximos
+dependentes, o botão **Vincular** no cartão de cada filho continua mostrando um
+guia: em qual computador fazer a configuração, como instalar a extensão, abrir
+a janelinha pelo ícone do Guardian e entrar com a mesma conta do responsável.
+
+O código é gerado no painel, não na extensão, e pode ser copiado ou digitado em
+outro PC. Ele expira em cinco minutos; depois de instalar a extensão, gere outro
+se necessário. O link de instalação abre o onboarding em outra aba, sem fechar o
+painel. Em outro computador, acesse o endereço mostrado, faça login e escolha
+**Instalar a extensão neste computador**. Esse guia também permite selecionar o
+dependente e vincular automaticamente, sem digitar o código.
+
+Cada perfil do navegador protege um dependente por vez. Para outro filho, use
+outro computador ou um perfil separado; não desconecte o primeiro dispositivo.
+Ao terminar no computador do filho, saia da conta do responsável no site e na
+extensão, sem desconectar o dispositivo.
 
 ---
 

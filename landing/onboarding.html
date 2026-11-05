@@ -66,6 +66,18 @@
           <p class="onb-note" id="guideNote"></p>
         </div>
 
+        <div class="screen" data-screen="handoff" data-step="2">
+          <h1 tabindex="-1">Tudo pronto neste computador</h1>
+          <p class="lead">A extensão GuardIAn já está instalada aqui. Agora é só gerar o código no seu computador e digitá-lo neste.</p>
+          <div class="next-pc"><h2>1. Gere o código no seu painel:</h2><ol id="handoffPanel"></ol></div>
+          <div class="next-pc"><h2>2. Digite o código aqui, neste computador:</h2><ol id="handoffPopup"></ol></div>
+          <div class="alert" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span>Por segurança, saia da sua conta neste site antes de entregar o computador. <strong>A extensão continua instalada.</strong></span></div>
+          <div class="onb-cta">
+            <button class="btn-primary" type="button" data-logout>Sair da conta e fechar</button>
+            <button class="btn-secondary" type="button" data-go="guide">Voltar e vincular aqui</button>
+          </div>
+        </div>
+
         <div class="screen" data-screen="complete" data-step="3">
           <div class="done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
           <h1 tabindex="-1">Primeira vinculação concluída!</h1>
@@ -73,7 +85,17 @@
           <div class="alert r-minor" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span><strong>Importante:</strong> por segurança, saia da sua conta neste computador. Você acompanha tudo pelo seu próprio computador.</span></div>
           <div class="onb-cta">
             <button class="btn-primary r-minor" type="button" data-finish="logout">Sair da conta neste computador</button>
-            <button class="btn-primary r-resp r-same" type="button" data-finish="panel">Abrir o painel</button>
+            <button class="btn-primary r-not-minor" type="button" data-finish="panel">Abrir o painel</button>
+          </div>
+        </div>
+
+        <div class="screen" data-screen="restricted">
+          <div class="done-ico" style="background:linear-gradient(135deg,#e11d48,#7D41C4)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h1 tabindex="-1">Acesso ao painel bloqueado</h1>
+          <p class="lead">Este computador está configurado como <strong>computador do menor</strong>. O painel com os alertas só abre no computador do responsável.</p>
+          <div class="onb-cta">
+            <button class="btn-primary" type="button" data-reauth="resp">Sou o responsável: entrar com e-mail e senha</button>
+            <button class="btn-secondary" type="button" data-go-home>Voltar</button>
           </div>
         </div>
 
@@ -83,7 +105,8 @@
           <p class="lead" id="homeLead">Sua família já está protegida.</p>
           <ul class="gf-check" id="homeDevices"></ul>
           <div class="onb-cta">
-            <a class="btn-primary" href="/dashboard/">Acessar o painel</a>
+            <a class="btn-primary r-not-minor" href="/dashboard/">Acessar o painel</a>
+            <button class="btn-primary r-minor" type="button" data-reauth="resp">Abrir o painel (pede e-mail e senha)</button>
             <button class="btn-secondary" type="button" data-go="reinstall">Instalar a extensão neste computador</button>
           </div>
           <p class="onb-note"><button type="button" class="link" data-logout>Sair da conta</button></p>
@@ -143,7 +166,7 @@
           <div class="flow">
             <div class="r-minor"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><div><b>Este computador</b><small>Computador do menor</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="8" cy="12" r="4"/><path d="M12 12h9m-3 0v3"/></svg></span><div><b>Tela de vinculação</b><small>Login do responsável</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 20V10m6 10V4m6 16v-7M3 20h18"/></svg></span><div><b>Dashboard</b><small>No computador do responsável</small></div></div></div>
             <div class="r-resp"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><div><b>Este computador</b><small>Computador do responsável</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 20V10m6 10V4m6 16v-7M3 20h18"/></svg></span><div><b>Dashboard</b><small>Alertas e controle</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><div><b>Vincular menores</b><small>Um computador por vez</small></div></div></div>
-            <div class="r-same"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><div><b>Painel</b><small>Cadastre o dependente</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20"/></svg></span><div><b>Extensão</b><small>Use o código de vínculo</small></div></div></div>
+            <div class="r-same"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><div><b>Painel</b><small>Cadastre o dependente</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20"/></svg></span><div><b>Extensão</b><small>Use o código de vínculo</small></div></div></div>
           </div>
         </div>
 
