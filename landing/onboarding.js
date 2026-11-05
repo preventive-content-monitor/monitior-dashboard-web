@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   var F = window.GuardianFlow;
-  if (!F || !F.isLoggedIn()) { window.location.replace('auth.html'); return; }
+  if (!F || (!F.isLoggedIn() && !F.isMinor())) { window.location.replace('auth.html'); return; }
 
   var root = document.getElementById('onb'), back = document.getElementById('back');
   var label = document.getElementById('stepLabel'), dots = document.querySelectorAll('#dots span');
@@ -11,6 +11,7 @@
   var current = null, status = null, extStatus = F.extension.current();
   var reinstallLinked = false;
   var guideLink = { busy: false, error: '' };
+  var minorClosePromise = null;
 
   function mostrar(nome) {
     current = nome;
@@ -39,13 +40,17 @@
     if (w) w.focus(); else location.href = path || F.URLS.dependents;
   }
 
-  function linked() { return !!((status && status.devices.length) || (extStatus && extStatus.enrolled)); }
+  function linked() {
+    if (F.isMinor()) return !!(extStatus && extStatus.scopedEnrollment && extStatus.enrolled);
+    return !!((status && status.devices.length) || (extStatus && extStatus.enrolled));
+  }
   function extInstalled() { return !!(extStatus && extStatus.installed); }
+  function extOutdated() { return extInstalled() && !extStatus.scopedEnrollment; }
 
   var restrictedAsked = /[?&]restrito=1/.test(location.search);
   function decide() {
     var st = F.getState();
-    if (restrictedAsked && st.role === 'minor') { restrictedAsked = false; return 'restricted'; }
+    if (restrictedAsked && (F.isMinor() || st.role === 'minor')) { restrictedAsked = false; return 'restricted'; }
     if (linked()) return st.role && !st.doneAck ? 'complete' : 'home';
     if (st.role) return 'guide';
     return 'intro';
@@ -65,29 +70,39 @@
   }
 
   function renderGuide() {
-    var st = F.getState(), role = st.role || 'same';
+    var st = F.getState(), role = F.isMinor() ? 'minor' : (st.role || 'same');
     root.dataset.role = role;
     var deps = status ? status.dependents : [];
-    var hasDep = deps.length > 0, inst = extInstalled(), isLinked = linked();
+    var outdated = extOutdated();
+    var needsAuth = !!(extStatus && extStatus.requiresAuthorization);
+    var hasDep = deps.length > 0, inst = extInstalled() && !outdated, isLinked = linked();
     var depSub = hasDep ? deps.length + ' dependente(s) cadastrado(s)' : '';
     var list = [item(true, false, 'Conta de responsável criada', esc(F.email()))];
     var cta = $('guideCta');
     cta.style.display = '';
 
     if (role === 'minor') {
-      // Computador do filho: só a extensão. O painel nunca é aberto aqui.
       list.push(item(inst, !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'Siga o guia abaixo'));
-      list.push(item(hasDep, inst && !hasDep, 'Cadastrar o filho', depSub || 'Aqui mesmo, só o nome e a idade'));
-      list.push(item(isLinked, inst && hasDep && !isLinked, 'Vincular este computador ao filho', 'Aqui mesmo, com um clique'));
+      list.push(item(hasDep, inst && !hasDep, 'Cadastrar o filho', F.hasSetupSession() ? (depSub || 'Aqui mesmo, só o nome e a idade') : 'No painel do responsável'));
+      list.push(item(isLinked, inst && !isLinked, 'Vincular este computador ao filho', F.hasSetupSession() ? 'Aqui mesmo, com um clique' : 'Com o código do painel'));
       $('guideTitle').textContent = inst ? 'Extensão instalada! Falta vincular' : 'Vamos proteger este computador';
       $('guideLead').textContent = inst
-        ? 'Escolha qual filho usa este computador. O painel com os alertas fica no seu computador, não neste.'
+        ? (F.hasSetupSession() ? 'Escolha qual filho usa este computador. O painel com os alertas fica no seu computador, não neste.' : 'No seu computador, gere o código no painel e depois digite-o na extensão deste navegador.')
         : st.downloadedAt
           ? 'Siga o guia abaixo para instalar. Esta tela percebe sozinha quando você terminar.'
           : 'Neste computador vamos apenas instalar a extensão que protege a navegação. O painel com os alertas fica no seu computador.';
       cta.textContent = st.downloadedAt ? 'Baixar a extensão novamente' : 'Baixar a extensão';
       cta.className = st.downloadedAt ? 'btn-secondary' : 'btn-primary';
       if (inst) cta.style.display = 'none';
+      if (outdated) {
+        $('guideTitle').textContent = 'Atualize a extensão neste computador';
+        $('guideLead').textContent = 'A versão antiga precisa ser atualizada antes de você digitar sua senha.';
+        cta.textContent = 'Baixar a versão atualizada';
+        cta.className = 'btn-primary';
+      } else if (needsAuth) {
+        $('guideTitle').textContent = 'Autorize novamente a proteção';
+        $('guideLead').textContent = 'O vínculo anterior será mantido. Abra o Guardian e confirme a conta do responsável.';
+      }
     } else if (role === 'resp') {
       list.push(item(hasDep, !hasDep, 'Cadastrar o filho no painel', depSub || 'No painel, na aba Dependentes'));
       list.push(item(isLinked, hasDep && !isLinked, 'Vincular o computador do filho', 'Feito no computador do filho'));
@@ -108,12 +123,12 @@
 
     var extra = $('guideExtra');
     var sig = deps.map(function (d) { return d.id; }).join(',');
-    var key = [role, !!st.downloadedAt, inst, sig, guideLink.busy, guideLink.error].join('|');
+    var key = [role, !!st.downloadedAt, inst, outdated, needsAuth, sig, F.hasSetupSession(), guideLink.busy, guideLink.error].join('|');
     if (extra.dataset.key !== key) {
       extra.dataset.key = key;
       var keep = extra.querySelector('#guideDep');
       var picked = keep ? keep.value : '';
-      extra.innerHTML = guideExtraHTML(role, st, inst, deps);
+      extra.innerHTML = guideExtraHTML(role, st, inst, deps, outdated, needsAuth);
       F.bindInstallGuide(extra);
       var sel = extra.querySelector('#guideDep');
       if (sel && picked) sel.value = picked;
@@ -125,11 +140,11 @@
       if (role === 'minor') notes.push('<button type="button" class="link" data-same>Na verdade, usamos o mesmo computador</button>');
       notes.push('<button type="button" class="link" data-change-role>Mudar a escolha do computador</button>');
     }
-    $('guideNote').innerHTML = notes.join('<br>');
+    $('guideNote').innerHTML = (guideLink.error ? '<span class="error" role="alert">' + esc(guideLink.error) + '</span><br>' : '') + notes.join('<br>');
   }
 
   function panelStepsHTML(withCode) {
-    return '<li>No <strong>seu</strong> computador ou celular, abra <code>' + esc(location.host) + '/dashboard</code> e entre com <strong>' + esc(F.email()) + '</strong>.</li>' +
+    return '<li>No <strong>seu</strong> computador ou celular, abra <code>' + esc(location.origin) + '/dashboard</code> e entre com <strong>' + esc(F.email()) + '</strong>.</li>' +
       '<li>Vá em <strong>Dependentes</strong> e clique em <strong>Adicionar Dependente</strong> (se ainda não cadastrou).</li>' +
       (withCode ? '<li>No cartão do filho, clique em <strong>Vincular</strong> e anote o código de 6 letras.</li>' : '');
   }
@@ -139,10 +154,22 @@
       '<li>Digite o código e clique em <strong>Conectar</strong>.</li>';
   }
 
-  function guideExtraHTML(role, st, inst, deps) {
+  function guideExtraHTML(role, st, inst, deps, outdated, needsAuth) {
     if (role === 'minor') {
+      if (outdated) return F.updateGuideHTML();
+      if (needsAuth) {
+        return '<div class="gf-alert">Clique no ícone do <strong>Guardian</strong> ao lado da barra de endereço (ou em 🧩 → Guardian) e entre com a conta do responsável. Não é necessário gerar outro código.</div>' +
+          '<div class="gf-wait"><span class="gf-spin"></span>Aguardando a reautorização da extensão…</div>';
+      }
       if (!inst) {
         return st.downloadedAt ? '<h2 style="margin-bottom:12px">Como instalar a extensão</h2>' + F.installGuideHTML() : '';
+      }
+      if (!F.hasSetupSession()) {
+        return '<h2 style="margin:4px 0 6px">Vincule este computador</h2>' +
+          '<p class="onb-note">A sessão do responsável não fica salva aqui. Para continuar, use o código gerado no seu painel.</p>' +
+          (guideLink.error ? '<p class="error" role="alert">' + esc(guideLink.error) + '</p>' : '') +
+          '<ol>' + panelStepsHTML(true) + '<li>De volta neste computador:</li>' + popupStepsHTML() + '</ol>' +
+          '<p class="onb-note">Prefere cadastrar e vincular aqui? <a href="/auth.html?configurar=1">Confirme sua senha para uma configuração temporária</a>.</p>';
       }
       if (!deps.length) {
         return '<h2 style="margin:4px 0 6px">Quem vai usar este computador?</h2>' +
@@ -174,7 +201,7 @@
       return here + '<div class="next-pc"><h2>' + (inst ? 'Ou, se ele usa outro computador:' : 'Depois, no computador do seu filho:') + '</h2><ol>' +
           '<li>Abra <code>' + esc(location.host) + '</code> no Chrome ou Edge.</li>' +
           '<li>Clique em <strong>Fazer login</strong> e entre com <strong>' + esc(F.email()) + '</strong>.</li>' +
-          '<li>Escolha <strong>“Este é o computador de um menor de idade”</strong>: lá instalamos só a extensão e você vincula com um clique.</li>' +
+          '<li>Escolha <strong>“Este é o computador de um menor de idade”</strong>. A sessão do painel será encerrada e a configuração terá acesso temporário limitado.</li>' +
         '</ol></div>' +
         '<div class="gf-wait"><span class="gf-spin"></span>Aguardando o primeiro computador ser vinculado…</div>' +
         '<p class="onb-note">' + (inst ? '' : 'Quer proteger este navegador também? <button type="button" class="link" data-optional-download>Baixar a extensão (opcional)</button>') + '</p>';
@@ -199,6 +226,7 @@
     guideLink.busy = true; guideLink.error = ''; renderGuide();
     try {
       await F.extension.enroll(await F.generateCode(dep));
+      if (!await closeMinorSession()) return;
       await refresh();
     } catch (err) {
       guideLink.error = (err && err.message) || 'Não foi possível vincular. Tente de novo.';
@@ -226,14 +254,32 @@
       btn.disabled = false; btn.textContent = 'Cadastrar e continuar';
     }
   });
-  $('guideNote').addEventListener('click', function (e) {
+  $('guideNote').addEventListener('click', async function (e) {
     if (e.target.closest('[data-change-role]')) {
-      if (F.getState().role === 'minor') F.reauth('');
+      if (F.isMinor() || F.getState().role === 'minor') {
+        try { await F.reauth(''); } catch (err) { alert(err.message); }
+      }
       else mostrar('choose');
     }
-    else if (e.target.closest('[data-same]')) F.reauth('same');
-    else if (e.target.closest('[data-handoff]')) mostrar('handoff');
+    else if (e.target.closest('[data-same]')) {
+      try { await F.reauth('same'); } catch (err) { alert(err.message); }
+    }
+    else if (e.target.closest('[data-handoff]') && await closeMinorSession()) mostrar('handoff');
   });
+
+  function closeMinorSession() {
+    if (!F.isMinor() || !F.hasSetupSession()) return Promise.resolve(true);
+    if (minorClosePromise) return minorClosePromise;
+    minorClosePromise = F.finishMinor().then(function () {
+      guideLink.error = '';
+      return true;
+    }).catch(function () {
+      guideLink.error = 'Não foi possível encerrar a autorização temporária no servidor. Verifique a conexão e tente novamente.';
+      if (current === 'guide') renderGuide();
+      return false;
+    }).finally(function () { minorClosePromise = null; });
+    return minorClosePromise;
+  }
 
   function renderHandoff() {
     $('handoffPanel').innerHTML = panelStepsHTML(true);
@@ -242,7 +288,7 @@
 
   // ---------- Conclusão ----------
   function renderComplete() {
-    var role = F.getState().role || 'same';
+    var role = F.isMinor() ? 'minor' : (F.getState().role || 'same');
     root.dataset.role = role;
     var d = status && status.devices[0];
     $('completeLead').textContent = d
@@ -250,17 +296,24 @@
       : 'O computador foi vinculado com sucesso.';
   }
   document.querySelectorAll('[data-finish]').forEach(function (b) {
-    b.addEventListener('click', function () {
+    b.addEventListener('click', async function () {
       F.setState({ doneAck: true });
-      if (b.dataset.finish === 'logout') F.logout('/');
+      if (b.dataset.finish === 'logout') {
+        try { await F.logout('/'); } catch (err) { alert(err.message); location.href = '/'; }
+      }
       else location.href = F.URLS.dashboard;
     });
   });
 
   // ---------- Usuário que volta ----------
   function renderHome() {
-    root.dataset.role = F.getState().role || 'same';
+    root.dataset.role = F.isMinor() ? 'minor' : (F.getState().role || 'same');
     var devs = status ? status.devices : [];
+    if (F.isMinor()) {
+      $('homeLead').textContent = extStatus && extStatus.enrolled ? 'Este navegador está protegido.' : 'A extensão pode ser instalada neste navegador.';
+      $('homeDevices').innerHTML = '';
+      return;
+    }
     $('homeLead').textContent = devs.length === 1
       ? 'Você tem 1 computador protegido.'
       : 'Você tem ' + devs.length + ' computadores protegidos.';
@@ -311,18 +364,37 @@
     b.addEventListener('click', function () { mostrar(b.dataset.go); });
   });
   document.querySelectorAll('[data-pick]').forEach(function (b) {
-    b.addEventListener('click', function () {
+    b.addEventListener('click', async function () {
       var cur = F.getState().role;
-      if (cur === 'minor' && b.dataset.pick !== 'minor') return F.reauth(b.dataset.pick);
+      if ((F.isMinor() || cur === 'minor') && b.dataset.pick !== 'minor') {
+        try { await F.reauth(b.dataset.pick); } catch (err) { alert(err.message); }
+        return;
+      }
+      if (b.dataset.pick === 'minor' && F.hasParentSession()) {
+        b.disabled = true;
+        try {
+          await F.beginMinor();
+          await refresh();
+          mostrar('guide');
+        } catch (err) {
+          alert(err.message);
+          if (F.isMinor()) mostrar('guide');
+        } finally { b.disabled = false; }
+        return;
+      }
       F.setState({ role: b.dataset.pick, startedAt: F.getState().startedAt || Date.now() });
       mostrar('guide');
     });
   });
   document.querySelectorAll('[data-logout]').forEach(function (b) {
-    b.addEventListener('click', function () { F.logout('/'); });
+    b.addEventListener('click', async function () {
+      try { await F.logout('/'); } catch (err) { alert(err.message); location.href = '/'; }
+    });
   });
   document.querySelectorAll('[data-reauth]').forEach(function (b) {
-    b.addEventListener('click', function () { F.reauth(b.dataset.reauth); });
+    b.addEventListener('click', async function () {
+      try { await F.reauth(b.dataset.reauth); } catch (err) { alert(err.message); }
+    });
   });
   document.querySelectorAll('[data-go-home]').forEach(function (b) {
     b.addEventListener('click', function () { history.replaceState(null, '', 'onboarding.html'); mostrar(decide()); });
@@ -338,14 +410,20 @@
   var wasLinked = false;
   async function refresh() {
     try { status = await F.status(); } catch (e) {
+      if (F.isMinor() && !F.hasSetupSession()) {
+        status = { dependents: [], devices: [] };
+        guideLink.error = e.message;
+      } else {
       if (current === 'loading') {
         document.querySelector('[data-screen="loading"] .gf-wait').innerHTML =
           '<span class="gf-spin"></span>Não conseguimos falar com o servidor. Tentando de novo…';
       }
       return;
+      }
     }
     updateBadge();
     if (!wasLinked && linked() && (current === 'guide' || current === 'loading')) {
+      if (!await closeMinorSession()) return;
       wasLinked = true;
       mostrar(decide());
       return;
@@ -360,21 +438,24 @@
     if (current === 'home') renderHome();
   }
 
-  F.on('extension', function (s) {
+  F.on('extension', async function (s) {
     extStatus = s;
     // Vínculo feito pelo ícone do Guardian (código digitado) também conclui o guia.
-    if (!wasLinked && linked() && (current === 'guide' || current === 'handoff')) {
+    if (!wasLinked && linked() && !guideLink.busy && (current === 'guide' || current === 'handoff')) {
+      if (!await closeMinorSession()) return;
       wasLinked = true; updateBadge(); mostrar(decide()); return;
     }
     rerender();
   });
   F.on('state', function () { if (current === 'guide') renderGuide(); });
-  F.on('logout', function () { location.replace('auth.html'); });
+  F.on('logout', function () { if (!F.isMinor()) location.replace('auth.html'); });
   F.extension.watch(2500);
   setInterval(function () { if (!document.hidden) refresh(); }, 4000);
   window.addEventListener('focus', refresh);
 
   mostrar('loading');
   F.extension.detect().then(function (s) { extStatus = s; });
-  refresh();
+  if (F.getState().role === 'minor' && F.hasParentSession()) {
+    F.beginMinor().then(refresh).catch(function (err) { alert(err.message); refresh(); });
+  } else refresh();
 })();

@@ -9,6 +9,8 @@
 
   var TOKEN_KEY = "guardian_token";
   var EMAIL_KEY = "guardian_email";
+  var SETUP_TOKEN_KEY = "guardian_setup_token";
+  var MINOR_EMAIL_KEY = "guardian_minor_email";
 
   var URLS = {
     landing: "/",
@@ -34,23 +36,84 @@
   }
 
   // ---------- Sessão ----------
-  function token() { return localStorage.getItem(TOKEN_KEY); }
-  function email() { return localStorage.getItem(EMAIL_KEY) || ""; }
+  function token() { return sessionStorage.getItem(SETUP_TOKEN_KEY) || localStorage.getItem(TOKEN_KEY); }
+  function email() { return localStorage.getItem(EMAIL_KEY) || localStorage.getItem(MINOR_EMAIL_KEY) || ""; }
   function isLoggedIn() { return !!token(); }
+  function isMinor() { return !!localStorage.getItem(MINOR_EMAIL_KEY); }
+  function hasSetupSession() { return !!sessionStorage.getItem(SETUP_TOKEN_KEY); }
+  function hasParentSession() { return !!localStorage.getItem(TOKEN_KEY); }
   function saveSession(tk, mail) {
+    sessionStorage.removeItem(SETUP_TOKEN_KEY);
+    localStorage.removeItem(MINOR_EMAIL_KEY);
     localStorage.setItem(TOKEN_KEY, tk);
     localStorage.setItem(EMAIL_KEY, mail);
   }
-  function logout(redirectTo) {
+
+  async function revokeSession(tk) {
+    if (!tk) return;
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 8000);
+    try {
+      var res = await fetch("/api/autenticacao/sair", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + tk },
+        signal: controller.signal,
+        keepalive: true,
+      });
+      if (!res.ok && res.status !== 401) throw new Error("O servidor não confirmou o encerramento da sessão.");
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function logout(redirectTo) {
+    var tk = token();
+    var error = null;
+    try { await revokeSession(tk); } catch (e) { error = e; }
+    sessionStorage.removeItem(SETUP_TOKEN_KEY);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(EMAIL_KEY);
+    if (error) throw new Error("A sessão foi removida deste navegador, mas não foi possível confirmar seu encerramento no servidor. Verifique a conexão.");
     if (redirectTo !== false) location.href = redirectTo || URLS.landing;
   }
-  // Sair do modo "computador do menor" exige e-mail e senha de novo: a sessão é
-  // encerrada e o novo papel só é aplicado depois do login (landing/auth.js).
-  function reauth(nextRole) {
+
+  async function beginMinor() {
+    var mail = email();
+    var original = localStorage.getItem(TOKEN_KEY);
+    if (!mail || !original) throw new Error("Entre com a conta do responsável para iniciar a configuração.");
+    try {
+      var data = await api("/api/autenticacao/sessao-menor", { method: "POST", body: "{}" });
+      if (!data || !data.token) throw new Error("O servidor não retornou a autorização temporária.");
+      setState({ role: "minor", startedAt: getState().startedAt || Date.now() });
+      sessionStorage.setItem(SETUP_TOKEN_KEY, data.token);
+      localStorage.setItem(MINOR_EMAIL_KEY, mail);
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(EMAIL_KEY);
+    } catch (e) {
+      var revokeError = null;
+      try { await revokeSession(original); } catch (failure) { revokeError = failure; }
+      setState({ role: "minor" });
+      localStorage.setItem(MINOR_EMAIL_KEY, mail);
+      sessionStorage.removeItem(SETUP_TOKEN_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(EMAIL_KEY);
+      if (revokeError) {
+        throw new Error("A sessão foi removida deste navegador, mas não foi possível confirmar seu encerramento no servidor. Verifique a conexão.");
+      }
+      throw e;
+    }
+  }
+
+  async function finishMinor() {
+    var tk = sessionStorage.getItem(SETUP_TOKEN_KEY);
+    await revokeSession(tk);
+    sessionStorage.removeItem(SETUP_TOKEN_KEY);
+  }
+
+  async function reauth(nextRole) {
     localStorage.setItem("guardian_reauth", JSON.stringify({ email: email().toLowerCase(), role: nextRole || "" }));
-    logout(URLS.auth + "?reauth=1");
+    await logout(false);
+    location.href = URLS.auth + "?reauth=1";
   }
 
   // ---------- Estado do tutorial (por conta, compartilhado entre abas) ----------
@@ -67,7 +130,13 @@
   }
   window.addEventListener("storage", function (e) {
     if (e.key === stateKey()) emit("state", getState());
-    if (e.key === TOKEN_KEY && !e.newValue) emit("logout");
+    if (e.key === TOKEN_KEY && !e.newValue) {
+      emit("logout");
+      if (location.pathname.indexOf("/dashboard/") === 0 && !/\/login\.html$/.test(location.pathname)) {
+        if (document.body) document.body.textContent = "";
+        location.replace(isMinor() ? "/onboarding.html?restrito=1" : URLS.auth);
+      }
+    }
   });
 
   // ---------- Backend ----------
@@ -77,9 +146,13 @@
     if (token()) headers.Authorization = "Bearer " + token();
     var res = await fetch(path, Object.assign({}, options, { headers: headers }));
     if (res.status === 401) {
-      logout(false);
-      location.href = URLS.auth;
-      throw new Error("Sua sessão expirou. Entre novamente.");
+      sessionStorage.removeItem(SETUP_TOKEN_KEY);
+      if (!isMinor()) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(EMAIL_KEY);
+        location.href = URLS.auth;
+      }
+      throw new Error(isMinor() ? "A autorização temporária expirou. Confirme sua senha para continuar." : "Sua sessão expirou. Entre novamente.");
     }
     var text = await res.text();
     var data = null;
@@ -114,7 +187,9 @@
 
   var lastStatus = null;
   async function status() {
-    var r = await Promise.all([api("/api/dependentes"), api("/api/dispositivos")]);
+    var r = isMinor() && !hasSetupSession()
+      ? [[], []]
+      : await Promise.all([api("/api/dependentes"), isMinor() ? Promise.resolve([]) : api("/api/dispositivos")]);
     lastStatus = {
       dependents: (Array.isArray(r[0]) ? r[0] : []).map(normDependent),
       devices: (Array.isArray(r[1]) ? r[1] : []).map(normDevice),
@@ -178,12 +253,27 @@
   }
 
   async function enrollWithExtension(code) {
-    var msg = await request("ENROLL", { code: String(code).toLowerCase() }, 20000);
-    if (!msg) throw new Error("A extensão não respondeu. Recarregue a página e tente novamente.");
-    var result = msg.result || {};
-    if (!result.ok) throw new Error(result.error || "Não foi possível vincular este navegador.");
-    detectExtension();
-    return result;
+    var installed = await detectExtension();
+    if (!installed || !installed.scopedEnrollment) {
+      throw new Error("Atualize a extensão: baixe o novo ZIP, extraia na pasta atual e clique em Recarregar em chrome://extensions ou edge://extensions.");
+    }
+    var grant = await api("/api/autenticacao/autorizacao-vinculo", { method: "POST", body: "{}" });
+    if (!grant || !grant.token) throw new Error("O servidor não retornou a autorização de vínculo.");
+    try {
+      var msg = await request("ENROLL", { code: String(code).toLowerCase(), token: grant.token }, 20000);
+      if (!msg) throw new Error("A extensão não respondeu. Recarregue a página e tente novamente.");
+      var result = msg.result || {};
+      if (!result.ok) throw new Error(result.error || "Não foi possível vincular este navegador.");
+      if (result.warning) window.alert(result.warning);
+      detectExtension();
+      return result;
+    } catch (e) {
+      try { await revokeSession(grant.token); }
+      catch (revokeError) {
+        throw new Error("Não foi possível vincular nem confirmar o encerramento da autorização temporária. Verifique a conexão.");
+      }
+      throw e;
+    }
   }
 
   function startExtensionWatch(intervalMs) {
@@ -242,6 +332,7 @@
       '<div class="gf-alert">Para instalar a extensão, abra este site no <strong>Google Chrome</strong> ou no <strong>Microsoft Edge</strong>.</div>';
     return (
       warn +
+      '<div class="gf-alert">Já tinha o Guardian instalado? Não digite sua senha na versão antiga. Baixe este ZIP, substitua os arquivos na pasta anterior e clique em <strong>Recarregar</strong> na página de extensões.</div>' +
       '<ol class="gf-steps">' +
         '<li data-gf-step="download"><span class="gf-n">1</span><div>' +
           '<h3>Baixe a extensão</h3>' +
@@ -276,6 +367,21 @@
     );
   }
 
+  function updateGuideHTML() {
+    var b = browserInfo();
+    return '<div class="gf-alert"><strong>Não digite sua senha na versão antiga.</strong> Atualize a extensão antes de continuar.</div>' +
+      '<ol class="gf-steps">' +
+      '<li><span class="gf-n">1</span><div><h3>Baixe a versão atualizada</h3>' +
+      '<button type="button" class="gf-btn gf-btn-soft" data-gf-download>Baixar extensão atualizada</button></div></li>' +
+      '<li><span class="gf-n">2</span><div><h3>Substitua os arquivos antigos</h3>' +
+      '<p>Extraia o ZIP na mesma pasta que você escolheu ao instalar a extensão e confirme a substituição dos arquivos.</p></div></li>' +
+      '<li><span class="gf-n">3</span><div><h3>Recarregue a extensão</h3>' +
+      '<p>Abra uma nova aba, cole o endereço abaixo e clique em <strong>Recarregar</strong> no cartão do Guardian.</p>' +
+      '<div class="gf-copy"><code>' + b.page + '</code><button type="button" class="gf-btn" data-gf-copy="' + b.page + '">Copiar endereço</button></div></div></li>' +
+      '<li><span class="gf-n">4</span><div><h3>Autorize novamente</h3>' +
+      '<p>Abra o ícone do Guardian e entre com a conta do responsável. Se já havia um vínculo, ele será mantido.</p></div></li></ol>';
+  }
+
   function bindInstallGuide(root) {
     root.querySelectorAll("[data-gf-download]").forEach(function (btn) {
       btn.addEventListener("click", downloadExtension);
@@ -307,8 +413,13 @@
     token: token,
     email: email,
     isLoggedIn: isLoggedIn,
+    isMinor: isMinor,
+    hasSetupSession: hasSetupSession,
+    hasParentSession: hasParentSession,
     saveSession: saveSession,
     logout: logout,
+    beginMinor: beginMinor,
+    finishMinor: finishMinor,
     getState: getState,
     setState: setState,
     api: api,
@@ -328,6 +439,7 @@
     downloadExtension: downloadExtension,
     copyText: copyText,
     installGuideHTML: installGuideHTML,
+    updateGuideHTML: updateGuideHTML,
     bindInstallGuide: bindInstallGuide,
     escapeHTML: escapeHTML,
   };

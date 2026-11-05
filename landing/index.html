@@ -238,6 +238,7 @@
 </footer>
 
 <script src="script.js"></script>
+<script src="/dashboard/js/guardian-flow.js"></script>
 <script>
   // Sessão compartilhada com o painel: quem já entrou vê "Continuar" e "Sair".
   (function () {
@@ -248,8 +249,9 @@
       if (!head || !head.contains(a)) { a.href = 'onboarding.html'; if (/Começar|Criar|cadastro/i.test(a.textContent)) a.textContent = 'Continuar'; }
     });
     document.querySelectorAll('[data-sair]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        localStorage.removeItem('guardian_token'); localStorage.removeItem('guardian_email'); location.reload();
+      b.addEventListener('click', async function () {
+        try { await window.GuardianFlow.logout('/'); }
+        catch (error) { alert(error.message); location.reload(); }
       });
     });
   })();

@@ -43,7 +43,7 @@
           <h1 tabindex="-1">Para começar, escolha o computador</h1>
           <p class="lead">Essa escolha nos ajuda a configurar o monitoramento.</p>
           <div class="choices">
-            <button class="choice" data-pick="minor"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><span class="t"><strong>Este é o computador de um menor de idade</strong><span class="d">Será monitorado para proteção e segurança</span></span><span class="go">Escolher este</span></button>
+            <button class="choice" data-pick="minor"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><span class="t"><strong>Este é o computador de um menor de idade</strong><span class="d">Será monitorado. Por segurança, você terá que entrar novamente nos painéis abertos em outros computadores.</span></span><span class="go">Escolher este</span></button>
             <button class="choice" data-pick="resp"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span class="t"><strong>Este é o computador do responsável</strong><span class="d">Você terá acesso e controle sobre o monitoramento</span></span><span class="go">Escolher este</span></button>
             <button class="choice" data-pick="same"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 9h8M8 12h5"/></svg></span><span class="t"><strong>Vou configurar os dois neste computador</strong><span class="d">Primeiro o painel do responsável, depois a extensão a ser monitorada</span></span><span class="go">Configurar aqui</span></button>
           </div>
@@ -71,9 +71,9 @@
           <p class="lead">A extensão GuardIAn já está instalada aqui. Agora é só gerar o código no seu computador e digitá-lo neste.</p>
           <div class="next-pc"><h2>1. Gere o código no seu painel:</h2><ol id="handoffPanel"></ol></div>
           <div class="next-pc"><h2>2. Digite o código aqui, neste computador:</h2><ol id="handoffPopup"></ol></div>
-          <div class="alert" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span>Por segurança, saia da sua conta neste site antes de entregar o computador. <strong>A extensão continua instalada.</strong></span></div>
+          <div class="alert" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span>A autorização temporária foi encerrada. <strong>A extensão continua instalada.</strong></span></div>
           <div class="onb-cta">
-            <button class="btn-primary" type="button" data-logout>Sair da conta e fechar</button>
+            <button class="btn-primary" type="button" data-logout>Concluir neste computador</button>
             <button class="btn-secondary" type="button" data-go="guide">Voltar e vincular aqui</button>
           </div>
         </div>
@@ -82,9 +82,9 @@
           <div class="done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
           <h1 tabindex="-1">Primeira vinculação concluída!</h1>
           <p class="lead" id="completeLead"></p>
-          <div class="alert r-minor" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span><strong>Importante:</strong> por segurança, saia da sua conta neste computador. Você acompanha tudo pelo seu próprio computador.</span></div>
+          <div class="alert r-minor" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span>A autorização temporária foi encerrada. Você acompanha os alertas pelo seu próprio computador.</span></div>
           <div class="onb-cta">
-            <button class="btn-primary r-minor" type="button" data-finish="logout">Sair da conta neste computador</button>
+            <button class="btn-primary r-minor" type="button" data-finish="logout">Concluir neste computador</button>
             <button class="btn-primary r-not-minor" type="button" data-finish="panel">Abrir o painel</button>
           </div>
         </div>
@@ -107,7 +107,8 @@
           <div class="onb-cta">
             <a class="btn-primary r-not-minor" href="/dashboard/">Acessar o painel</a>
             <button class="btn-primary r-minor" type="button" data-reauth="resp">Abrir o painel (pede e-mail e senha)</button>
-            <button class="btn-secondary" type="button" data-go="reinstall">Instalar a extensão neste computador</button>
+            <button class="btn-secondary r-not-minor" type="button" data-go="reinstall">Instalar a extensão neste computador</button>
+            <button class="btn-secondary r-minor" type="button" data-go="guide">Ver instruções da extensão</button>
           </div>
           <p class="onb-note"><button type="button" class="link" data-logout>Sair da conta</button></p>
         </div>

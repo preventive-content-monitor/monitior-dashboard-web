@@ -1,6 +1,7 @@
 (function () {
   'use strict';
-  if (localStorage.getItem('guardian_token')) { window.location.replace('onboarding.html'); return; }
+  var setupMode = new URLSearchParams(location.search).get('configurar') === '1' && !!localStorage.getItem('guardian_minor_email');
+  if (localStorage.getItem('guardian_token') && !setupMode) { window.location.replace('onboarding.html'); return; }
   var card = document.getElementById('auth'), seg = document.getElementById('seg');
   var form = document.getElementById('form'), submit = document.getElementById('submit');
   var titulos = {
@@ -84,7 +85,8 @@
 
     submit.disabled = true; submit.classList.add('loading');
     submit.textContent = aba === 'cadastro' ? 'Criando conta...' : 'Entrando...';
-    var endpoint = aba === 'cadastro' ? '/api/autenticacao/registrar' : '/api/autenticacao/entrar';
+    var endpoint = setupMode ? '/api/autenticacao/entrar-configuracao' :
+      aba === 'cadastro' ? '/api/autenticacao/registrar' : '/api/autenticacao/entrar';
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,9 +104,24 @@
       if (!response.ok) throw new Error('Conta criada, mas não foi possível iniciar a sessão.');
       return response.json();
     }).then(function (data) {
-      localStorage.setItem('guardian_token', data.token);
-      localStorage.setItem('guardian_email', email);
-      applyReauth(email);
+      if (!data || !data.token) throw new Error('O servidor não retornou uma sessão válida.');
+      if (setupMode) {
+        var key = 'guardian_flow:' + email.toLowerCase(), state = {};
+        try { state = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { state = {}; }
+        state.role = 'minor';
+        localStorage.setItem(key, JSON.stringify(state));
+        localStorage.setItem('guardian_minor_email', email);
+        localStorage.removeItem('guardian_token');
+        localStorage.removeItem('guardian_email');
+        sessionStorage.setItem('guardian_setup_token', data.token);
+      } else {
+        sessionStorage.removeItem('guardian_setup_token');
+        localStorage.removeItem('guardian_minor_email');
+        localStorage.setItem('guardian_token', data.token);
+        localStorage.setItem('guardian_email', email);
+        applyReauth(email);
+      }
+      document.getElementById('senha').value = '';
       window.location.href = 'onboarding.html';
     }).catch(function (error) {
       document.getElementById('geral').textContent = error.message;
@@ -129,12 +146,15 @@
     st.updatedAt = Date.now();
     localStorage.setItem(key, JSON.stringify(st));
   }
-  if (new URLSearchParams(location.search).get('reauth') && pendingReauth()) {
+  if (setupMode || (new URLSearchParams(location.search).get('reauth') && pendingReauth())) {
     setAba('entrar', false);
     seg.style.display = 'none';
+    form.querySelectorAll('.swap').forEach(function (el) { el.style.display = 'none'; });
     document.getElementById('titulo').textContent = 'Confirme que você é o responsável';
-    document.getElementById('subtitulo').textContent = 'Este computador está protegido como computador do menor. Para mudar isso, entre com o e-mail e a senha do responsável.';
-    document.getElementById('email').value = pendingReauth().email || '';
+    document.getElementById('subtitulo').textContent = setupMode
+      ? 'Entre para receber uma autorização temporária, sem acesso ao painel. Por segurança, suas outras sessões de painel serão encerradas.'
+      : 'Este computador está protegido como computador do menor. Para mudar isso, entre com o e-mail e a senha do responsável.';
+    document.getElementById('email').value = setupMode ? localStorage.getItem('guardian_minor_email') : (pendingReauth().email || '');
     document.getElementById('senha').focus();
   }
 })();

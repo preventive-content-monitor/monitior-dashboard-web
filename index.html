@@ -30,7 +30,7 @@
     <script>
       // Auth check imediato
       if (!localStorage.getItem("guardian_token")) {
-        window.location.replace("login.html");
+        window.location.replace(localStorage.getItem("guardian_minor_email") ? "/onboarding.html?restrito=1" : "login.html");
       }
       try { var gE = (localStorage.getItem("guardian_email") || "").toLowerCase(); if ((JSON.parse(localStorage.getItem("guardian_flow:" + gE)) || {}).role === "minor") window.location.replace("/onboarding.html?restrito=1"); } catch (e) {}
     </script>

@@ -9,13 +9,13 @@ Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar polít
 | Atributo | Valor |
 |----------|-------|
 | Tecnologia | HTML5 / CSS3 / JavaScript (sem framework) |
-| Hospedagem | nginx na EC2 (porta 80), servido como arquivos estáticos |
-| API Backend | `http://<EC2-IP>/api` (nginx faz proxy `/api/` → Spring Boot :8080) |
-| Landing pública | `http://<EC2-IP>/` |
-| Acesso ao painel | `http://<EC2-IP>/dashboard/` |
+| Hospedagem | nginx na EC2, por HTTPS |
+| API Backend | `https://<EC2-IP>/api` (proxy para Spring Boot em `127.0.0.1:8080`) |
+| Landing pública | `https://<EC2-IP>/` |
+| Acesso ao painel | `https://<EC2-IP>/dashboard/` |
 | Autenticação | JWT Bearer Token (armazenado em `localStorage`) |
 
-> Os arquivos são enviados para o S3 (`guardian-logs-<account>/dashboard/`) durante o deploy e baixados para `/usr/share/nginx/html/` pelo `ec2_userdata.sh` na inicialização da EC2.
+> O deploy publica a landing e o painel na EC2 e exige um certificado HTTPS válido.
 
 ---
 
@@ -37,7 +37,7 @@ Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar polít
 
 ### 1. Primeiro acesso
 
-1. Acesse `http://<EC2-IP>/dashboard/` ou clique em **Entrar no painel** na landing pública
+1. Acesse `https://<EC2-IP>/dashboard/` ou clique em **Entrar no painel** na landing pública
 2. Clique em "Criar conta" ou vá para `login.html`
 3. Crie uma conta com e-mail e senha
 4. Faça login — o JWT é armazenado localmente
@@ -66,8 +66,8 @@ Todas as chamadas usam o caminho relativo `/api/` que o nginx redireciona para o
 GET  /api/dependentes          → lista dependentes do responsável logado
 POST /api/dependentes          → cria novo dependente
 GET  /api/dispositivos         → lista dispositivos
-POST /api/dispositivos/{id}/vincular → gera código de vínculo (5 min)
-GET  /api/politica?dispositivoId={id} → obtém política do dispositivo
+POST /api/dispositivos/gerar-codigo/{id} → gera código de vínculo (5 min)
+GET  /api/politica/atual?dispositivoId={id} → obtém política do dispositivo
 PUT  /api/politica             → atualiza política
 GET  /api/metricas             → métricas para o painel
 GET  /api/alertas              → lista alertas de risco alto
@@ -86,12 +86,15 @@ Depois do login na landing, a escolha do computador define o tutorial:
 
 | Escolha | O que acontece |
 |---|---|
-| Computador do menor | Só baixa e instala a extensão; o painel **nunca** é aberto ali. Com a extensão detectada, o responsável escolhe o filho e vincula com um clique (ou usa um código gerado no próprio painel). Também oferece “usamos o mesmo computador” e “continuar no meu computador” (instruções + sair da conta). |
+| Computador do menor | Baixa e instala a extensão; o painel não abre sem nova autenticação. Com a extensão detectada, o responsável escolhe o filho e vincula com um clique (ou usa um código gerado no próprio painel). Também oferece “usamos o mesmo computador” e “continuar no meu computador”. |
 | Computador do responsável | Abre o painel em outra aba e destaca o cadastro do dependente. A extensão é opcional; o tutorial ensina a terminar no computador do filho. |
 | Os dois no mesmo computador | Primeiro o painel (cadastrar o filho), depois baixar/instalar a extensão e vincular com um clique. |
 
-Se o painel for aberto com a escolha “menor”, o tour avisa que o painel fica no
-computador do responsável e oferece voltar para a instalação ou mudar a escolha.
+Ao escolher “menor”, o servidor revoga todas as sessões do responsável, inclusive
+as abertas em outros computadores, e concede apenas uma autorização temporária
+sem acesso ao painel. O responsável precisa fazer login novamente no seu PC.
+Para abrir o painel neste computador, é necessário confirmar e-mail e senha.
+Após o vínculo, apenas a credencial limitada do dispositivo fica na extensão.
 
 ---
 
@@ -111,25 +114,17 @@ dependente e vincular automaticamente, sem digitar o código.
 
 Cada perfil do navegador protege um dependente por vez. Para outro filho, use
 outro computador ou um perfil separado; não desconecte o primeiro dispositivo.
-Ao terminar no computador do filho, saia da conta do responsável no site e na
-extensão, sem desconectar o dispositivo.
+Ao terminar no computador do filho, a autorização temporária é encerrada sem
+desconectar o dispositivo. Em computador compartilhado, saia também do painel
+após usá-lo; enquanto a sessão do responsável estiver aberta, ela permite acesso.
 
 ---
 
 ## Deploy
 
-Os arquivos do dashboard são enviados ao S3 durante o deploy:
-
-```powershell
-# Upload para S3 (feito pelo operador antes do terraform apply)
-O deploy é feito pelo script `Infraetrutura/infra/8° - deploy-front-monitior-dashboard-web/deploy-front.ps1`. Ele publica a landing em `/`, o dashboard em `/dashboard/` e cria o download da extensão em `/downloads/guardian-extension.zip`.
-```
-
-A EC2 baixa automaticamente esses arquivos no boot via `ec2_userdata.sh`:
-
-```bash
-aws s3 sync s3://${s3_bucket}/dashboard/ /usr/share/nginx/html/ --region ${aws_region}
-```
+O deploy é feito pelo script `Infraetrutura/infra/8° - deploy-front-monitior-dashboard-web/deploy-front.ps1`.
+Ele publica a landing em `/`, o dashboard em `/dashboard/` e o ZIP da extensão
+em `/downloads/`. Instalações antigas precisam ser atualizadas e reautorizadas.
 
 ---
 

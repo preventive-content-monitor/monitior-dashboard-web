@@ -743,9 +743,14 @@
       return true;
     },
 
-    logout() {
-      clearToken();
-      window.location.replace("login.html");
+    async logout() {
+      try {
+        await window.GuardianFlow.logout("login.html");
+      } catch (error) {
+        alert(error.message);
+        clearToken();
+        window.location.replace("login.html");
+      }
     },
 
     isAuthenticated,

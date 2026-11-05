@@ -90,7 +90,9 @@
     current.key = key;
     card.innerHTML = html;
     var out = card.querySelector("[data-gt-logout]");
-    if (out) out.addEventListener("click", function () { F.logout("/"); });
+    if (out) out.addEventListener("click", function () {
+      F.logout("/").catch(function (error) { alert(error.message); location.href = "/"; });
+    });
     if (bind) bind(card);
     return true;
   }
@@ -195,13 +197,24 @@
     panel("choose", {
       badge: "Antes de começar",
       title: "Qual computador é este?",
-      text: "Escolha uma opção para o GuardIAn montar o passo a passo certo para você.",
+      text: "Escolha uma opção para o GuardIAn montar o passo a passo certo. Ao escolher o computador do menor, suas sessões de painel em outros computadores também serão encerradas.",
       noFooter: false,
     }, function (c) {
       c.querySelectorAll("[data-role]").forEach(function (b) {
-        b.addEventListener("click", function () {
+        b.addEventListener("click", async function () {
+          if (b.dataset.role === "minor") {
+            b.disabled = true;
+            try {
+              await F.beginMinor();
+              location.replace("/onboarding.html");
+            } catch (error) {
+              alert(error.message);
+              if (F.isMinor()) location.replace("/onboarding.html");
+              else b.disabled = false;
+            }
+            return;
+          }
           F.setState({ role: b.dataset.role, startedAt: Date.now() });
-          if (b.dataset.role === "minor") { location.replace("/onboarding.html"); return; }
           current.key = null;
           render();
         });
@@ -228,6 +241,22 @@
     }, function (c) { F.bindInstallGuide(c); });
   }
 
+  function updatePanel() {
+    panel("update-extension", {
+      badge: "Atualização necessária",
+      title: "Atualize a extensão antes de continuar",
+      html: F.updateGuideHTML(),
+    }, function (c) { F.bindInstallGuide(c); });
+  }
+
+  function reauthorizePanel() {
+    panel("reauthorize-extension", {
+      badge: "Atualização necessária",
+      title: "Autorize novamente a proteção",
+      text: "Clique no ícone do Guardian no navegador e entre com a conta do responsável. O vínculo existente será mantido e você não precisa gerar outro código.",
+    });
+  }
+
   function waitChildPanel() {
     var origin = location.origin;
     var html =
@@ -239,7 +268,7 @@
         '<li><span class="gf-n">1</span><div><h3>No computador do seu filho, abra o Chrome</h3><p>Acesse este endereço:</p>' +
           '<div class="gf-copy"><code>' + esc(origin) + '</code><button type="button" class="gf-btn" data-gf-copy="' + esc(origin) + '">Copiar endereço</button></div></div></li>' +
         '<li><span class="gf-n">2</span><div><h3>Entre com a sua conta</h3><p>Clique em <strong>Fazer login</strong> e use <strong>' + esc(F.email()) + "</strong>.</p></div></li>" +
-        '<li><span class="gf-n">3</span><div><h3>Escolha “computador de um menor de idade”</h3><p>Lá o GuardIAn instala só a extensão (o painel não abre no computador dele) e você escolhe o filho para vincular com um clique. No final, ele mesmo pede para sair da sua conta lá.</p></div></li>' +
+        '<li><span class="gf-n">3</span><div><h3>Escolha “computador de um menor de idade”</h3><p>Lá o GuardIAn instala só a extensão. Por segurança, esta sessão do painel será encerrada; entre novamente aqui para acompanhar o vínculo.</p></div></li>' +
       "</ol>" +
       '<div class="gf-wait"><span class="gf-spin"></span>Aguardando o computador do seu filho se conectar… esta tela atualiza sozinha.</div>' +
       (manualCode
@@ -278,7 +307,9 @@
     }, function (c) {
       c.querySelector("[data-gt-back]").addEventListener("click", function () { location.href = "/onboarding.html"; });
       c.querySelectorAll("[data-gt-role]").forEach(function (b) {
-        b.addEventListener("click", function () { F.reauth(b.dataset.gtRole); });
+        b.addEventListener("click", function () {
+          F.reauth(b.dataset.gtRole).catch(function (error) { alert(error.message); });
+        });
       });
     }, '<div class="gt-actions" style="flex-direction:column;align-items:stretch">' +
       '<button class="gf-btn gf-btn-lg" data-gt-back>Voltar para a instalação da extensão</button>' +
@@ -343,7 +374,7 @@
         b.addEventListener("click", function () {
           F.setState({ doneAck: Date.now() });
           var go = b.dataset.gtFinish;
-          if (go === "logout") return F.logout("/");
+          if (go === "logout") return F.logout("/").catch(function (error) { alert(error.message); location.href = "/"; });
           hide();
           if (go === "devices" && page !== "devices.html") location.href = "devices.html";
           else if (go === "panel" && page !== "index.html") location.href = "index.html";
@@ -359,6 +390,10 @@
     if (!data) return;
     var st = F.getState();
     var role = st.role;
+    var extension = F.extension.current();
+
+    if (role === "same" && extension && !extension.scopedEnrollment) return updatePanel();
+    if (role === "same" && extension && extension.requiresAuthorization) return reauthorizePanel();
 
     if (data.devices.length > 0) {
       if (role && !st.doneAck) return donePanel(role);
