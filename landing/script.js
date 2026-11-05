@@ -89,11 +89,13 @@
   /* ---------- Formulário de contato ---------- */
   var form = document.getElementById('contactForm');
   var msg = document.getElementById('formMsg');
+  var botaoEnviar = form.querySelector('.btn-send');
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (botaoEnviar.disabled) return;
     var ok = true;
-    form.querySelectorAll('input, textarea').forEach(function (c) {
-      var valido = c.value.trim() !== '' && (c.type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.value));
+    form.querySelectorAll('.fl input, .fl textarea').forEach(function (c) {
+      var valido = c.value.trim() !== '' && (c.type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.value.trim()));
       c.classList.toggle('invalid', !valido);
       if (!valido) ok = false;
     });
@@ -102,8 +104,35 @@
       msg.textContent = 'Preencha todos os campos com um e-mail válido.';
       return;
     }
-    // Aqui você pode enviar os dados ao seu back-end com fetch().
-    msg.textContent = 'Mensagem enviada! Responderemos em breve.';
-    form.reset();
+
+    botaoEnviar.disabled = true;
+    msg.className = 'form-msg';
+    msg.textContent = 'Enviando...';
+    fetch('/api/contato', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: form.nome.value.trim(),
+        email: form.email.value.trim(),
+        mensagem: form.msg.value.trim(),
+        site: form.site.value
+      })
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; });
+      })
+      .then(function (res) {
+        if (!res.ok || !res.d.enviado) throw new Error(res.d.mensagem || 'Não foi possível enviar agora. Tente novamente em alguns minutos.');
+        msg.className = 'form-msg ok';
+        msg.textContent = 'Mensagem enviada! Responderemos em breve no seu e-mail.';
+        form.reset();
+      })
+      .catch(function (err) {
+        msg.className = 'form-msg err';
+        msg.textContent = err && err.message && err.message !== 'Failed to fetch'
+          ? err.message
+          : 'Sem conexão com o servidor. Tente novamente em instantes.';
+      })
+      .then(function () { botaoEnviar.disabled = false; });
   });
 })();

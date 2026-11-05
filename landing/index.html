@@ -200,7 +200,8 @@
           <h3>Envie sua mensagem</h3>
           <div class="fl"><input id="nome" name="nome" type="text" placeholder=" " autocomplete="name" required><label for="nome">Nome completo</label></div>
           <div class="fl"><input id="email" name="email" type="email" placeholder=" " autocomplete="email" required><label for="email">Endereço de e-mail</label></div>
-          <div class="fl"><textarea id="msg" name="msg" rows="5" placeholder=" " required></textarea><label for="msg">Digite sua dúvida</label></div>
+          <div class="fl"><textarea id="msg" name="msg" rows="5" placeholder=" " maxlength="4000" required></textarea><label for="msg">Digite sua dúvida</label></div>
+          <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden"><label for="site">Não preencha este campo</label><input id="site" name="site" type="text" tabindex="-1" autocomplete="off"></div>
           <button type="submit" class="btn btn-solid btn-send">Enviar mensagem <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-4 16-4-7z"/><path d="m12 13 8-9"/></svg></button>
           <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
         </form>
