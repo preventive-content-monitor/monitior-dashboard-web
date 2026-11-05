@@ -1,0 +1,122 @@
+(function () {
+  'use strict';
+  if (localStorage.getItem('guardian_token')) { window.location.replace('onboarding.html'); return; }
+  var card = document.getElementById('auth'), seg = document.getElementById('seg');
+  var form = document.getElementById('form'), submit = document.getElementById('submit');
+  var titulos = {
+    entrar: ['Bem-vindo de volta', 'Entre para acompanhar a proteção digital da sua família.', 'Fazer Login'],
+    cadastro: ['Crie sua conta', 'Leva menos de um minuto. Depois, configure a proteção passo a passo.', 'Fazer Cadastro']
+  };
+  var aba = 'entrar';
+
+  function setAba(a, foco) {
+    aba = a;
+    card.dataset.aba = a; seg.dataset.aba = a;
+    document.getElementById('titulo').textContent = titulos[a][0];
+    document.getElementById('subtitulo').textContent = titulos[a][1];
+    submit.textContent = titulos[a][2];
+    document.getElementById('senha').autocomplete = a === 'entrar' ? 'current-password' : 'new-password';
+    seg.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.abaBtn === a); });
+    document.querySelector('.legal').style.visibility = a === 'cadastro' ? 'visible' : 'hidden';
+    limpar();
+    document.title = (a === 'entrar' ? 'Entrar' : 'Cadastrar') + ' | GuardIAn';
+    if (foco) document.getElementById('email').focus();
+  }
+  function limpar() {
+    form.querySelectorAll('.error').forEach(function (e) { e.textContent = ''; });
+    form.querySelectorAll('input').forEach(function (i) { i.classList.remove('invalid'); });
+    document.getElementById('geral').textContent = '';
+  }
+
+  document.querySelectorAll('[data-aba-btn]').forEach(function (b) {
+    b.addEventListener('click', function () { setAba(b.dataset.abaBtn, true); });
+  });
+  document.querySelectorAll('[data-aba-link]').forEach(function (l) {
+    l.addEventListener('click', function (e) { e.preventDefault(); setAba(l.dataset.abaLink, true); });
+  });
+
+  /* mostrar/ocultar senha */
+  document.querySelectorAll('[data-eye]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = document.getElementById(b.dataset.eye), v = i.type === 'password';
+      i.type = v ? 'text' : 'password';
+      b.classList.toggle('on', v);
+      b.setAttribute('aria-label', v ? 'Ocultar senha' : 'Mostrar senha');
+    });
+  });
+
+  /* força da senha */
+  function forca(s) {
+    var n = 0;
+    if (s.length >= 8) n++;
+    if (/[a-z]/.test(s) && /[A-Z]/.test(s)) n++;
+    if (/\d/.test(s)) n++;
+    if (/[^A-Za-z0-9]/.test(s)) n++;
+    return s ? Math.max(1, n) : 0;
+  }
+  var nomes = ['Use 8 ou mais caracteres, com letras e números.', 'Senha fraca', 'Senha razoável', 'Senha boa', 'Senha forte'];
+  document.getElementById('senha').addEventListener('input', function () {
+    if (aba !== 'cadastro') return;
+    var n = forca(this.value);
+    document.getElementById('meter').dataset.n = n;
+    document.getElementById('meterTxt').textContent = nomes[n];
+  });
+
+  function erro(id, msg) {
+    var i = document.getElementById(id);
+    i.classList.add('invalid'); i.setAttribute('aria-invalid', 'true');
+    form.querySelector('[data-err="' + id + '"]').textContent = msg;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); limpar();
+    var email = document.getElementById('email').value.trim();
+    var s = document.getElementById('senha').value, s2 = document.getElementById('senha2').value;
+    var primeiro = null, ok = true;
+    function falha(id, m) { erro(id, m); ok = false; if (!primeiro) primeiro = id; }
+
+    if (!email) falha('email', 'Informe seu e-mail.');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) falha('email', 'Digite um e-mail válido, como nome@email.com.');
+    if (!s) falha('senha', 'Informe sua senha.');
+    else if (aba === 'cadastro' && (s.length < 8 || !/\d/.test(s) || !/[A-Za-z]/.test(s))) falha('senha', 'A senha precisa ter 8 ou mais caracteres, com letras e números.');
+    if (aba === 'cadastro' && s && s2 !== s) falha('senha2', 'As senhas não coincidem.');
+    if (!ok) { document.getElementById(primeiro).focus(); return; }
+
+    submit.disabled = true; submit.classList.add('loading');
+    submit.textContent = aba === 'cadastro' ? 'Criando conta...' : 'Entrando...';
+    var endpoint = aba === 'cadastro' ? '/api/autenticacao/registrar' : '/api/autenticacao/entrar';
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, senha: s })
+    }).then(function (response) {
+      if (!response.ok) {
+        return response.json().catch(function () { return {}; }).then(function (body) {
+          throw new Error(body.mensagem || (aba === 'cadastro' ? 'Não foi possível criar sua conta.' : 'E-mail ou senha inválidos.'));
+        });
+      }
+      return aba === 'cadastro'
+        ? fetch('/api/autenticacao/entrar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, senha: s }) })
+        : response;
+    }).then(function (response) {
+      if (!response.ok) throw new Error('Conta criada, mas não foi possível iniciar a sessão.');
+      return response.json();
+    }).then(function (data) {
+      localStorage.setItem('guardian_token', data.token);
+      localStorage.setItem('guardian_email', email);
+      window.location.href = 'onboarding.html';
+    }).catch(function (error) {
+      document.getElementById('geral').textContent = error.message;
+    }).finally(function () {
+      submit.disabled = false; submit.classList.remove('loading'); submit.textContent = titulos[aba][2];
+    });
+  });
+
+  setAba(new URLSearchParams(location.search).get('aba') === 'cadastro' ? 'cadastro' : 'entrar', false);
+})();
+
+/* menu móvel */
+(function () {
+  var t = document.querySelector('.menu-toggle'), m = document.getElementById('menu');
+  t.addEventListener('click', function () { var o = m.classList.toggle('open'); t.setAttribute('aria-expanded', o); });
+})();

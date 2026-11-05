@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Passo a passo | GuardIAn</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="telas.css">
+  <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="/dashboard/css/guardian-tour.css">
+</head>
+<body>
+<div class="page onb-page">
+  <header class="header">
+    <a class="brand" href="index.html" aria-label="GuardIAn, ir para a página inicial"><img src="img/logo-icon.png" alt="" class="brand-icon"><img src="img/logo-texto.png" alt="GuardIAn - Proteção digital inteligente" class="brand-text"></a>
+    <span class="status" id="protStatus"><i></i>Proteção Inativa</span>
+  </header>
+
+  <main class="stage full">
+    <section class="onb" id="onb" data-role="same" data-cur="loading">
+      <div class="onb-main">
+        <div class="onb-top">
+          <button class="back" id="back" hidden aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M19 12H5m6-6-6 6 6 6"/></svg></button>
+          <span class="step-label" id="stepLabel">&nbsp;</span>
+        </div>
+
+        <div class="screen" data-screen="intro">
+          <h1 tabindex="-1">Seja bem-vindo ao GuardIAn</h1>
+          <p class="lead">Acreditamos que a tecnologia que expõe também pode ser a tecnologia que protege, quando usada de forma inteligente.</p>
+          <ul class="perks">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Monitoramento inteligente em tempo real</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Alertas claros sobre riscos digitais</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Configuração em poucos passos</li>
+          </ul>
+          <button class="btn-primary" data-go="choose">Prosseguir</button>
+        </div>
+
+        <div class="screen" data-screen="choose" data-step="1">
+          <h1 tabindex="-1">Para começar, escolha o computador</h1>
+          <p class="lead">Essa escolha nos ajuda a configurar o monitoramento.</p>
+          <div class="choices">
+            <button class="choice" data-pick="minor"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><span class="t"><strong>Este é o computador de um menor de idade</strong><span class="d">Será monitorado para proteção e segurança</span></span><span class="go">Escolher este</span></button>
+            <button class="choice" data-pick="resp"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span class="t"><strong>Este é o computador do responsável</strong><span class="d">Você terá acesso e controle sobre o monitoramento</span></span><span class="go">Escolher este</span></button>
+            <button class="choice" data-pick="same"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 9h8M8 12h5"/></svg></span><span class="t"><strong>Vou configurar os dois neste computador</strong><span class="d">Primeiro o painel do responsável, depois a extensão a ser monitorada</span></span><span class="go">Configurar aqui</span></button>
+          </div>
+        </div>
+
+        <div class="screen" data-screen="loading">
+          <h1 tabindex="-1">Carregando sua conta…</h1>
+          <p class="lead">Estamos verificando o que já foi configurado.</p>
+          <div class="gf-wait"><span class="gf-spin"></span>Conectando ao GuardIAn…</div>
+        </div>
+
+        <div class="screen" data-screen="guide" data-step="2">
+          <h1 tabindex="-1" id="guideTitle">Vamos configurar a proteção</h1>
+          <p class="lead" id="guideLead"></p>
+          <ul class="gf-check" id="guideCheck"></ul>
+          <div class="onb-cta">
+            <button class="btn-primary" id="guideCta" type="button">Começar</button>
+          </div>
+          <div id="guideExtra"></div>
+          <p class="onb-note" id="guideNote"></p>
+        </div>
+
+        <div class="screen" data-screen="complete" data-step="3">
+          <div class="done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
+          <h1 tabindex="-1">Primeira vinculação concluída!</h1>
+          <p class="lead" id="completeLead"></p>
+          <div class="alert r-minor" style="margin-bottom:22px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17v.01"/></svg><span><strong>Importante:</strong> por segurança, saia da sua conta neste computador. Você acompanha tudo pelo seu próprio computador.</span></div>
+          <div class="onb-cta">
+            <button class="btn-primary r-minor" type="button" data-finish="logout">Sair da conta neste computador</button>
+            <button class="btn-primary r-resp r-same" type="button" data-finish="panel">Abrir o painel</button>
+          </div>
+        </div>
+
+        <div class="screen" data-screen="home">
+          <div class="done-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h1 tabindex="-1">Olá de novo!</h1>
+          <p class="lead" id="homeLead">Sua família já está protegida.</p>
+          <ul class="gf-check" id="homeDevices"></ul>
+          <div class="onb-cta">
+            <a class="btn-primary" href="/dashboard/">Acessar o painel</a>
+            <button class="btn-secondary" type="button" data-go="reinstall">Instalar a extensão neste computador</button>
+          </div>
+          <p class="onb-note"><button type="button" class="link" data-logout>Sair da conta</button></p>
+        </div>
+
+        <div class="screen" data-screen="reinstall">
+          <h1 tabindex="-1">Instalar a extensão neste computador</h1>
+          <p class="lead">Siga os passos. Quando a extensão aparecer, escolha qual filho usa este computador e vinculamos automaticamente.</p>
+          <div class="onb-cta" style="margin-bottom:16px"><button class="btn-primary" type="button" data-download>Baixar a extensão</button></div>
+          <div id="reinstallGuide"></div>
+          <div id="reinstallLink" hidden>
+            <div class="gf-wait ok"><span class="gf-spin"></span>Extensão detectada neste navegador.</div>
+            <div class="field-row">
+              <label for="reinstallDep"><strong>Quem usa este computador?</strong></label>
+              <select id="reinstallDep"></select>
+            </div>
+            <p class="error" id="reinstallError" role="alert"></p>
+            <div class="onb-cta"><button class="btn-primary" type="button" id="reinstallBtn">Vincular este navegador</button></div>
+          </div>
+          <div id="reinstallDone" hidden>
+            <div class="gf-wait ok"><span class="gf-spin"></span><span id="reinstallDoneTxt">Navegador vinculado com sucesso!</span></div>
+            <div class="onb-cta" style="margin-top:18px"><a class="btn-primary" href="/dashboard/devices.html">Ver dispositivos no painel</a></div>
+          </div>
+        </div>
+        <div class="dots" id="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+
+      <aside class="onb-side" aria-hidden="true">
+        <div class="vis vis-intro">
+          <div class="lap">
+            <div class="lap-screen">
+              <div class="lap-bar"><i></i><i></i><i></i><span>painel.guardian.com</span></div>
+              <div class="lap-body">
+                <div class="ring-card">
+                  <div class="ring"><svg viewBox="0 0 90 90"><defs><linearGradient id="rg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#1D7CCE"/><stop offset="1" stop-color="#7D41C4"/></linearGradient></defs><circle cx="45" cy="45" r="39" fill="none" stroke="#e3e6f4" stroke-width="7"/><circle cx="45" cy="45" r="39" fill="none" stroke="url(#rg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="245" stroke-dashoffset="70" transform="rotate(-90 45 45)"/></svg><img src="img/logo-icon.png" alt=""></div>
+                  <b>Quase lá</b><span>Pronto para ativar</span>
+                </div>
+                <div class="lap-cards"><div class="mini"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><div><b>Monitoramento</b><span class="bar"><i style="width:82%"></i></span></div></div><div class="mini"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg><div><b>Alertas</b><span class="bar"><i style="width:46%"></i></span></div></div><div class="mini"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 20V10m6 10V4m6 16v-7M3 20h18"/></svg><div><b>Dashboard</b><span class="bar"><i style="width:64%"></i></span></div></div></div>
+              </div>
+            </div>
+            <div class="lap-base"></div>
+          </div>
+          <div class="chip fl1"><i class="dot ok"></i> Navegação segura</div>
+          <div class="chip fl2"><i class="dot warn"></i> 1 alerta analisado</div>
+        </div>
+
+        <div class="vis vis-choose">
+          <div class="pair">
+            <div class="dev"><span class="ni big"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><b>Menor de idade</b><small>Monitorado</small></div>
+            <div class="bridge"><span><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z"/></svg></span></div>
+            <div class="dev"><span class="ni big"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><b>Responsável</b><small>Com controle</small></div>
+          </div>
+          <p class="vcap">Dois papéis, uma mesma proteção.</p>
+        </div>
+
+        <div class="vis vis-steps">
+          <div class="flow">
+            <div class="r-minor"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><div><b>Este computador</b><small>Computador do menor</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="8" cy="12" r="4"/><path d="M12 12h9m-3 0v3"/></svg></span><div><b>Tela de vinculação</b><small>Login do responsável</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 20V10m6 10V4m6 16v-7M3 20h18"/></svg></span><div><b>Dashboard</b><small>No computador do responsável</small></div></div></div>
+            <div class="r-resp"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><div><b>Este computador</b><small>Computador do responsável</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 20V10m6 10V4m6 16v-7M3 20h18"/></svg></span><div><b>Dashboard</b><small>Alertas e controle</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><div><b>Vincular menores</b><small>Um computador por vez</small></div></div></div>
+            <div class="r-same"><div class="node"><span class="ni"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><div><b>Painel</b><small>Cadastre o dependente</small></div></div><span class="arrow"></span><div class="node"><span class="ni"><svg viewBox="0 0 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20"/></svg></span><div><b>Extensão</b><small>Use o código de vínculo</small></div></div></div>
+          </div>
+        </div>
+
+        <div class="vis vis-done">
+          <div class="big-shield"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z"/></svg><img src="img/logo-icon.png" alt=""></div>
+          <p class="vcap">Proteção pronta para ativar.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+</div>
+<script src="/dashboard/js/guardian-flow.js"></script>
+<script src="onboarding.js"></script>
+</body>
+</html>

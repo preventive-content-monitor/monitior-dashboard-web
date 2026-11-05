@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GuardIAn | Proteção digital inteligente</title>
+  <meta name="description" content="Monitoramento inteligente que analisa e alerta sobre riscos digitais antes que eles se tornem problemas reais.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+
+<header class="header" id="topo">
+  <a class="brand" href="#topo" aria-label="GuardIAn, início">
+    <img src="img/logo-icon.png" alt="" class="brand-icon">
+    <img src="img/logo-texto.png" alt="GuardIAn - Proteção digital inteligente" class="brand-text">
+  </a>
+  <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav" id="menu">
+    <a href="#funcionalidades">Funcionalidades</a>
+    <a href="onboarding.html">Instalar extensão</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contato">Contato</a>
+    <div class="nav-actions">
+      <a href="auth.html" class="btn btn-outline">Fazer login</a>
+      <a href="auth.html?aba=cadastro" class="btn btn-solid">Criar conta</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob blob-hero" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <h1>Monitoramento <span class="grad">inteligente</span> para um ambiente digital mais seguro.</h1>
+        <p>Uma solução inteligente que monitora, analisa e alerta sobre riscos digitais antes que eles se tornem problemas reais.</p>
+        <div class="nav-actions"><a href="auth.html?aba=cadastro" class="btn btn-solid btn-lg">Começar agora</a><a href="onboarding.html" class="btn btn-outline btn-lg">Instalar a extensão</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="device" role="img" aria-label="Prévia do painel de monitoramento do GuardIAn">
+          <div class="dev-bar"><i></i><i></i><i></i><span>guardian.com</span></div>
+          <div class="dev-body">
+            <aside class="dev-side"><img src="img/logo-icon.png" alt=""><b class="act"></b><b></b><b></b><b></b></aside>
+            <div class="dev-main">
+              <div class="dev-top"><strong>Visão geral</strong><span class="pill">Protegido</span></div>
+              <div class="dev-kpis">
+                <div><small>Atividade</small><strong>Visão geral</strong></div>
+                <div><small>Alertas</small><strong>Em um lugar</strong></div>
+                <div><small>Proteção</small><strong>Configurável</strong></div>
+              </div>
+              <svg class="dev-chart" viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true">
+                <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7D41C4" stop-opacity=".35"/><stop offset="1" stop-color="#7D41C4" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0 70 C30 60 45 30 80 40 S130 75 160 45 S220 15 250 30 S285 20 300 12 V90 H0Z" fill="url(#g1)"/>
+                <path d="M0 70 C30 60 45 30 80 40 S130 75 160 45 S220 15 250 30 S285 20 300 12" fill="none" stroke="#1D7CCE" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <ul class="dev-alerts">
+                <li><i class="dot warn"></i>Conteúdo sensível detectado<em>agora</em></li>
+                <li><i class="dot ok"></i>Site malicioso bloqueado<em>2 min</em></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="notif"><img src="img/favicon.png" alt=""><div><strong>GuardIAn</strong><span>Risco analisado. Nenhuma ação necessária.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRASE COM ANIMAÇÃO DE SCROLL -->
+  <section class="statement" id="statement" aria-label="Quando a navegação é livre, a proteção precisa ser inteligente.">
+    <div class="statement-sticky">
+      <h2 class="statement-text" aria-hidden="true">Quando a navegação é livre, a proteção precisa ser inteligente.</h2>
+      <div class="statement-bar" aria-hidden="true"><span id="statementBar"></span></div>
+    </div>
+  </section>
+
+  <!-- FUNCIONALIDADES -->
+  <section class="feature" id="funcionalidades">
+    <div class="container feature-grid">
+      <div class="feature-visual">
+        <div class="blob blob-a" aria-hidden="true"></div>
+        <div class="mock mock-alert">
+          <div class="mock-head"><i class="dot not"></i> Risco detectado</div>
+          <div class="mock-line w80"></div>
+          <div class="mock-line w60"></div>
+          <div class="mock-tag">Ação recomendada: bloquear</div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <h2>Detectamos riscos antes que virem problemas</h2>
+        <p>Nosso sistema analisa conteúdos digitais em tempo real com inteligência artificial, identificando sinais de risco e padrões sensíveis para permitir ações rápidas e preventivas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature feature-reverse">
+    <div class="container feature-grid">
+      <div class="feature-text">
+        <h2>Informações claras para decisões seguras</h2>
+        <p>A dashboard reúne dados e alertas em visualizações simples, facilitando o acompanhamento e a tomada de decisão de proteção digital.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="blob blob-b" aria-hidden="true"></div>
+        <div class="mock mock-dash">
+          <div class="mock-head">Resumo da semana</div>
+          <div class="bars" aria-hidden="true">
+            <span style="--h:40%"></span><span style="--h:65%"></span><span style="--h:35%"></span>
+            <span style="--h:80%"></span><span style="--h:55%"></span><span style="--h:90%"></span><span style="--h:70%"></span>
+          </div>
+          <div class="mock-row"><span>Bloqueios</span><strong>128</strong></div>
+          <div class="mock-row"><span>Alertas</span><strong>7</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO COMEÇAR -->
+  <section class="stats" id="numeros">
+    <div class="container stats-grid">
+      <div class="stat">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 32a8 8 0 0 1 0-16 11 11 0 0 1 21 3 7 7 0 0 1-1 13M24 22v18m-6-6 6 6 6-6"/></svg>
+        <strong>1</strong>
+        <span>Crie sua conta no painel</span>
+      </div>
+      <div class="stat">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18"/><path d="m16 25 6 6 11-13"/></svg>
+        <strong>2</strong>
+        <span>Cadastre um dependente e gere o código</span>
+      </div>
+      <div class="stat">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 6 5.5 11.5 12.5 1.7-9.1 8.8 2.2 12.5L24 34.6 12.9 40.5l2.2-12.5L6 19.2l12.5-1.7z"/></svg>
+        <strong>3</strong>
+        <span>Instale e vincule a extensão no Chrome</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2 class="section-title">FAQ de Dúvidas</h2>
+      <div class="faq-grid">
+        <div class="faq-visual" aria-hidden="true">
+          <div class="bento">
+            <div class="bt bt-main"><span class="q">?</span><b>Tire suas dúvidas</b><small>Respostas rápidas sobre o GuardIAn</small></div>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Como o GuardIAn monitora a navegação?<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="acc-panel"><p>O sistema analisa os conteúdos acessados em tempo real com inteligência artificial e identifica sinais e padrões de risco.</p></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Receberei alertas quando houver um risco?<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="acc-panel"><p>Sim. Você recebe um alerta com a descrição do risco e a ação recomendada, para agir antes que ele vire um problema.</p></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Onde acompanho os dados e alertas?<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="acc-panel"><p>Na dashboard, que reúne tudo em visualizações simples para facilitar o acompanhamento.</p></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Como instalo a extensão?<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="acc-panel"><p>Baixe o pacote pela página de instalação, extraia-o, abra chrome://extensions, ative o Modo do desenvolvedor e selecione “Carregar sem compactação”. Depois, use o código gerado no painel para vincular o dispositivo.</p></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Onde encontro o código de vínculo?<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="acc-panel"><p>No painel, cadastre o dependente, abra Dispositivos e gere um código de vínculo. O código deve ser informado nas Opções da extensão.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section class="contact" id="contato">
+    <div class="container">
+      <div class="contact-wrap">
+        <div class="c-info">
+          <span class="eyebrow">Contato</span>
+          <h2>Vamos conversar sobre proteção digital?</h2>
+          <!-- <p class="sub">Envie suas dúvidas!</p> -->
+          <ul class="chans">
+            <li><a class="chan" href="mailto:grupo07tcc2026@sptech.school"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span><small>E-mail</small><b>grupo07tcc2026@sptech.school</b></span></a></li>
+            <!-- <li><a class="chan" href="tel:+5511812341234"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span><small>Telefone</small><b>55 11 8 1234-1234</b></span></a></li> -->
+            <li><div class="chan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><span><small>Endereço</small><b>Rua Haddock Lobo, 595, São Paulo - SP</b></span></div></li>
+          </ul>
+          <div class="map-frame">
+            <iframe title="Mapa: São Paulo Tech School" src="https://www.google.com/maps?q=S%C3%A3o+Paulo+Tech+School,+Rua+Haddock+Lobo,+595,+S%C3%A3o+Paulo&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          </div>
+        </div>
+        <form class="c-form contact-form" id="contactForm" novalidate>
+          <h3>Envie sua mensagem</h3>
+          <div class="fl"><input id="nome" name="nome" type="text" placeholder=" " autocomplete="name" required><label for="nome">Nome completo</label></div>
+          <div class="fl"><input id="email" name="email" type="email" placeholder=" " autocomplete="email" required><label for="email">Endereço de e-mail</label></div>
+          <div class="fl"><textarea id="msg" name="msg" rows="5" placeholder=" " required></textarea><label for="msg">Digite sua dúvida</label></div>
+          <button type="submit" class="btn btn-solid btn-send">Enviar mensagem <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-4 16-4-7z"/><path d="m12 13 8-9"/></svg></button>
+          <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#topo" class="f-logo" aria-label="GuardIAn, voltar ao topo"><img src="img/logo-icon.png" alt="" class="f-icon"><img src="img/logo-texto-branco.png" alt="GuardIAn - Proteção digital inteligente" class="f-text"></a>
+        <p>Monitoramento inteligente que analisa e alerta sobre riscos digitais.</p>
+        <div class="social">
+          <a href="#" aria-label="Instagram do GuardIAn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6"/></svg></a>
+          <a href="#" aria-label="LinkedIn do GuardIAn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9v9M6 6v.01M10 18V9m0 3c0-2 1.5-3 3-3s3 1 3 3.5V18"/></svg></a>
+          <a href="#" aria-label="YouTube do GuardIAn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="4"/><path d="m10 9.5 4.5 2.5-4.5 2.5z"/></svg></a>
+        </div>
+      </div>
+      <nav aria-label="Navegação do site"><h3>Navegue</h3><a href="#funcionalidades">Funcionalidades</a><a href="onboarding.html">Instalar extensão</a><a href="#faq">Dúvidas frequentes</a><a href="#contato">Contato</a></nav>
+      <nav aria-label="Sua conta"><h3>Sua conta</h3><a href="auth.html">Fazer login</a><a href="auth.html?aba=cadastro">Fazer cadastro</a><a href="onboarding.html">Passo a passo</a></nav>
+      <div class="footer-contact"><h3>Fale com a gente</h3>
+        <a href="mailto:abc@gmail.com">abc@gmail.com</a>
+        <a href="tel:+5511812341234">55 11 8 1234-1234</a>
+        <address>Rua Haddock Lobo, 595<br>São Paulo - SP</address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 GuardIAn. Todos os direitos reservados.</span>
+      <ul><li><a href="#">Termos de uso</a></li><li><a href="#">Política de privacidade</a></li><li><a href="#">LGPD</a></li></ul>
+      <a href="#topo" class="to-top">Voltar ao topo</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  // Sessão compartilhada com o painel: quem já entrou vê "Continuar" e "Sair".
+  (function () {
+    if (!localStorage.getItem('guardian_token')) return;
+    var head = document.querySelector('.header .nav-actions');
+    if (head) head.innerHTML = '<a href="onboarding.html" class="btn btn-solid">Minha conta</a><button type="button" class="btn btn-outline" data-sair>Sair</button>';
+    document.querySelectorAll('a[href^="auth.html"]').forEach(function (a) {
+      if (!head || !head.contains(a)) { a.href = 'onboarding.html'; if (/Começar|Criar|cadastro/i.test(a.textContent)) a.textContent = 'Continuar'; }
+    });
+    document.querySelectorAll('[data-sair]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        localStorage.removeItem('guardian_token'); localStorage.removeItem('guardian_email'); location.reload();
+      });
+    });
+  })();
+</script>
+</body>
+</html>

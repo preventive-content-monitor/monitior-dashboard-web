@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GuardIAn - Instalar extensão</title>
+<script>
+  // A instalação agora é guiada pelo passo a passo da conta (onboarding.html).
+  location.replace(localStorage.getItem('guardian_token') ? 'onboarding.html' : 'auth.html');
+</script>
+</head>
+<body><p>Redirecionando… <a href="onboarding.html">Continuar</a></p></body>
+</html>

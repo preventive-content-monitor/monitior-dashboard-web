@@ -11,7 +11,8 @@ Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar polít
 | Tecnologia | HTML5 / CSS3 / JavaScript (sem framework) |
 | Hospedagem | nginx na EC2 (porta 80), servido como arquivos estáticos |
 | API Backend | `http://<EC2-IP>/api` (nginx faz proxy `/api/` → Spring Boot :8080) |
-| Acesso | `http://<EC2-IP>` — ver `terraform output dashboard_url` |
+| Landing pública | `http://<EC2-IP>/` |
+| Acesso ao painel | `http://<EC2-IP>/dashboard/` |
 | Autenticação | JWT Bearer Token (armazenado em `localStorage`) |
 
 > Os arquivos são enviados para o S3 (`guardian-logs-<account>/dashboard/`) durante o deploy e baixados para `/usr/share/nginx/html/` pelo `ec2_userdata.sh` na inicialização da EC2.
@@ -36,7 +37,7 @@ Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar polít
 
 ### 1. Primeiro acesso
 
-1. Acesse `http://<EC2-IP>` (URL do `terraform output dashboard_url`)
+1. Acesse `http://<EC2-IP>/dashboard/` ou clique em **Entrar no painel** na landing pública
 2. Clique em "Criar conta" ou vá para `login.html`
 3. Crie uma conta com e-mail e senha
 4. Faça login — o JWT é armazenado localmente
@@ -85,7 +86,7 @@ Os arquivos do dashboard são enviados ao S3 durante o deploy:
 
 ```powershell
 # Upload para S3 (feito pelo operador antes do terraform apply)
-aws s3 sync monitior-dashboard-web/ s3://guardian-logs-750476866422/dashboard/ --delete
+O deploy é feito pelo script `Infraetrutura/infra/8° - deploy-front-monitior-dashboard-web/deploy-front.ps1`. Ele publica a landing em `/`, o dashboard em `/dashboard/` e cria o download da extensão em `/downloads/guardian-extension.zip`.
 ```
 
 A EC2 baixa automaticamente esses arquivos no boot via `ec2_userdata.sh`:
