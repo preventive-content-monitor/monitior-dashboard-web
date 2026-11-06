@@ -163,7 +163,7 @@
     <div class="modal-overlay" id="addModal">
       <div class="modal">
         <div class="modal-header">
-          <h3 class="modal-title">Adicionar Dependente</h3>
+          <h3 class="modal-title" id="addModalTitle">Adicionar Dependente</h3>
           <button class="modal-close" type="button">&times;</button>
         </div>
         <form id="addForm">
@@ -207,8 +207,8 @@
             </div>
             <div class="form-group">
               <small style="color: var(--text-muted)">
-                Informe dia, mês e ano para identificarmos aniversário e faixa
-                etária corretamente.
+                O GuardIAn protege menores de 18 anos. Ao completar 18, o
+                monitoramento é encerrado automaticamente.
               </small>
             </div>
             <p class="error-message" id="addError"></p>
@@ -223,6 +223,32 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Delete Dependent Modal -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <div class="modal-header">
+          <h3 class="modal-title" id="deleteModalTitle">Excluir dependente</h3>
+          <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Tem certeza que deseja excluir <strong id="deleteDependentName"></strong>?</p>
+          <ul class="delete-warning-list">
+            <li>Os computadores vinculados serão desconectados.</li>
+            <li>Histórico de acessos, alertas e regras serão apagados.</li>
+            <li>Essa ação não pode ser desfeita.</li>
+          </ul>
+          <p class="error-message" id="deleteError"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="deleteConfirmBtn">
+            <span class="btn-icon">🗑️</span>
+            Excluir
+          </button>
+        </div>
       </div>
     </div>
 
@@ -308,6 +334,23 @@
       let dependentsList = [];
       let currentDependentId = null;
       let currentCode = null;
+      let editingId = null;
+      let deletingId = null;
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function formatIsoDate(value) {
+        if (!value) return "-";
+        const [y, m, d] = String(value).slice(0, 10).split("-");
+        return `${d}/${m}/${y}`;
+      }
       const monthNames = [
         "Janeiro",
         "Fevereiro",
@@ -337,10 +380,11 @@
           monthSelect.appendChild(option);
         });
 
-        for (let year = currentYear - 3; year >= currentYear - 18; year--) {
+        for (let year = currentYear; year >= currentYear - 18; year--) {
           const option = document.createElement("option");
           option.value = year;
-          option.textContent = `${year} (${currentYear - year} anos)`;
+          const years = Math.min(currentYear - year, 17);
+          option.textContent = `${year} (${years === 0 ? "menos de 1 ano" : years === 1 ? "1 ano" : `${years} anos`})`;
           yearSelect.appendChild(option);
         }
 
@@ -485,6 +529,14 @@
 
         $("#addForm").addEventListener("submit", handleAddDependent);
 
+        // Delete modal
+        $("#deleteModal .modal-close").addEventListener("click", () => closeModal("#deleteModal"));
+        $("#deleteModal .modal-cancel").addEventListener("click", () => closeModal("#deleteModal"));
+        $("#deleteModal").addEventListener("click", (e) => {
+          if (e.target === $("#deleteModal")) closeModal("#deleteModal");
+        });
+        $("#deleteConfirmBtn").addEventListener("click", handleDeleteDependent);
+
         // Code modal
         $("#codeModal .modal-close").addEventListener("click", () =>
           closeModal("#codeModal"),
@@ -530,16 +582,47 @@
         });
       }
 
-      function openAddModal() {
-        $("#nickname").value = "";
-        $("#sex").value = "";
-        $("#birthDay").value = "";
-        $("#birthMonth").value = "";
-        $("#birthYear").value = "";
+      function openAddModal(dep = null) {
+        editingId = dep ? dep.id : null;
+        const [year, month, day] = (dep?.birthDate || "").split("-");
+        $("#addModalTitle").textContent = dep ? "Editar Dependente" : "Adicionar Dependente";
+        $("#addSubmitBtn").innerHTML = dep
+          ? '<span class="btn-icon">💾</span> Salvar'
+          : '<span class="btn-icon">➕</span> Adicionar';
+        $("#nickname").value = dep?.nickname || "";
+        $("#sex").value = dep ? String(dep.sex || "").toUpperCase() : "";
+        $("#birthMonth").value = month || "";
+        $("#birthYear").value = year || "";
         updateBirthDayOptions();
+        $("#birthDay").value = day || "";
         $("#addError").textContent = "";
         $("#addModal").classList.add("show");
-        $("#sex").focus();
+        (dep ? $("#nickname") : $("#sex")).focus();
+      }
+
+      function openDeleteModal(dep) {
+        deletingId = dep.id;
+        $("#deleteDependentName").textContent = dep.nickname;
+        $("#deleteError").textContent = "";
+        $("#deleteModal").classList.add("show");
+      }
+
+      async function handleDeleteDependent() {
+        const btn = $("#deleteConfirmBtn");
+        const dep = dependentsList.find((d) => d.id === deletingId);
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-icon">⏳</span> Excluindo...';
+        try {
+          await dependents.remove(deletingId);
+          closeModal("#deleteModal");
+          showToast(`${dep?.nickname || "Dependente"} foi excluído.`, "success");
+          await loadDependents();
+        } catch (error) {
+          $("#deleteError").textContent = error.message;
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="btn-icon">🗑️</span> Excluir';
+        }
       }
 
       function closeModal(selector) {
@@ -584,14 +667,29 @@
             const sexLabel = formatSexLabel(dep);
             const ageLabel =
               age !== null ? `${age} anos` : "Idade não informada";
+            const name = escapeHtml(dep.nickname);
+            const id = escapeHtml(dep.id);
+            const ended = dep.monitoringEnded;
+            const days = dep.daysToAdulthood;
+            let notice = "";
+            if (ended) {
+              const until = dep.deletionDate ? new Date(dep.deletionDate).toLocaleDateString("pt-BR") : "-";
+              notice = `<div class="dependent-notice ended">🎓 ${name} completou 18 anos e o monitoramento foi encerrado. O histórico fica disponível até <strong>${until}</strong> e depois é apagado automaticamente.</div>`;
+            } else if (days !== null && days <= 30) {
+              notice = `<div class="dependent-notice">🎂 ${name} faz 18 anos em ${days} dia(s) (${formatIsoDate(dep.adulthoodDate)}). Nesse dia o monitoramento será encerrado automaticamente.</div>`;
+            }
 
             return `
-          <div class="dependent-card ${birthdayToday ? "dependent-card-birthday" : ""}" data-id="${dep.id}">
+          <div class="dependent-card ${birthdayToday ? "dependent-card-birthday" : ""} ${ended ? "dependent-card-ended" : ""}" data-id="${id}">
             <div class="dependent-header">
+              <div class="dependent-actions">
+                ${ended ? "" : `<button type="button" class="dependent-action-btn edit-btn" data-id="${id}" title="Editar ${name}" aria-label="Editar ${name}">✏️</button>`}
+                <button type="button" class="dependent-action-btn danger delete-btn" data-id="${id}" title="Excluir ${name}" aria-label="Excluir ${name}">🗑️</button>
+              </div>
               ${birthdayToday ? '<div class="dependent-birthday-tag">Aniversário Hoje</div>' : ""}
               <div class="dependent-avatar">${avatar}</div>
-              <div class="dependent-name">${dep.nickname}</div>
-              <div class="dependent-age">${ageLabel}</div>
+              <div class="dependent-name">${name}</div>
+              <div class="dependent-age">${ended ? "Monitoramento encerrado" : ageLabel}</div>
             </div>
             <div class="dependent-body">
               <div class="dependent-stat">
@@ -607,20 +705,33 @@
                 <span class="dependent-stat-value">${formatDate(dep.createdAt)}</span>
               </div>
             </div>
+            ${notice}
             <div class="dependent-footer">
-              <button class="btn btn-secondary view-btn" data-id="${dep.id}">
+              <button class="btn btn-secondary view-btn" data-id="${id}">
                 <span class="btn-icon">📊</span>
                 Ver Dados
               </button>
-              <button class="btn btn-primary code-btn" data-id="${dep.id}">
+              ${ended ? "" : `<button class="btn btn-primary code-btn" data-id="${id}">
                 <span class="btn-icon">🔗</span>
                 Vincular
-              </button>
+              </button>`}
             </div>
           </div>
         `;
           })
           .join("");
+
+        $$(".edit-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            openAddModal(dependentsList.find((d) => d.id === btn.dataset.id));
+          });
+        });
+
+        $$(".delete-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            openDeleteModal(dependentsList.find((d) => d.id === btn.dataset.id));
+          });
+        });
 
         // Add event listeners
         $$(".view-btn").forEach((btn) => {
@@ -663,23 +774,43 @@
           return;
         }
 
+        const age = getAgeFromBirthDate(birthDate);
+        if (new Date(`${birthDate}T00:00:00`) > new Date()) {
+          errorEl.textContent = "A data de nascimento não pode estar no futuro";
+          return;
+        }
+        if (age >= 18) {
+          errorEl.textContent = "O GuardIAn protege apenas menores de 18 anos";
+          return;
+        }
+
+        const editing = editingId;
         btn.disabled = true;
-        btn.innerHTML = '<span class="btn-icon">⏳</span> Adicionando...';
+        btn.innerHTML = editing
+          ? '<span class="btn-icon">⏳</span> Salvando...'
+          : '<span class="btn-icon">⏳</span> Adicionando...';
 
         try {
-          await dependents.create({
-            nickname,
-            birthDate,
-            sex,
-          });
-          showToast("Dependente adicionado! Clique em “Vincular” no cartão dele para conectar o navegador.", "success");
+          if (editing) {
+            await dependents.update(editing, { nickname, birthDate, sex });
+            showToast("Dados atualizados!", "success");
+          } else {
+            await dependents.create({
+              nickname,
+              birthDate,
+              sex,
+            });
+            showToast("Dependente adicionado! Clique em “Vincular” no cartão dele para conectar o navegador.", "success");
+          }
           closeModal("#addModal");
           await loadDependents();
         } catch (error) {
           errorEl.textContent = error.message;
         } finally {
           btn.disabled = false;
-          btn.innerHTML = '<span class="btn-icon">➕</span> Adicionar';
+          btn.innerHTML = editing
+            ? '<span class="btn-icon">💾</span> Salvar'
+            : '<span class="btn-icon">➕</span> Adicionar';
         }
       }
 

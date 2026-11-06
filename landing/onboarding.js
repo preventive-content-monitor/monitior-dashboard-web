@@ -176,7 +176,7 @@
           '<p class="onb-note" style="margin:0 0 10px">Cadastre seu filho aqui mesmo. Depois ele aparece no seu painel.</p>' +
           '<form id="depForm" class="dep-form" novalidate>' +
             '<div class="field-row"><label for="depNick"><strong>Nome ou apelido</strong></label><input id="depNick" maxlength="60" required autocomplete="off"></div>' +
-            '<div class="field-row"><label for="depBirth"><strong>Data de nascimento</strong></label><input id="depBirth" type="date" required max="' + new Date().toISOString().slice(0, 10) + '"></div>' +
+            '<div class="field-row"><label for="depBirth"><strong>Data de nascimento</strong></label><input id="depBirth" type="date" required min="' + (function () { var d = new Date(); d.setFullYear(d.getFullYear() - 18); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); })() + '" max="' + new Date().toISOString().slice(0, 10) + '"></div>' +
             '<div class="field-row"><span><strong>Sexo</strong></span><div class="dep-sex">' +
               '<label><input type="radio" name="depSex" value="MASCULINO" required> Menino</label>' +
               '<label><input type="radio" name="depSex" value="FEMININO"> Menina</label></div></div>' +

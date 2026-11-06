@@ -563,6 +563,8 @@
           .map((alert) => {
             const sev = alert.tipo === "PROTECAO"
               ? { ...(SEVERITY[alert.severidade] || SEVERITY.ATENCAO), icon: "🛡️", text: "Proteção" }
+              : alert.tipo === "MAIORIDADE"
+              ? { ...(SEVERITY[alert.severidade] || SEVERITY.INFO), icon: "🎓", text: "Maioridade" }
               : SEVERITY[alert.severidade] || SEVERITY.INFO;
 
             const metaParts = [];
@@ -584,7 +586,7 @@
                       ${metaParts.join(" · ")}
                     </span>
                     ${
-                      alert.referencia && alert.tipo !== "NOVO_DISPOSITIVO" && alert.tipo !== "PROTECAO"
+                      alert.referencia && !["NOVO_DISPOSITIVO", "PROTECAO", "MAIORIDADE"].includes(alert.tipo)
                         ? `<span class="alert-ref" title="${escapeHtml(alert.referencia)}">${escapeHtml(alert.referencia)}</span>`
                         : ""
                     }

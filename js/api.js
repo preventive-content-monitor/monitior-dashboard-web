@@ -65,6 +65,11 @@
       birthYear:
         dependent.birthYear ?? dependent.anoNascimento ?? birthYearFromDate,
       createdAt: dependent.createdAt ?? dependent.criadoEm,
+      age: dependent.idade ?? null,
+      adulthoodDate: dependent.maioridadeEm ?? null,
+      daysToAdulthood: dependent.diasParaMaioridade ?? null,
+      monitoringEnded: !!dependent.monitoramentoEncerrado,
+      deletionDate: dependent.exclusaoAgendadaEm ?? null,
     };
   }
 
@@ -359,6 +364,11 @@
       const found = mockDB.dependentes.find((d) => d.id === parts[2]);
       return { status: found ? 200 : 404, data: found || { mensagem: "Dependente não encontrado" } };
     }
+    if (parts[0] === "api" && parts[1] === "dependentes" && parts[2] && method === "DELETE") {
+      mockDB.dependentes = mockDB.dependentes.filter((d) => d.id !== parts[2]);
+      mockDB.dispositivos = mockDB.dispositivos.filter((d) => d.dependenteId !== parts[2]);
+      return { status: 204, data: null };
+    }
 
     // ---- Dispositivos ----
     if (path === "/api/dispositivos" && method === "GET") {
@@ -561,6 +571,15 @@
       await mockDelay(null, 200);
       return new Response(JSON.stringify(novo), {
         status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    const depPut = endpoint.match(/^\/api\/dependentes\/([^/?]+)$/);
+    if (depPut && method === "PUT" && body) {
+      const dep = mockDB.dependentes.find((d) => d.id === depPut[1]);
+      if (dep) Object.assign(dep, { apelido: body.apelido, dataNascimento: body.dataNascimento, sexo: body.sexo });
+      return new Response(JSON.stringify(dep || { mensagem: "Dependente não encontrado" }), {
+        status: dep ? 200 : 404,
         headers: { "Content-Type": "application/json" },
       });
     }
@@ -780,6 +799,19 @@
     async get(id) {
       const data = await apiGet(`/api/dependentes/${id}`);
       return normalizeDependent(data);
+    },
+
+    async update(id, { nickname, birthDate, sex }) {
+      const data = await apiPut(`/api/dependentes/${id}`, {
+        apelido: nickname,
+        dataNascimento: birthDate,
+        sexo: sex,
+      });
+      return normalizeDependent(data);
+    },
+
+    async remove(id) {
+      return apiDelete(`/api/dependentes/${id}`);
     },
   };
 
