@@ -77,6 +77,9 @@
       dependentNickname: device.dependentNickname ?? device.apelidoDependente,
       enrolledAt: device.enrolledAt ?? device.vinculadoEm,
       lastSeenAt: device.lastSeenAt ?? device.ultimoAcessoEm,
+      heartbeatAt: device.ultimoSinalEm ?? null,
+      incognitoAllowed: device.anonimoPermitido ?? null,
+      removedAt: device.removidoEm ?? null,
     };
   }
 

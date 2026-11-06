@@ -1,0 +1,303 @@
+/* ====================================
+   GuardIAn - Componentes da visão "família"
+   Compartilhado entre Dashboard e Relatórios.
+   Usa apenas os tokens de variables.css.
+   ==================================== */
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Barra de filtros ---------- */
+.fam-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.fam-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.fam-filter-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.fam-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.fam-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.fam-chip:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.fam-chip:focus-visible,
+.fam-btn-link:focus-visible,
+.fam-child-card a:focus-visible {
+  outline: 3px solid var(--input-focus-ring);
+  outline-offset: 2px;
+}
+
+.fam-chip[aria-pressed="true"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-on-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.fam-chip[aria-pressed="true"] .fam-avatar {
+  box-shadow: 0 0 0 2px var(--text-on-primary);
+}
+
+.fam-filters .fam-refresh {
+  margin-left: auto;
+  min-height: 44px;
+}
+
+/* ---------- Avatar com inicial ---------- */
+.fam-avatar {
+  --child-color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--child-color);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.fam-avatar.lg {
+  width: 52px;
+  height: 52px;
+  font-size: 1.4rem;
+}
+
+.fam-avatar.md {
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+}
+
+/* ---------- Faixa de resumo em linguagem simples ---------- */
+.fam-headline {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  border-left: 6px solid var(--success);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.fam-headline.tone-warning {
+  border-left-color: var(--warning);
+}
+.fam-headline.tone-danger {
+  border-left-color: var(--danger);
+}
+.fam-headline.tone-muted {
+  border-left-color: var(--border);
+}
+
+.fam-headline-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  font-size: 1.4rem;
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.tone-warning .fam-headline-icon {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+.tone-danger .fam-headline-icon {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+.tone-muted .fam-headline-icon {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+
+.fam-headline-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.fam-headline-text {
+  margin-top: var(--space-xs);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ---------- Pílula de nível de risco ---------- */
+.fam-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fam-pill.tone-success {
+  background: var(--success-light);
+  color: var(--success);
+}
+.fam-pill.tone-warning {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+.fam-pill.tone-danger {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+.fam-pill.tone-muted {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+
+/* ---------- Esqueleto de carregamento ---------- */
+.fam-skeleton {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    90deg,
+    var(--surface-muted) 0%,
+    var(--surface) 50%,
+    var(--surface-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: famShimmer 1.2s ease-in-out infinite;
+  min-height: 120px;
+}
+
+@keyframes famShimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- Estado vazio amigável ---------- */
+.fam-empty {
+  text-align: center;
+  padding: var(--space-xl) var(--space-lg);
+  color: var(--text-secondary);
+}
+
+.fam-empty-icon {
+  font-size: 2.4rem;
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.fam-empty-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-xs);
+}
+
+.fam-empty .btn {
+  margin-top: var(--space-md);
+}
+
+.fam-btn-link {
+  text-decoration: none;
+}
+
+.fam-card-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.fam-card-link:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fam-skeleton {
+    animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .fam-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+  }
+
+  .fam-filters .fam-refresh {
+    margin-left: 0;
+  }
+
+  .fam-headline {
+    padding: var(--space-md);
+  }
+}

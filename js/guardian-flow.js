@@ -252,11 +252,70 @@
     return ext.status;
   }
 
+  // ---------- Palavra-chave (protege a extensão contra desconexão) ----------
+  async function keywordDefined() {
+    var r = await api("/api/protecao/palavra-chave");
+    return !!(r && r.definida);
+  }
+
+  async function saveKeyword(palavra) {
+    await api("/api/protecao/palavra-chave", { method: "PUT", body: JSON.stringify({ palavraChave: palavra }) });
+  }
+
+  function askKeyword(opts) {
+    opts = opts || {};
+    return new Promise(function (resolve, reject) {
+      var wrap = document.createElement("div");
+      wrap.className = "gf-kw-overlay";
+      wrap.innerHTML =
+        '<form class="gf-kw" role="dialog" aria-modal="true" aria-labelledby="gfKwTitle">' +
+          '<div class="gf-kw-ico" aria-hidden="true">🔑</div>' +
+          '<h2 id="gfKwTitle">' + escapeHTML(opts.title || "Crie sua palavra-chave") + '</h2>' +
+          '<p>Só você vai saber. Ela é pedida para mexer na extensão — assim seu filho não consegue desligar a proteção.</p>' +
+          '<label>Palavra-chave<input name="a" type="password" autocomplete="new-password" minlength="4" maxlength="60" required placeholder="Ex.: nome do seu primeiro cachorro"></label>' +
+          '<label>Repita<input name="b" type="password" autocomplete="new-password" required></label>' +
+          '<p class="gf-kw-err" role="alert"></p>' +
+          '<div class="gf-kw-actions">' +
+            (opts.cancelable ? '<button type="button" class="gf-btn gf-btn-ghost" data-kw-cancel>Cancelar</button>' : "") +
+            '<button type="submit" class="gf-btn gf-btn-lg">Salvar palavra-chave</button>' +
+          "</div>" +
+        "</form>";
+      document.body.appendChild(wrap);
+      var form = wrap.querySelector("form");
+      var err = wrap.querySelector(".gf-kw-err");
+      form.a.focus();
+      var cancel = wrap.querySelector("[data-kw-cancel]");
+      if (cancel) cancel.addEventListener("click", function () { wrap.remove(); reject(new Error("cancelado")); });
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var a = form.a.value.trim(), b = form.b.value.trim();
+        if (a.length < 4) { err.textContent = "Use pelo menos 4 letras."; return; }
+        if (a !== b) { err.textContent = "As duas não estão iguais."; return; }
+        var btn = form.querySelector("[type=submit]");
+        btn.disabled = true; btn.textContent = "Salvando…";
+        try {
+          await saveKeyword(a);
+          wrap.remove();
+          resolve();
+        } catch (failure) {
+          err.textContent = failure.message;
+          btn.disabled = false; btn.textContent = "Salvar palavra-chave";
+        }
+      });
+    });
+  }
+
+  async function ensureKeyword() {
+    if (await keywordDefined()) return;
+    await askKeyword();
+  }
+
   async function enrollWithExtension(code) {
     var installed = await detectExtension();
     if (!installed || !installed.scopedEnrollment) {
       throw new Error("Atualize a extensão: baixe o novo ZIP, extraia na pasta atual e clique em Recarregar em chrome://extensions ou edge://extensions.");
     }
+    await ensureKeyword();
     var grant = await api("/api/autenticacao/autorizacao-vinculo", { method: "POST", body: "{}" });
     if (!grant || !grant.token) throw new Error("O servidor não retornou a autorização de vínculo.");
     try {
@@ -429,6 +488,12 @@
     generateCode: generateCode,
     createDependent: createDependent,
     reauth: reauth,
+    keyword: {
+      defined: keywordDefined,
+      save: saveKeyword,
+      ask: askKeyword,
+      ensure: ensureKeyword,
+    },
     extension: {
       current: function () { return ext.status; },
       detect: detectExtension,

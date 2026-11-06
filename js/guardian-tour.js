@@ -313,8 +313,8 @@
       });
     }, '<div class="gt-actions" style="flex-direction:column;align-items:stretch">' +
       '<button class="gf-btn gf-btn-lg" data-gt-back>Voltar para a instalação da extensão</button>' +
-      '<button class="gf-btn gf-btn-soft" style="margin:0" data-gt-role="same">Usamos o mesmo computador (pede e-mail e senha)</button>' +
-      '<button class="gf-btn gf-btn-ghost" data-gt-role="resp">Sou o responsável (pede e-mail e senha)</button></div>');
+      '<button class="gf-btn gf-btn-soft" style="margin:0" data-gt-role="same">Usamos o mesmo computador (confirmar senha)</button>' +
+      '<button class="gf-btn gf-btn-ghost" data-gt-role="resp">Sou o responsável (confirmar senha)</button></div>');
   }
 
   function codeCardHTML() {
@@ -352,6 +352,32 @@
     } finally {
       enroll.busy = false; current.key = null; render();
     }
+  }
+
+  var autoStarted = false;
+  function autoEnrollPanel(dep) {
+    if (!autoStarted && !enroll.busy) {
+      autoStarted = true;
+      enroll.busy = true; enroll.error = "";
+      (async function () {
+        try {
+          lastCode = { code: await F.generateCode(dep.id), dependentId: dep.id, at: Date.now() };
+        } catch (e) {
+          enroll.error = e.message; enroll.manual = true;
+        } finally {
+          enroll.busy = false;
+        }
+        if (lastCode && !enroll.error) await doEnroll();
+        if (enroll.error === "cancelado") { enroll.error = ""; autoStarted = false; }
+        current.key = null; render();
+      })();
+    }
+    panel("auto-enroll:" + enroll.busy, {
+      badge: "Passo 3 de 3",
+      title: "Extensão instalada! Protegendo " + esc(dep.nickname) + "…",
+      html: '<div class="gf-wait"><span class="gf-spin"></span>Conectando a extensão à sua conta. Você não precisa digitar nada.</div>',
+      step: 3, total: 3,
+    });
   }
 
   function donePanel(role) {
@@ -432,6 +458,8 @@
     if (role === "resp") return waitChildPanel();
 
     if (!F.extension.current()) return installPanel(role);
+
+    if (data.dependents.length === 1 && !enroll.manual) return autoEnrollPanel(data.dependents[0]);
 
     if (page !== "dependents.html") {
       return spot("link-nav", navLink("dependents.html"), {

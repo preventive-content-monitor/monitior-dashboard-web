@@ -112,6 +112,26 @@
           <p>Visualize e gerencie os dispositivos vinculados</p>
         </div>
 
+        <!-- Proteção -->
+        <div class="protect-grid">
+          <div class="card protect-card">
+            <div class="protect-ico">🔑</div>
+            <div class="protect-body">
+              <h3>Palavra-chave</h3>
+              <p id="keywordStatus">Verificando…</p>
+            </div>
+            <button class="btn btn-primary" id="keywordBtn" type="button">Criar</button>
+          </div>
+          <div class="card protect-card">
+            <div class="protect-ico">🛡️</div>
+            <div class="protect-body">
+              <h3>Blindar o computador do filho</h3>
+              <p>Bloqueia guia anônima, modo visitante e a página de extensões. Rode uma vez no PC do filho.</p>
+            </div>
+            <a class="btn btn-secondary" href="/downloads/GuardIAn-Blindagem.zip" download>Baixar</a>
+          </div>
+        </div>
+
         <!-- Filter -->
         <div class="card" style="margin-bottom: var(--space-lg)">
           <div
@@ -328,8 +348,31 @@
         $("#refreshBtn").addEventListener("click", loadData);
 
         setupPolicyModal();
+        $("#keywordBtn").addEventListener("click", async () => {
+          try {
+            await GuardianFlow.keyword.ask({ title: keywordSet ? "Trocar palavra-chave" : "Crie sua palavra-chave", cancelable: true });
+            showToast("Palavra-chave salva!", "success");
+            loadKeyword();
+          } catch (error) {
+            if (error.message !== "cancelado") showToast(error.message, "error");
+          }
+        });
+        loadKeyword();
 
         await loadData();
+      }
+
+      let keywordSet = false;
+      async function loadKeyword() {
+        try {
+          keywordSet = await GuardianFlow.keyword.defined();
+          $("#keywordStatus").textContent = keywordSet
+            ? "Ativa. Só quem sabe a palavra-chave consegue desconectar a extensão."
+            : "Ainda não criada. Crie agora para seu filho não conseguir desligar a proteção.";
+          $("#keywordBtn").textContent = keywordSet ? "Trocar" : "Criar";
+        } catch (error) {
+          $("#keywordStatus").textContent = "Não foi possível verificar agora.";
+        }
       }
 
       async function loadData() {
@@ -387,11 +430,20 @@
 
         tbody.innerHTML = filteredDevices
           .map((device) => {
-            const isOnline =
-              device.lastSeenAt &&
-              Date.now() - new Date(device.lastSeenAt).getTime() < 300000; // 5 min
-            const statusClass = isOnline ? "success" : "warning";
-            const statusText = isOnline ? "Online" : "Offline";
+            const seen = device.heartbeatAt || device.lastSeenAt;
+            const isOnline = seen && Date.now() - new Date(seen).getTime() < 15 * 60000;
+            let statusClass = isOnline ? "success" : "warning";
+            let statusText = isOnline ? "🛡️ Protegido" : "Desligado";
+            let statusHint = seen ? "Último sinal " + formatRelativeTime(seen) : "Ainda sem sinal";
+            if (device.removedAt) {
+              statusClass = "danger";
+              statusText = "⚠️ Extensão removida";
+              statusHint = "Removida " + formatRelativeTime(device.removedAt) + ". Reinstale e vincule de novo.";
+            } else if (device.incognitoAllowed === false) {
+              statusClass = "warning";
+              statusText = "⚠️ Guia anônima sem proteção";
+              statusHint = "Ative “Permitir no modo anônimo” na extensão ou use a blindagem abaixo.";
+            }
 
             const deviceIcon = getDeviceIcon(device.name || "");
 
@@ -416,6 +468,7 @@
             <td>${device.lastSeenAt ? formatRelativeTime(device.lastSeenAt) : "Nunca"}</td>
             <td>
               <span class="badge badge-${statusClass}">${statusText}</span>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">${statusHint}</div>
             </td>
             <td>
               <button class="btn btn-ghost btn-small policy-btn" data-id="${device.id}" title="Configurar Política">
@@ -571,7 +624,7 @@
       }
 
       // Start
-      init();
+      window.addEventListener("DOMContentLoaded", init);
     </script>
     <script src="js/guardian-flow.js"></script>
     <script src="js/guardian-tour.js"></script>

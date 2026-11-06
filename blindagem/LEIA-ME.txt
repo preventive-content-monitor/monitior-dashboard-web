@@ -1,0 +1,17 @@
+﻿GuardIAn - Blindar o computador do filho
+=========================================
+
+O que faz (só no Chrome e no Edge deste computador):
+  - Desliga a guia anônima / InPrivate
+  - Desliga o modo visitante e a criação de novos perfis
+  - Bloqueia a página de extensões (para a extensão não ser desligada)
+
+Como usar:
+  1. Dê dois cliques em "Blindar-GuardIAn.bat"
+  2. Clique em "Sim" quando o Windows pedir permissão
+  3. Feche e abra o navegador
+
+Para desfazer: dois cliques em "Remover-Blindagem.bat".
+
+Privacidade (LGPD): nada é enviado para a internet. São só configurações
+do próprio navegador, visíveis em chrome://policy.

@@ -561,7 +561,9 @@
 
         list.innerHTML = result.items
           .map((alert) => {
-            const sev = SEVERITY[alert.severidade] || SEVERITY.INFO;
+            const sev = alert.tipo === "PROTECAO"
+              ? { ...(SEVERITY[alert.severidade] || SEVERITY.ATENCAO), icon: "🛡️", text: "Proteção" }
+              : SEVERITY[alert.severidade] || SEVERITY.INFO;
 
             const metaParts = [];
             if (alert.dependente) metaParts.push(escapeHtml(alert.dependente));
@@ -582,7 +584,7 @@
                       ${metaParts.join(" · ")}
                     </span>
                     ${
-                      alert.referencia && alert.tipo !== "NOVO_DISPOSITIVO"
+                      alert.referencia && alert.tipo !== "NOVO_DISPOSITIVO" && alert.tipo !== "PROTECAO"
                         ? `<span class="alert-ref" title="${escapeHtml(alert.referencia)}">${escapeHtml(alert.referencia)}</span>`
                         : ""
                     }
