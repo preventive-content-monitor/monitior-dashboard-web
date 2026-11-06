@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/guardian-tour.css" />
     <link rel="stylesheet" href="css/family.css" />
-    <link rel="stylesheet" href="css/overview.css?v=2" />
+    <link rel="stylesheet" href="css/overview.css?v=3" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -195,7 +195,20 @@
             </div>
           </section>
 
-          <section class="card" aria-labelledby="topSitesTitle">
+          <section class="card" aria-labelledby="recentAlertsTitle">
+            <div class="card-header">
+              <h2 class="card-title" id="recentAlertsTitle">
+                <i class="fa-solid fa-bell ui-icon ui-icon-tone-primary" aria-hidden="true"></i>
+                Últimos avisos
+              </h2>
+              <a class="fam-card-link" href="alerts.html">Ver todos os alertas</a>
+            </div>
+            <div class="card-body ov-alerts" id="recentAlerts">
+              <div class="fam-skeleton"></div>
+            </div>
+          </section>
+
+          <section class="card ov-sites-card" aria-labelledby="topSitesTitle">
             <div class="card-header">
               <h2 class="card-title" id="topSitesTitle">
                 <i class="fa-solid fa-globe ui-icon ui-icon-tone-primary" aria-hidden="true"></i>
@@ -208,18 +221,6 @@
           </section>
         </div>
 
-        <section class="card ov-section" aria-labelledby="recentAlertsTitle">
-          <div class="card-header">
-            <h2 class="card-title" id="recentAlertsTitle">
-              <i class="fa-solid fa-bell ui-icon ui-icon-tone-primary" aria-hidden="true"></i>
-              Últimos avisos
-            </h2>
-            <a class="fam-card-link" href="alerts.html">Ver todos os alertas</a>
-          </div>
-          <div class="card-body ov-alerts" id="recentAlerts">
-            <div class="fam-skeleton"></div>
-          </div>
-        </section>
       </main>
     </div>
 
