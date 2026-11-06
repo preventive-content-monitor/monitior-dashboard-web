@@ -260,77 +260,6 @@
     box.innerHTML = children.map(childCard).join("");
   }
 
-  // ---------- Comparação (barras em CSS puro) ----------
-  function renderCompare(children) {
-    const card = $("#compareCard");
-    const withDevices = children.filter((c) => c.devices.length);
-    if (state.selected !== "all" || withDevices.length < 2) {
-      card.hidden = true;
-      return;
-    }
-    card.hidden = false;
-
-    const rows = withDevices.map((child) => {
-      const stats = state.data.stats.get(child.id);
-      return {
-        child,
-        values: {
-          totalEvents: stats.totalEvents,
-          blockAttempts: stats.blockAttempts,
-          sensitiveEvents: stats.sensitiveEvents,
-          alerts: childAlerts(child).length,
-          riskScore: stats.riskScore ?? 0,
-        },
-      };
-    });
-
-    const metrics = [
-      { key: "totalEvents", label: "Acessos à internet", icon: "fa-globe" },
-      { key: "blockAttempts", label: "Tentativas bloqueadas", icon: "fa-ban" },
-      { key: "sensitiveEvents", label: "Conteúdo sensível", icon: "fa-triangle-exclamation" },
-      { key: "alerts", label: "Alertas recebidos", icon: "fa-bell" },
-      { key: "riskScore", label: "Nível de risco (0 a 100)", icon: "fa-gauge-high", max: 100 },
-    ];
-
-    $("#compareLegend").innerHTML = withDevices
-      .map((c) => `<span class="ov-legend-item">${F.avatarHtml(c)} ${escapeHtml(c.nickname)}</span>`)
-      .join("");
-
-    $("#compareBody").innerHTML = metrics
-      .map((m) => {
-        const max = m.max || Math.max(1, ...rows.map((r) => r.values[m.key]));
-        const top = [...rows].sort((a, b) => b.values[m.key] - a.values[m.key]);
-        const leader =
-          top[0].values[m.key] > 0 && top[0].values[m.key] !== (top[1]?.values[m.key] ?? -1)
-            ? `${top[0].child.nickname} tem mais`
-            : top[0].values[m.key] === 0
-              ? "Nenhum registro"
-              : "Empate";
-        return `
-          <div class="ov-compare-group" role="group" aria-label="${escapeHtml(m.label)}">
-            <div class="ov-compare-head">
-              <span><i class="fa-solid ${m.icon}" aria-hidden="true"></i> ${m.label}</span>
-              <span class="ov-compare-leader">${escapeHtml(leader)}</span>
-            </div>
-            ${rows
-              .map(({ child, values }) => {
-                const value = values[m.key];
-                const width = value > 0 ? Math.max(3, (value / max) * 100) : 0;
-                return `
-                  <div class="ov-bar-row">
-                    <span class="ov-bar-name">${escapeHtml(child.nickname)}</span>
-                    <div class="ov-bar-track" aria-hidden="true">
-                      <div class="ov-bar-fill" style="width: ${width}%; --child-color: ${escapeHtml(child.color)}"></div>
-                    </div>
-                    <span class="ov-bar-value">${formatNumber(value)}</span>
-                  </div>`;
-              })
-              .join("")}
-          </div>`;
-      })
-      .join("");
-  }
-
   // ---------- Gráfico de risco (Chart.js já usado no projeto) ----------
   function chartColors() {
     const css = getComputedStyle(document.documentElement);
@@ -567,7 +496,6 @@
     syncPeriodChips();
     renderHeadline(children);
     renderCards(children);
-    renderCompare(children);
     renderRiskChart(children);
     renderTopSites(children);
     renderAlerts(children);
