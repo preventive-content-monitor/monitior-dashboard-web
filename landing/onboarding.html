@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Passo a passo | GuardIAn</title>
   <link rel="icon" type="image/png" href="img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="telas.css?v=2">
-  <link rel="stylesheet" href="responsive.css?v=7">
+  <link rel="stylesheet" href="telas.css">
+  <link rel="stylesheet" href="responsive.css?v=8">
   <link rel="stylesheet" href="/dashboard/css/guardian-tour.css">
 </head>
 <body>
@@ -28,8 +28,6 @@
           <span class="step-label" id="stepLabel">&nbsp;</span>
         </div>
 
-        <p class="onb-mobile-note">Painel no celular. Extensão no computador que será protegido.</p>
-
         <div class="screen" data-screen="intro">
           <h1 tabindex="-1">Seja bem-vindo ao GuardIAn</h1>
           <p class="lead">Acreditamos que a tecnologia que expõe também pode ser a tecnologia que protege, quando usada de forma inteligente.</p>
@@ -42,12 +40,12 @@
         </div>
 
         <div class="screen" data-screen="choose" data-step="1">
-          <h1 tabindex="-1">Qual computador você usa?</h1>
-          <p class="lead">Escolha onde usar o GuardIAn.</p>
+          <h1 tabindex="-1">Para começar, escolha o computador</h1>
+          <p class="lead">Essa escolha nos ajuda a configurar o monitoramento.</p>
           <div class="choices">
-            <button class="choice" data-pick="minor"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><span class="t"><strong>Computador do menor</strong><span class="d">Será monitorado. Outros painéis pedirão login de novo por segurança.</span></span><span class="go" aria-hidden="true">Escolher este</span></button>
-            <button class="choice" data-pick="resp"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span class="t"><strong>Computador do responsável</strong><span class="d">Acompanhe tudo pelo painel.</span></span><span class="go" aria-hidden="true">Escolher este</span></button>
-            <button class="choice" data-pick="same"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 9h8M8 12h5"/></svg></span><span class="t"><strong>Usamos o mesmo computador</strong><span class="d">Use o painel e a extensão aqui.</span></span><span class="go" aria-hidden="true">Configurar aqui</span></button>
+            <button class="choice" data-pick="minor"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20M12 8l3 1.2v2c0 1.5-1.2 2.5-3 3-1.8-.5-3-1.5-3-3v-2z"/></svg></span><span class="t"><strong>Este é o computador de um menor de idade</strong><span class="d">Será monitorado. Por segurança, você terá que entrar novamente nos painéis abertos em outros computadores.</span></span><span class="go">Escolher este</span></button>
+            <button class="choice" data-pick="resp"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span class="t"><strong>Este é o computador do responsável</strong><span class="d">Você terá acesso e controle sobre o monitoramento</span></span><span class="go">Escolher este</span></button>
+            <button class="choice" data-pick="same"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 9h8M8 12h5"/></svg></span><span class="t"><strong>Vou configurar os dois neste computador</strong><span class="d">Primeiro o painel do responsável, depois a extensão a ser monitorada</span></span><span class="go">Configurar aqui</span></button>
           </div>
         </div>
 
@@ -58,13 +56,11 @@
         </div>
 
         <div class="screen" data-screen="guide" data-step="2">
-          <div class="guide-summary">
-            <h1 tabindex="-1" id="guideTitle">Vamos configurar a proteção</h1>
-            <p class="lead" id="guideLead"></p>
-            <ul class="gf-check" id="guideCheck"></ul>
-            <div class="onb-cta">
-              <button class="btn-primary" id="guideCta" type="button">Começar</button>
-            </div>
+          <h1 tabindex="-1" id="guideTitle">Vamos configurar a proteção</h1>
+          <p class="lead" id="guideLead"></p>
+          <ul class="gf-check" id="guideCheck"></ul>
+          <div class="onb-cta">
+            <button class="btn-primary" id="guideCta" type="button">Começar</button>
           </div>
           <div id="guideExtra"></div>
           <p class="onb-note" id="guideNote"></p>
@@ -111,15 +107,15 @@
           <div class="onb-cta">
             <a class="btn-primary r-not-minor" href="/dashboard/">Acessar o painel</a>
             <button class="btn-primary r-minor" type="button" data-reauth="resp">Abrir o painel (pede e-mail e senha)</button>
-            <button class="btn-secondary r-not-minor" type="button" data-go="reinstall"><span class="onb-desktop-label">Instalar a extensão neste computador</span><span class="onb-mobile-label">Ver como instalar a extensão</span></button>
+            <button class="btn-secondary r-not-minor" type="button" data-go="reinstall">Instalar a extensão neste computador</button>
             <button class="btn-secondary r-minor" type="button" data-go="guide">Ver instruções da extensão</button>
           </div>
           <p class="onb-note"><button type="button" class="link" data-logout>Sair da conta</button></p>
         </div>
 
         <div class="screen" data-screen="reinstall">
-          <h1 tabindex="-1"><span class="onb-desktop-label">Instalar a extensão neste computador</span><span class="onb-mobile-label">Como instalar a extensão</span></h1>
-          <p class="lead"><span class="onb-desktop-label">Siga os passos. Quando a extensão aparecer, escolha qual filho usa este computador e vinculamos automaticamente.</span><span class="onb-mobile-label">Abra esta página no computador que será protegido para instalar a extensão e vinculá-la ao perfil do seu filho.</span></p>
+          <h1 tabindex="-1">Instalar a extensão neste computador</h1>
+          <p class="lead">Siga os passos. Quando a extensão aparecer, escolha qual filho usa este computador e vinculamos automaticamente.</p>
           <div class="onb-cta" style="margin-bottom:16px"><button class="btn-primary" type="button" data-download>Baixar a extensão</button></div>
           <div id="reinstallGuide"></div>
           <div id="reinstallLink" hidden>

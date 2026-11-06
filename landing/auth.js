@@ -6,7 +6,7 @@
   var form = document.getElementById('form'), submit = document.getElementById('submit');
   var titulos = {
     entrar: ['Bem-vindo de volta', 'Entre para acompanhar a proteção digital da sua família.', 'Fazer Login'],
-    cadastro: ['Crie sua conta', 'Crie sua conta e siga o passo a passo.', 'Fazer Cadastro']
+    cadastro: ['Crie sua conta', 'Leva menos de um minuto. Depois, configure a proteção passo a passo.', 'Fazer Cadastro']
   };
   var aba = 'entrar';
 
@@ -18,7 +18,7 @@
     submit.textContent = titulos[a][2];
     document.getElementById('senha').autocomplete = a === 'entrar' ? 'current-password' : 'new-password';
     seg.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.abaBtn === a); });
-    document.querySelector('.legal').hidden = a !== 'cadastro';
+    document.querySelector('.legal').style.visibility = a === 'cadastro' ? 'visible' : 'hidden';
     limpar();
     document.title = (a === 'entrar' ? 'Entrar' : 'Cadastrar') + ' | GuardIAn';
     if (foco) document.getElementById('email').focus();
@@ -55,7 +55,7 @@
     if (/[^A-Za-z0-9]/.test(s)) n++;
     return s ? Math.max(1, n) : 0;
   }
-  var nomes = ['8 ou mais caracteres, com letras e números.', 'Senha fraca', 'Senha razoável', 'Senha boa', 'Senha forte'];
+  var nomes = ['Use 8 ou mais caracteres, com letras e números.', 'Senha fraca', 'Senha razoável', 'Senha boa', 'Senha forte'];
   document.getElementById('senha').addEventListener('input', function () {
     if (aba !== 'cadastro') return;
     var n = forca(this.value);
