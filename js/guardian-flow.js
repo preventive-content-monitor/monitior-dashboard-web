@@ -316,8 +316,8 @@
 
   async function enrollWithExtension(code) {
     var installed = await detectExtension();
-    if (!installed || !installed.scopedEnrollment) {
-      throw new Error("Atualize a extensão: baixe o novo ZIP, extraia na pasta atual e clique em Recarregar em chrome://extensions ou edge://extensions.");
+    if (!installed || !installed.scopedEnrollment || installed.browserProtection !== true) {
+      throw new Error("Atualize a extensão para ativar a proteção contra guia anônima e alterações no navegador: baixe o novo ZIP, substitua os arquivos e clique em Recarregar.");
     }
     await ensureKeyword();
     var grant = await api("/api/autenticacao/autorizacao-vinculo", { method: "POST", body: "{}" });
@@ -354,12 +354,12 @@
   function browserInfo() {
     var ua = navigator.userAgent;
     if (/Edg\//.test(ua)) {
-      return { name: "Microsoft Edge", page: "edge://extensions", dev: "Modo de desenvolvedor", devWhere: "no menu à esquerda", load: "Carregar sem pacote", supported: true };
+      return { name: "Microsoft Edge", page: "edge://extensions", dev: "Modo de desenvolvedor", devWhere: "no menu à esquerda", load: "Carregar sem pacote", incognito: "Permitir em InPrivate", supported: true };
     }
     if (/Chrome\//.test(ua) && !/OPR\//.test(ua)) {
-      return { name: "Google Chrome", page: "chrome://extensions", dev: "Modo do desenvolvedor", devWhere: "no canto superior direito", load: "Carregar sem compactação", supported: true };
+      return { name: "Google Chrome", page: "chrome://extensions", dev: "Modo do desenvolvedor", devWhere: "no canto superior direito", load: "Carregar sem compactação", incognito: "Permitir no modo anônimo", supported: true };
     }
-    return { name: "este navegador", page: "chrome://extensions", dev: "Modo do desenvolvedor", devWhere: "no canto superior direito", load: "Carregar sem compactação", supported: false };
+    return { name: "este navegador", page: "chrome://extensions", dev: "Modo do desenvolvedor", devWhere: "no canto superior direito", load: "Carregar sem compactação", incognito: "Permitir no modo anônimo", supported: false };
   }
 
   function downloadExtension() {
@@ -393,9 +393,11 @@
     var b = browserInfo();
     var warn = b.supported ? "" :
       '<div class="gf-alert">Para instalar a extensão, abra este site no <strong>Google Chrome</strong> ou no <strong>Microsoft Edge</strong>.</div>';
+    var protection = '<div class="gf-alert">Depois de vincular, o GuardIAn fecha abas anônimas (com a permissão ativada) e protege as páginas de extensões e de restauração. O responsável pode liberar essas configurações por 5 minutos com a palavra-chave.</div>';
     return (
       warn +
       '<div class="gf-alert">Já tinha o Guardian instalado? Não digite sua senha na versão antiga. Baixe este ZIP, substitua os arquivos na pasta anterior e clique em <strong>Recarregar</strong> na página de extensões.</div>' +
+      protection +
       '<ol class="gf-steps">' +
         '<li data-gf-step="download"><span class="gf-n">1</span><div>' +
           '<h3>Baixe a extensão</h3>' +
@@ -422,8 +424,13 @@
           '<div class="gf-mock"><span class="gf-mock-btn">' + b.load + '</span><span class="gf-mock-btn ghost">Compactar extensão</span></div>' +
         '</div></li>' +
         '<li><span class="gf-n">6</span><div>' +
-          '<h3>Pronto, volte para cá</h3>' +
-          '<p>Assim que a extensão for instalada, esta tela atualiza sozinha e continua o passo a passo.</p>' +
+          '<h3>Ative a proteção em janelas anônimas</h3>' +
+          '<p>No cartão do GuardIAn, clique em <strong>Detalhes</strong> e ligue <strong>' + b.incognito + '</strong>. Essa permissão deixa a extensão fechar uma janela anônima se ela for aberta. O Chrome e o Edge deixam essa opção desligada por padrão.</p>' +
+          '<div class="gf-mock"><span class="gf-mock-title">Guardian - Proteção Familiar</span><span class="gf-mock-btn ghost">Detalhes</span><span class="gf-toggle"><i></i></span><small>' + b.incognito + '</small></div>' +
+        '</div></li>' +
+        '<li><span class="gf-n">7</span><div>' +
+          '<h3>Volte para cá</h3>' +
+          '<p>Esta tela percebe sozinha quando você terminar e continua o passo a passo.</p>' +
         '</div></li>' +
       '</ol>' +
       '<div class="gf-wait" data-gf-wait><span class="gf-spin"></span>Aguardando a extensão ser instalada neste navegador…</div>'

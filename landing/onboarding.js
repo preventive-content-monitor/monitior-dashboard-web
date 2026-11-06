@@ -41,16 +41,20 @@
   }
 
   function linked() {
+    if (extOutdated()) return false;
     if (F.isMinor()) return !!(extStatus && extStatus.scopedEnrollment && extStatus.enrolled);
     return !!((status && status.devices.length) || (extStatus && extStatus.enrolled));
   }
   function extInstalled() { return !!(extStatus && extStatus.installed); }
-  function extOutdated() { return extInstalled() && !extStatus.scopedEnrollment; }
+  function extOutdated() {
+    return extInstalled() && (!extStatus.scopedEnrollment || extStatus.browserProtection !== true);
+  }
 
   var restrictedAsked = /[?&]restrito=1/.test(location.search);
   function decide() {
     var st = F.getState();
     if (restrictedAsked && (F.isMinor() || st.role === 'minor')) { restrictedAsked = false; return 'restricted'; }
+    if (extOutdated() && st.role) return 'guide';
     if (linked()) return st.role && !st.doneAck ? 'complete' : 'home';
     if (st.role) return 'guide';
     return 'intro';
@@ -76,6 +80,7 @@
     var outdated = extOutdated();
     var needsAuth = !!(extStatus && extStatus.requiresAuthorization);
     var hasDep = deps.length > 0, inst = extInstalled() && !outdated, isLinked = linked();
+    var incognitoAllowed = !!(inst && extStatus.anonimoPermitido);
     var depSub = hasDep ? deps.length + ' dependente(s) cadastrado(s)' : '';
     var list = [item(true, false, 'Conta de responsável criada', esc(F.email()))];
     var cta = $('guideCta');
@@ -83,6 +88,7 @@
 
     if (role === 'minor') {
       list.push(item(inst, !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'Siga o guia abaixo'));
+      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Ativar proteção em janelas anônimas', incognitoAllowed ? 'Permissão ativada' : 'Uma opção do navegador'));
       list.push(item(hasDep, inst && !hasDep, 'Cadastrar o filho', F.hasSetupSession() ? (depSub || 'Aqui mesmo, só o nome e a idade') : 'No painel do responsável'));
       list.push(item(isLinked, inst && !isLinked, 'Vincular este computador ao filho', F.hasSetupSession() ? 'Aqui mesmo, com um clique' : 'Com o código do painel'));
       $('guideTitle').textContent = inst ? 'Extensão instalada! Falta vincular' : 'Vamos proteger este computador';
@@ -113,17 +119,24 @@
     } else {
       list.push(item(hasDep, !hasDep, 'Cadastrar o filho no painel', depSub || 'Primeiro passo, no painel'));
       list.push(item(inst, hasDep && !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'O painel mostra como baixar e instalar'));
+      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Ativar proteção em janelas anônimas', incognitoAllowed ? 'Permissão ativada' : 'Uma opção do navegador'));
       list.push(item(isLinked, hasDep && inst && !isLinked, 'Vincular este navegador ao filho', 'Um clique no painel, no botão destacado'));
       $('guideTitle').textContent = 'Vamos configurar tudo neste computador';
       $('guideLead').textContent = 'Primeiro o painel, depois a extensão. O painel abre em outra aba com cada passo destacado; esta aba fica aqui acompanhando.';
       cta.textContent = 'Abrir o painel';
       cta.className = 'btn-primary';
     }
+    if (outdated && role !== 'minor') {
+      $('guideTitle').textContent = 'Atualize a extensão neste computador';
+      $('guideLead').textContent = 'A versão atual precisa ser instalada para proteger as configurações do navegador e as janelas anônimas.';
+      cta.textContent = 'Baixar a versão atualizada';
+      cta.className = 'btn-primary';
+    }
     $('guideCheck').innerHTML = list.join('');
 
     var extra = $('guideExtra');
     var sig = deps.map(function (d) { return d.id; }).join(',');
-    var key = [role, !!st.downloadedAt, inst, outdated, needsAuth, sig, F.hasSetupSession(), guideLink.busy, guideLink.error].join('|');
+    var key = [role, !!st.downloadedAt, inst, outdated, needsAuth, incognitoAllowed, sig, F.hasSetupSession(), guideLink.busy, guideLink.error].join('|');
     if (extra.dataset.key !== key) {
       extra.dataset.key = key;
       var keep = extra.querySelector('#guideDep');
@@ -155,24 +168,28 @@
   }
 
   function guideExtraHTML(role, st, inst, deps, outdated, needsAuth) {
+    if (outdated) return F.updateGuideHTML();
+    var incognitoSetup = inst && extStatus && extStatus.anonimoPermitido === false
+      ? '<div class="gf-alert"><strong>Falta ativar uma opção:</strong> na página de extensões, clique em <strong>Detalhes</strong> no GuardIAn e ligue <strong>' + F.browserInfo().incognito + '</strong>. Depois volte aqui; o passo será confirmado automaticamente.</div>' +
+        '<div class="gf-mock"><span class="gf-mock-title">Guardian - Proteção Familiar</span><span class="gf-mock-btn ghost">Detalhes</span><span class="gf-toggle"><i></i></span><small>' + F.browserInfo().incognito + '</small></div>'
+      : '';
     if (role === 'minor') {
-      if (outdated) return F.updateGuideHTML();
       if (needsAuth) {
-        return '<div class="gf-alert">Clique no ícone do <strong>Guardian</strong> ao lado da barra de endereço (ou em 🧩 → Guardian) e entre com a conta do responsável. Não é necessário gerar outro código.</div>' +
+        return incognitoSetup + '<div class="gf-alert">Clique no ícone do <strong>Guardian</strong> ao lado da barra de endereço (ou em 🧩 → Guardian) e entre com a conta do responsável. Não é necessário gerar outro código.</div>' +
           '<div class="gf-wait"><span class="gf-spin"></span>Aguardando a reautorização da extensão…</div>';
       }
       if (!inst) {
         return st.downloadedAt ? '<h2 style="margin-bottom:12px">Como instalar a extensão</h2>' + F.installGuideHTML() : '';
       }
       if (!F.hasSetupSession()) {
-        return '<h2 style="margin:4px 0 6px">Vincule este computador</h2>' +
+        return incognitoSetup + '<h2 style="margin:4px 0 6px">Vincule este computador</h2>' +
           '<p class="onb-note">A sessão do responsável não fica salva aqui. Para continuar, use o código gerado no seu painel.</p>' +
           (guideLink.error ? '<p class="error" role="alert">' + esc(guideLink.error) + '</p>' : '') +
           '<ol>' + panelStepsHTML(true) + '<li>De volta neste computador:</li>' + popupStepsHTML() + '</ol>' +
           '<p class="onb-note">Prefere cadastrar e vincular aqui? <a href="/auth.html?configurar=1">Confirme sua senha para uma configuração temporária</a>.</p>';
       }
       if (!deps.length) {
-        return '<h2 style="margin:4px 0 6px">Quem vai usar este computador?</h2>' +
+        return incognitoSetup + '<h2 style="margin:4px 0 6px">Quem vai usar este computador?</h2>' +
           '<p class="onb-note" style="margin:0 0 10px">Cadastre seu filho aqui mesmo. Depois ele aparece no seu painel.</p>' +
           '<form id="depForm" class="dep-form" novalidate>' +
             '<div class="field-row"><label for="depNick"><strong>Nome ou apelido</strong></label><input id="depNick" maxlength="60" required autocomplete="off"></div>' +
@@ -184,7 +201,7 @@
             '<div class="onb-cta"><button class="btn-primary" type="submit">Cadastrar e continuar</button></div>' +
           '</form>';
       }
-      return '<div class="field-row"><label for="guideDep"><strong>Quem usa este computador?</strong></label><select id="guideDep">' +
+      return incognitoSetup + '<div class="field-row"><label for="guideDep"><strong>Quem usa este computador?</strong></label><select id="guideDep">' +
           deps.map(function (d) { return '<option value="' + esc(d.id) + '">' + esc(d.nickname) + '</option>'; }).join('') +
         '</select></div>' +
         '<p class="error" role="alert">' + esc(guideLink.error) + '</p>' +
@@ -195,7 +212,7 @@
     }
     if (role === 'resp') {
       var here = inst
-        ? '<div class="gf-wait ok"><span class="gf-spin"></span>A extensão já está instalada neste navegador.</div>' +
+        ? incognitoSetup + '<div class="gf-wait ok"><span class="gf-spin"></span>A extensão já está instalada neste navegador.</div>' +
           '<p class="onb-note">Seu filho também usa este computador? <button type="button" class="link" data-same-here>Vincular este navegador agora</button></p>'
         : '';
       return here + '<div class="next-pc"><h2>' + (inst ? 'Ou, se ele usa outro computador:' : 'Depois, no computador do seu filho:') + '</h2><ol>' +
@@ -206,14 +223,14 @@
         '<div class="gf-wait"><span class="gf-spin"></span>Aguardando o primeiro computador ser vinculado…</div>' +
         '<p class="onb-note">' + (inst ? '' : 'Quer proteger este navegador também? <button type="button" class="link" data-optional-download>Baixar a extensão (opcional)</button>') + '</p>';
     }
-    if (inst) return '<div class="gf-wait ok"><span class="gf-spin"></span>Extensão instalada! Volte ao painel e clique no botão destacado para vincular.</div>';
+    if (inst) return incognitoSetup + '<div class="gf-wait ok"><span class="gf-spin"></span>Extensão instalada! Volte ao painel e clique no botão destacado para vincular.</div>';
     if (deps.length) return '<div class="gf-wait"><span class="gf-spin"></span>Dependente cadastrado. No painel, baixe e instale a extensão seguindo o destaque.</div>';
     return '';
   }
 
   $('guideCta').addEventListener('click', function () {
     var st = F.getState();
-    if (st.role === 'minor') F.downloadExtension();
+    if (extOutdated() || st.role === 'minor') F.downloadExtension();
     else openPanel(F.URLS.dependents);
     renderGuide();
   });
