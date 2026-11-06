@@ -102,7 +102,7 @@
 
   function ageText(child) {
     if (!child.birthYear) return "";
-    const age = calculateAge(child.birthYear);
+    const age = Number.isFinite(child.age) ? child.age : calculateAge(child.birthYear);
     return Number.isFinite(age) ? `${age} anos` : "";
   }
 

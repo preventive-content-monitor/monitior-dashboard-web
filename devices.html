@@ -387,7 +387,7 @@
           dependentsList.forEach((dep) => {
             const option = document.createElement("option");
             option.value = dep.id;
-            option.textContent = `${dep.nickname} (${calculateAge(dep.birthYear)} anos)`;
+            option.textContent = `${dep.nickname} (${Number.isFinite(dep.age) ? dep.age : calculateAge(dep.birthYear)} anos)`;
             filter.appendChild(option);
           });
 

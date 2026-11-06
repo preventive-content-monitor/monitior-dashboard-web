@@ -126,7 +126,7 @@
 
   function ageOf(dep) {
     if (!dep?.birthYear) return null;
-    const age = calculateAge(Number(dep.birthYear));
+    const age = Number.isFinite(dep.age) ? dep.age : calculateAge(Number(dep.birthYear));
     return Number.isFinite(age) && age >= 0 && age < 30 ? age : null;
   }
 

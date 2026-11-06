@@ -173,178 +173,173 @@
     return d.toISOString();
   }
 
+  function localDay(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function birthDateYearsAgo(years, extraDays = 0) {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - years);
+    d.setDate(d.getDate() + extraDays);
+    return localDay(d);
+  }
+
+  function minutesAgoIso(minutes) {
+    return new Date(Date.now() - minutes * 60000).toISOString();
+  }
+
   const mockDB = {
     dependentes: [
-      {
-        id: "1",
-        apelido: "Sofia",
-        dataNascimento: "2014-05-12",
-        sexo: "FEMININO",
-        criadoEm: isoDaysAgo(180),
-      },
-      {
-        id: "2",
-        apelido: "Lucas",
-        dataNascimento: "2016-08-20",
-        sexo: "MASCULINO",
-        criadoEm: isoDaysAgo(120),
-      },
+      { id: "1", apelido: "Sofia", dataNascimento: birthDateYearsAgo(12, -140), sexo: "FEMININO", criadoEm: isoDaysAgo(180) },
+      { id: "2", apelido: "Lucas", dataNascimento: birthDateYearsAgo(10, -75), sexo: "MASCULINO", criadoEm: isoDaysAgo(150) },
+      { id: "3", apelido: "Ana", dataNascimento: birthDateYearsAgo(7, -200), sexo: "FEMININO", criadoEm: isoDaysAgo(90) },
+      // Faz 18 anos em 21 dias: mostra o aviso de maioridade na demo.
+      { id: "4", apelido: "Pedro", dataNascimento: birthDateYearsAgo(18, 21), sexo: "MASCULINO", criadoEm: isoDaysAgo(200) },
     ],
     dispositivos: [
-      {
-        id: "a1b2c3d4-e5f6-notebook-sofia",
-        nomeDispositivo: "Chrome - Notebook da Sofia",
-        plataforma: "Windows",
-        dependenteId: "1",
-        apelidoDependente: "Sofia",
-        vinculadoEm: isoDaysAgo(179),
-        ultimoAcessoEm: isoDaysAgo(0, new Date().getHours(), 2),
-      },
-      {
-        id: "b2c3d4e5-f6a7-tablet-lucas",
-        nomeDispositivo: "Chrome - Tablet do Lucas",
-        plataforma: "Android",
-        dependenteId: "2",
-        apelidoDependente: "Lucas",
-        vinculadoEm: isoDaysAgo(119),
-        ultimoAcessoEm: isoDaysAgo(0, 6, 30),
-      },
+      { id: "demo-sofia-notebook", nomeDispositivo: "Chrome - Notebook da Sofia", plataforma: "Windows", dependenteId: "1", apelidoDependente: "Sofia", vinculadoEm: isoDaysAgo(179), sinalMin: 1, anonimoPermitido: true },
+      { id: "demo-sofia-pc-quarto", nomeDispositivo: "Chrome - PC do quarto", plataforma: "Windows", dependenteId: "1", apelidoDependente: "Sofia", vinculadoEm: isoDaysAgo(60), sinalMin: 4, anonimoPermitido: true },
+      { id: "demo-lucas-chromebook", nomeDispositivo: "Chrome - Chromebook do Lucas", plataforma: "ChromeOS", dependenteId: "2", apelidoDependente: "Lucas", vinculadoEm: isoDaysAgo(149), sinalMin: 2, anonimoPermitido: true },
+      { id: "demo-lucas-pc-sala", nomeDispositivo: "Chrome - PC da sala", plataforma: "Windows", dependenteId: "2", apelidoDependente: "Lucas", vinculadoEm: isoDaysAgo(45), sinalMin: 6, anonimoPermitido: false },
+      { id: "demo-ana-notebook", nomeDispositivo: "Chrome - Notebook da Ana", plataforma: "Windows", dependenteId: "3", apelidoDependente: "Ana", vinculadoEm: isoDaysAgo(89), sinalMin: 3, anonimoPermitido: true },
+      { id: "demo-pedro-notebook", nomeDispositivo: "Chrome - Notebook do Pedro", plataforma: "Windows", dependenteId: "4", apelidoDependente: "Pedro", vinculadoEm: isoDaysAgo(199), sinalMin: 2, anonimoPermitido: true },
+      { id: "demo-pedro-pc-gamer", nomeDispositivo: "Chrome - PC gamer do Pedro", plataforma: "Windows", dependenteId: "4", apelidoDependente: "Pedro", vinculadoEm: isoDaysAgo(120), sinalMin: 8, anonimoPermitido: true },
     ],
     politicas: {
-      "a1b2c3d4-e5f6-notebook-sofia": {
-        modo: "WARN",
-        limiteRisco: 60,
-        dominiosBloqueados: ["apostas-online-exemplo.com", "chat-anonimo-exemplo.com"],
-        dominiosPermitidos: ["khanacademy.org", "wikipedia.org"],
-        modoEscolaAtivo: true,
-        escolaInicio: "07:00",
-        escolaFim: "17:00",
-      },
-      "b2c3d4e5-f6a7-tablet-lucas": {
-        modo: "BLOCK",
-        limiteRisco: 40,
-        dominiosBloqueados: ["conteudo-adulto-exemplo.com"],
-        dominiosPermitidos: ["youtube.com"],
-        modoEscolaAtivo: false,
-        escolaInicio: "07:00",
-        escolaFim: "17:00",
-      },
+      "demo-sofia-notebook": { modo: "BLOCK", limiteRisco: 55, dominiosBloqueados: ["omegle-exemplo.com", "chat-anonimo-exemplo.com", "conteudo-adulto-exemplo.com"], dominiosPermitidos: ["khanacademy.org", "wikipedia.org", "escola.sp.gov.br"], modoEscolaAtivo: true, escolaInicio: "07:00", escolaFim: "12:30" },
+      "demo-sofia-pc-quarto": { modo: "BLOCK", limiteRisco: 55, dominiosBloqueados: ["omegle-exemplo.com", "chat-anonimo-exemplo.com"], dominiosPermitidos: ["wikipedia.org"], modoEscolaAtivo: false, escolaInicio: "07:00", escolaFim: "12:30" },
+      "demo-lucas-chromebook": { modo: "BLOCK", limiteRisco: 40, dominiosBloqueados: ["skins-aposta-exemplo.com", "conteudo-adulto-exemplo.com"], dominiosPermitidos: ["youtube.com", "khanacademy.org"], modoEscolaAtivo: true, escolaInicio: "13:00", escolaFim: "18:00" },
+      "demo-lucas-pc-sala": { modo: "WARN", limiteRisco: 45, dominiosBloqueados: ["skins-aposta-exemplo.com"], dominiosPermitidos: ["youtube.com"], modoEscolaAtivo: false, escolaInicio: "13:00", escolaFim: "18:00" },
+      "demo-ana-notebook": { modo: "BLOCK", limiteRisco: 30, dominiosBloqueados: ["conteudo-adulto-exemplo.com", "tiktok.com"], dominiosPermitidos: ["youtubekids.com", "discoverykidsplus.com", "escolagames.com.br"], modoEscolaAtivo: false, escolaInicio: "07:00", escolaFim: "12:00" },
+      "demo-pedro-notebook": { modo: "WARN", limiteRisco: 70, dominiosBloqueados: ["bet-rapida-exemplo.com", "cassino-online-exemplo.com"], dominiosPermitidos: ["github.com", "stackoverflow.com"], modoEscolaAtivo: true, escolaInicio: "07:00", escolaFim: "12:30" },
+      "demo-pedro-pc-gamer": { modo: "WARN", limiteRisco: 70, dominiosBloqueados: ["bet-rapida-exemplo.com", "cassino-online-exemplo.com"], dominiosPermitidos: ["store.steampowered.com"], modoEscolaAtivo: false, escolaInicio: "07:00", escolaFim: "12:30" },
     },
-    alertas: [
-      {
-        id: "al-1",
-        titulo: "Tentativa de acesso bloqueada",
-        mensagem: "Sofia tentou acessar apostas-online-exemplo.com e foi bloqueada.",
-        severidade: "CRITICO",
-        criadoEm: isoDaysAgo(0, 8, 15),
-        lido: false,
-        dependente: "Sofia",
-        pontuacaoRisco: 88,
-        emailEnviado: true,
-        referencia: "apostas-online-exemplo.com",
-        tipo: "BLOQUEIO",
-      },
-      {
-        id: "al-2",
-        titulo: "Conteúdo sensível detectado",
-        mensagem: "Vídeo com risco moderado assistido por Lucas no YouTube.",
-        severidade: "ATENCAO",
-        criadoEm: isoDaysAgo(0, 6, 40),
-        lido: false,
-        dependente: "Lucas",
-        pontuacaoRisco: 55,
-        emailEnviado: false,
-        referencia: "youtube.com",
-        tipo: "CONTEUDO_SENSIVEL",
-      },
-      {
-        id: "al-3",
-        titulo: "Novo dispositivo vinculado",
-        mensagem: "Tablet do Lucas foi vinculado com sucesso.",
-        severidade: "POSITIVO",
-        criadoEm: isoDaysAgo(119, 9, 0),
-        lido: true,
-        dependente: "Lucas",
-        pontuacaoRisco: null,
-        emailEnviado: false,
-        referencia: null,
-        tipo: "NOVO_DISPOSITIVO",
-      },
-      {
-        id: "al-4",
-        titulo: "Resumo diário disponível",
-        mensagem: "O resumo de atividades de ontem já está pronto para consulta.",
-        severidade: "INFO",
-        criadoEm: isoDaysAgo(1, 20, 0),
-        lido: true,
-        dependente: null,
-        pontuacaoRisco: null,
-        emailEnviado: true,
-        referencia: null,
-        tipo: "RESUMO_DIARIO",
-      },
-      {
-        id: "al-5",
-        titulo: "Possível risco de aliciamento",
-        mensagem: "Conversa em chat-anonimo-exemplo.com sinalizada para revisão.",
-        severidade: "CRITICO",
-        criadoEm: isoDaysAgo(2, 22, 10),
-        lido: true,
-        dependente: "Sofia",
-        pontuacaoRisco: 92,
-        emailEnviado: true,
-        referencia: "chat-anonimo-exemplo.com",
-        tipo: "CONTEUDO_SENSIVEL",
-      },
-    ],
+    alertas: [],
     preferenciasAlertas: {
       tentativasBloqueio: true,
       conteudoSensivel: true,
-      resumoDiario: false,
+      resumoDiario: true,
       emailDestino: "responsavel@exemplo.com",
       emailHabilitado: true,
     },
   };
 
-  const MOCK_ACTIVITY_TEMPLATE = [
-    { host: "youtube.com", titulo: "Aula de matemática - Frações", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 5 },
-    { host: "wikipedia.org", titulo: "Sistema Solar", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 2 },
-    { host: "roblox.com", titulo: "Adopt Me!", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 8 },
-    { host: "khanacademy.org", titulo: "Introdução à Álgebra", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 1 },
-    { host: "tiktok.com", titulo: "Vídeo curto de dança", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 15 },
-    { host: "youtube.com", titulo: "Cena de ação com violência intensa", tipo: "NAVIGATION", acao: "WARN", rotulo: "VIOLENCE", risco: 62, chave: "youtube.com/watch?v=violenta1", mista: true },
-    { host: "instagram.com", titulo: "Stories de amigos", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 10 },
-    { host: "apostas-online-exemplo.com", titulo: "Página inicial de apostas", tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "GAMBLING", risco: 90 },
-    { host: "conteudo-adulto-exemplo.com", titulo: null, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "EXPLICIT", risco: 95 },
-    { host: "youtube.com", titulo: "Filme de terror - trailer", tipo: "NAVIGATION", acao: "WARN", rotulo: "HORROR", risco: 58, chave: "youtube.com/watch?v=terror1", mista: true },
-    { host: "discord.com", titulo: "Chat com colegas de jogo", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 20 },
-    { host: "chat-anonimo-exemplo.com", titulo: "Sala de bate-papo anônimo", tipo: "PERMISSION_REQUEST", acao: "BLOCK", rotulo: "GROOMING_RISK", risco: 88 },
-    { host: "twitch.tv", titulo: "Live de jogos", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 12 },
-    { host: "google.com", titulo: "Pesquisa: como fazer slime", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 3 },
-    { host: "youtube.com", titulo: "Vlog de dia a dia", tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE", risco: 6 },
-  ];
+  const SAFE = { tipo: "NAVIGATION", acao: "ALLOW", rotulo: "SAFE" };
+  // Cada perfil tem sites com peso (w). Os de risco aparecem pouco, como na vida real.
+  const MOCK_PROFILES = {
+    "1": {
+      perDay: [10, 18],
+      sites: [
+        { host: "instagram.com", titulos: ["Stories de amigos", "Reels de dança", "Perfil da escola"], w: 14, ...SAFE, risco: 12 },
+        { host: "tiktok.com", titulos: ["Trend de dança", "Receita de bolo de caneca", "Dicas de maquiagem"], w: 14, ...SAFE, risco: 14 },
+        { host: "youtube.com", titulos: ["Clipe de K-pop", "Aula de inglês", "Vlog de viagem"], w: 12, ...SAFE, risco: 6 },
+        { host: "pinterest.com", titulos: ["Ideias de desenho", "Decoração de quarto"], w: 6, ...SAFE, risco: 3 },
+        { host: "wikipedia.org", titulos: ["Revolução Francesa", "Célula animal"], w: 5, ...SAFE, risco: 1 },
+        { host: "spotify.com", titulos: ["Playlist para estudar"], w: 6, ...SAFE, risco: 2 },
+        { host: "google.com", titulos: ["Pesquisa: trabalho de geografia", "Pesquisa: como fazer slime"], w: 8, ...SAFE, risco: 2 },
+        { host: "chat-anonimo-exemplo.com", titulos: ["Sala de bate-papo anônimo"], w: 0.5, tipo: "PERMISSION_REQUEST", acao: "BLOCK", rotulo: "GROOMING_RISK", risco: 91 },
+        { host: "omegle-exemplo.com", titulos: ["Conversar com estranhos"], w: 0.4, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "GROOMING_RISK", risco: 88 },
+        { host: "youtube.com", titulos: ["Desafio perigoso viral"], w: 0.6, tipo: "NAVIGATION", acao: "WARN", rotulo: "VIOLENCE", risco: 64, chave: "youtube.com/watch?v=desafio1", mista: true },
+        { host: "tiktok.com", titulos: ["Vídeo sobre dietas extremas"], w: 0.4, tipo: "NAVIGATION", acao: "WARN", rotulo: "OTHER", risco: 58, chave: "tiktok.com/@perfil/video/123", mista: true },
+        { host: "conteudo-adulto-exemplo.com", titulos: [null], w: 0.2, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "EXPLICIT", risco: 96 },
+      ],
+    },
+    "2": {
+      perDay: [8, 15],
+      sites: [
+        { host: "roblox.com", titulos: ["Adopt Me!", "Brookhaven", "Blox Fruits"], w: 16, ...SAFE, risco: 8 },
+        { host: "youtube.com", titulos: ["Gameplay de Minecraft", "Como desenhar dragões", "Aula de matemática - Frações"], w: 14, ...SAFE, risco: 5 },
+        { host: "minecraft.net", titulos: ["Download de mapas"], w: 6, ...SAFE, risco: 4 },
+        { host: "khanacademy.org", titulos: ["Multiplicação", "Introdução à Álgebra"], w: 5, ...SAFE, risco: 1 },
+        { host: "twitch.tv", titulos: ["Live de jogos"], w: 5, ...SAFE, risco: 12 },
+        { host: "google.com", titulos: ["Pesquisa: dinossauros", "Pesquisa: códigos do Roblox"], w: 6, ...SAFE, risco: 2 },
+        { host: "discord.com", titulos: ["Chat com colegas de jogo"], w: 3, ...SAFE, risco: 20 },
+        { host: "youtube.com", titulos: ["Cena de ação com violência intensa"], w: 0.8, tipo: "NAVIGATION", acao: "WARN", rotulo: "VIOLENCE", risco: 66, chave: "youtube.com/watch?v=violenta1", mista: true },
+        { host: "skins-aposta-exemplo.com", titulos: ["Roleta de skins"], w: 0.6, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "GAMBLING", risco: 87 },
+        { host: "youtube.com", titulos: ["Jogo de terror - gameplay"], w: 0.6, tipo: "NAVIGATION", acao: "WARN", rotulo: "HORROR", risco: 57, chave: "youtube.com/watch?v=terror1", mista: true },
+      ],
+    },
+    "3": {
+      perDay: [5, 10],
+      sites: [
+        { host: "youtubekids.com", titulos: ["Galinha Pintadinha", "Mundo Bita", "Peppa Pig"], w: 18, ...SAFE, risco: 2 },
+        { host: "discoverykidsplus.com", titulos: ["Desenhos educativos"], w: 6, ...SAFE, risco: 1 },
+        { host: "escolagames.com.br", titulos: ["Jogo das vogais", "Contando até 100"], w: 6, ...SAFE, risco: 1 },
+        { host: "roblox.com", titulos: ["Obby colorido"], w: 4, ...SAFE, risco: 6 },
+        { host: "google.com", titulos: ["Pesquisa: desenhos para colorir"], w: 3, ...SAFE, risco: 2 },
+        { host: "youtube.com", titulos: ["Trailer de filme de terror"], w: 0.3, tipo: "NAVIGATION", acao: "WARN", rotulo: "HORROR", risco: 61, chave: "youtube.com/watch?v=terror2", mista: true },
+        { host: "tiktok.com", titulos: [null], w: 0.3, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "OTHER", risco: 52 },
+      ],
+    },
+    "4": {
+      perDay: [14, 24],
+      sites: [
+        { host: "youtube.com", titulos: ["Review de placa de vídeo", "Cursinho - Química", "Podcast de futebol"], w: 14, ...SAFE, risco: 6 },
+        { host: "twitch.tv", titulos: ["Live de CS2", "Live de Valorant"], w: 10, ...SAFE, risco: 14 },
+        { host: "store.steampowered.com", titulos: ["Promoção de jogos"], w: 6, ...SAFE, risco: 4 },
+        { host: "reddit.com", titulos: ["r/brasil", "r/gamesEcultura"], w: 7, ...SAFE, risco: 18 },
+        { host: "github.com", titulos: ["Projeto da escola"], w: 3, ...SAFE, risco: 1 },
+        { host: "instagram.com", titulos: ["Feed de amigos"], w: 8, ...SAFE, risco: 10 },
+        { host: "google.com", titulos: ["Pesquisa: vestibular 2026", "Pesquisa: placar do jogo"], w: 6, ...SAFE, risco: 2 },
+        { host: "bet-rapida-exemplo.com", titulos: ["Aposta esportiva"], w: 1.2, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "GAMBLING", risco: 92 },
+        { host: "cassino-online-exemplo.com", titulos: ["Jogo do tigrinho"], w: 0.8, tipo: "BLOCK_ATTEMPT", acao: "BLOCK", rotulo: "GAMBLING", risco: 94 },
+        { host: "reddit.com", titulos: ["Fórum sobre substâncias"], w: 0.5, tipo: "NAVIGATION", acao: "WARN", rotulo: "DRUGS", risco: 72, chave: "reddit.com/r/substancias", mista: true },
+        { host: "youtube.com", titulos: ["Briga de rua filmada"], w: 0.6, tipo: "NAVIGATION", acao: "WARN", rotulo: "VIOLENCE", risco: 68, chave: "youtube.com/watch?v=briga1", mista: true },
+      ],
+    },
+  };
 
-  function generateMockActivities(deviceId, dependentNickname) {
+  function seededRandom(seedText) {
+    let seed = 0;
+    for (let i = 0; i < seedText.length; i++) seed = (seed * 31 + seedText.charCodeAt(i)) | 0;
+    return function () {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const MOCK_DAYS = 35;
+
+  function generateMockActivities(device) {
+    const profile = MOCK_PROFILES[device.dependenteId] || MOCK_PROFILES["2"];
+    const rand = seededRandom(device.id);
+    const totalWeight = profile.sites.reduce((sum, s) => sum + s.w, 0);
+    const pick = () => {
+      let r = rand() * totalWeight;
+      for (const site of profile.sites) {
+        r -= site.w;
+        if (r <= 0) return site;
+      }
+      return profile.sites[0];
+    };
+
+    const now = Date.now();
     const items = [];
-    const days = 14;
-    let counter = 0;
-    for (let day = 0; day < days; day++) {
-      const perDay = 3 + (day % 3);
-      for (let i = 0; i < perDay; i++) {
-        const template = MOCK_ACTIVITY_TEMPLATE[counter % MOCK_ACTIVITY_TEMPLATE.length];
-        counter++;
+    for (let day = 0; day < MOCK_DAYS; day++) {
+      const [min, max] = profile.perDay;
+      const count = Math.round(min + rand() * (max - min));
+      for (let i = 0; i < count; i++) {
+        const site = pick();
+        const hour = 7 + Math.floor(rand() * 16);
+        const when = isoDaysAgo(day, hour, Math.floor(rand() * 60));
+        if (new Date(when).getTime() > now) continue;
         items.push({
-          id: `${deviceId}-act-${day}-${i}`,
-          ocorridoEm: isoDaysAgo(day, 7 + i * 2, (i * 13) % 60),
-          urlHost: template.host,
-          urlConteudo: template.chave || template.host,
-          plataformaMista: Boolean(template.mista),
-          titulo: template.titulo,
-          pontuacaoRisco: template.risco,
-          rotulo: template.rotulo,
-          acao: template.acao,
-          tipo: template.tipo,
-          dependente: dependentNickname,
+          id: `${device.id}-act-${day}-${i}`,
+          ocorridoEm: when,
+          urlHost: site.host,
+          urlConteudo: site.chave || site.host,
+          plataformaMista: Boolean(site.mista),
+          titulo: site.titulos[Math.floor(rand() * site.titulos.length)],
+          pontuacaoRisco: Math.max(0, Math.min(100, site.risco + Math.round((rand() - 0.5) * 8))),
+          rotulo: site.rotulo,
+          acao: site.acao,
+          tipo: site.tipo,
+          dependente: device.apelidoDependente,
         });
       }
     }
@@ -355,13 +350,150 @@
   function getMockActivities(deviceId) {
     if (!mockActivityCache[deviceId]) {
       const device = mockDB.dispositivos.find((d) => d.id === deviceId);
-      mockActivityCache[deviceId] = generateMockActivities(
-        deviceId,
-        device?.apelidoDependente || "Dependente",
-      );
+      mockActivityCache[deviceId] = device ? generateMockActivities(device) : [];
     }
     return mockActivityCache[deviceId];
   }
+
+  function filterByRange(items, params) {
+    const from = params.get("from") ? new Date(params.get("from")).getTime() : NaN;
+    const to = params.get("to") ? new Date(params.get("to")).getTime() : NaN;
+    return items.filter((a) => {
+      const t = new Date(a.ocorridoEm).getTime();
+      return (Number.isNaN(from) || t >= from) && (Number.isNaN(to) || t <= to);
+    });
+  }
+
+  function decorateMockDependent(dep) {
+    const birth = new Date(`${dep.dataNascimento}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let idade = today.getFullYear() - birth.getFullYear();
+    const birthdayThisYear = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+    if (today < birthdayThisYear) idade--;
+    const adulthood = new Date(birth.getFullYear() + 18, birth.getMonth(), birth.getDate());
+    return {
+      ...dep,
+      idade,
+      maioridadeEm: localDay(adulthood),
+      diasParaMaioridade: Math.max(0, Math.round((adulthood - today) / 86400000)),
+      monitoramentoEncerrado: false,
+    };
+  }
+
+  function decorateMockDevice(device) {
+    const { sinalMin, ...rest } = device;
+    const last = minutesAgoIso(sinalMin ?? 2);
+    return { ...rest, ultimoSinalEm: last, ultimoAcessoEm: last };
+  }
+
+  function buildMockAlerts() {
+    const list = [];
+    let seq = 1;
+    const add = (alert) => list.push({ id: `demo-al-${seq++}`, emailEnviado: false, pontuacaoRisco: null, referencia: null, ...alert });
+
+    // Avisos de risco tirados das próprias atividades (no máx. 1 por site por dia).
+    const seen = new Set();
+    mockDB.dispositivos.forEach((device) => {
+      getMockActivities(device.id).forEach((act) => {
+        const ageDays = (Date.now() - new Date(act.ocorridoEm).getTime()) / 86400000;
+        if (ageDays > 21) return;
+        const blocked = act.acao === "BLOCK";
+        if (!blocked && act.pontuacaoRisco < 55) return;
+        const key = `${act.dependente}|${act.urlHost}|${act.rotulo}|${act.ocorridoEm.slice(0, 10)}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        add(
+          blocked
+            ? {
+                tipo: "TENTATIVA_BLOQUEIO",
+                severidade: "CRITICO",
+                titulo: "Tentativa de acesso bloqueado",
+                mensagem: `${act.dependente} tentou acessar ${act.urlHost}, que está bloqueado pela política do dispositivo.`,
+                criadoEm: act.ocorridoEm,
+                dependente: act.dependente,
+                pontuacaoRisco: act.pontuacaoRisco,
+                referencia: act.urlHost,
+                emailEnviado: true,
+                lido: ageDays > 2,
+              }
+            : {
+                tipo: "CONTEUDO_SENSIVEL",
+                severidade: act.pontuacaoRisco >= 70 ? "CRITICO" : "ATENCAO",
+                titulo: "Conteúdo sensível detectado",
+                mensagem: `${act.dependente} acessou conteúdo classificado como ${act.rotulo} em ${act.urlHost}.`,
+                criadoEm: act.ocorridoEm,
+                dependente: act.dependente,
+                pontuacaoRisco: act.pontuacaoRisco,
+                referencia: act.urlHost,
+                emailEnviado: act.pontuacaoRisco >= 70,
+                lido: ageDays > 2,
+              },
+        );
+      });
+    });
+
+    const pedro = decorateMockDependent(mockDB.dependentes.find((d) => d.id === "4"));
+    const [y, m, d] = pedro.maioridadeEm.split("-");
+    add({
+      tipo: "MAIORIDADE",
+      severidade: "INFO",
+      titulo: `Pedro faz 18 anos em ${pedro.diasParaMaioridade} dia(s)`,
+      mensagem: `Em ${d}/${m}/${y} Pedro deixa de ser menor de idade e o monitoramento será encerrado automaticamente.`,
+      criadoEm: isoDaysAgo(0, 6, 0),
+      dependente: "Pedro",
+      emailEnviado: true,
+      lido: false,
+    });
+    add({
+      tipo: "PROTECAO",
+      severidade: "ATENCAO",
+      titulo: "Guia anônima sem proteção no computador de Lucas",
+      mensagem: "A guia anônima do Chrome não está protegida. Ative \"Permitir no modo anônimo\" na extensão.",
+      criadoEm: isoDaysAgo(1, 19, 12),
+      dependente: "Lucas",
+      referencia: "Chrome - PC da sala",
+      emailEnviado: true,
+      lido: false,
+    });
+    add({
+      tipo: "PROTECAO",
+      severidade: "CRITICO",
+      titulo: "Palavra-chave errada no computador de Pedro",
+      mensagem: "Alguém errou a palavra-chave 3 vezes tentando abrir as configurações do GuardIAn.",
+      criadoEm: isoDaysAgo(3, 23, 41),
+      dependente: "Pedro",
+      referencia: "Chrome - PC gamer do Pedro",
+      emailEnviado: true,
+      lido: true,
+    });
+    add({
+      tipo: "NOVO_DISPOSITIVO",
+      severidade: "POSITIVO",
+      titulo: "Novo dispositivo conectado",
+      mensagem: "Chrome - PC da sala foi vinculado a Lucas.",
+      criadoEm: isoDaysAgo(45, 18, 5),
+      dependente: "Lucas",
+      referencia: "Chrome - PC da sala",
+      lido: true,
+    });
+    for (let day = 1; day <= 7; day++) {
+      add({
+        tipo: "RESUMO_DIARIO",
+        severidade: "INFO",
+        titulo: "Resumo diário disponível",
+        mensagem: "O resumo das atividades da família já está pronto para consulta.",
+        criadoEm: isoDaysAgo(day, 21, 0),
+        dependente: null,
+        emailEnviado: true,
+        lido: day > 1,
+      });
+    }
+
+    return list.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
+  }
+
+  mockDB.alertas = buildMockAlerts();
 
   function mockDelay(value, ms = 300) {
     return new Promise((resolve) => setTimeout(() => resolve(value), ms));
@@ -378,11 +510,11 @@
 
     // ---- Dependentes ----
     if (path === "/api/dependentes" && method === "GET") {
-      return { status: 200, data: mockDB.dependentes };
+      return { status: 200, data: mockDB.dependentes.map(decorateMockDependent) };
     }
     if (parts[0] === "api" && parts[1] === "dependentes" && parts[2] && method === "GET") {
       const found = mockDB.dependentes.find((d) => d.id === parts[2]);
-      return { status: found ? 200 : 404, data: found || { mensagem: "Dependente não encontrado" } };
+      return { status: found ? 200 : 404, data: found ? decorateMockDependent(found) : { mensagem: "Dependente não encontrado" } };
     }
     if (parts[0] === "api" && parts[1] === "dependentes" && parts[2] && method === "DELETE") {
       mockDB.dependentes = mockDB.dependentes.filter((d) => d.id !== parts[2]);
@@ -392,7 +524,7 @@
 
     // ---- Dispositivos ----
     if (path === "/api/dispositivos" && method === "GET") {
-      return { status: 200, data: mockDB.dispositivos };
+      return { status: 200, data: mockDB.dispositivos.map(decorateMockDevice) };
     }
     if (parts[0] === "api" && parts[1] === "dispositivos" && parts[2] === "gerar-codigo" && method === "POST") {
       const dependentId = parts[3];
@@ -427,33 +559,50 @@
 
     // ---- Dashboard ----
     if (path === "/api/painel/resumo" && method === "GET") {
+      const items = filterByRange(getMockActivities(params.get("dispositivoId")), params);
+      const blocked = items.filter((a) => a.acao === "BLOCK").length;
+      const sensitive = items.filter((a) => a.acao !== "BLOCK" && a.rotulo !== "SAFE").length;
       return {
         status: 200,
-        data: { totalEventos: 187, eventosSensiveis: 12, tentativasBloqueio: 4 },
+        data: { totalEventos: items.length, eventosSensiveis: sensitive, tentativasBloqueio: blocked },
       };
     }
     if (path === "/api/painel/top-dominios" && method === "GET") {
-      return {
-        status: 200,
-        data: [
-          ["youtube.com", 142],
-          ["google.com", 98],
-          ["wikipedia.org", 45],
-          ["roblox.com", 37],
-          ["instagram.com", 25],
-          ["tiktok.com", 22],
-          ["khanacademy.org", 18],
-          ["discord.com", 14],
-        ],
-      };
+      const counts = new Map();
+      filterByRange(getMockActivities(params.get("dispositivoId")), params).forEach((a) => {
+        counts.set(a.urlHost, (counts.get(a.urlHost) || 0) + 1);
+      });
+      return { status: 200, data: [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10) };
     }
     if (path === "/api/painel/vulnerabilidade" && method === "GET") {
-      const scores = [12, 18, 15, 30, 22, 45, 60, 38, 25, 20, 55, 33, 28, 19];
-      const data = scores.map((score, i) => ({
-        dia: isoDaysAgo(scores.length - 1 - i).slice(0, 10),
-        pontuacao: score,
-      }));
+      const dependentId = params.get("dependenteId");
+      const byDay = new Map();
+      mockDB.dispositivos
+        .filter((d) => d.dependenteId === dependentId)
+        .forEach((d) => {
+          getMockActivities(d.id).forEach((a) => {
+            const day = localDay(new Date(a.ocorridoEm));
+            if (!byDay.has(day)) byDay.set(day, []);
+            byDay.get(day).push(a.pontuacaoRisco || 0);
+          });
+        });
+      const fromDay = (params.get("from") || "0000-00-00").slice(0, 10);
+      const toDay = (params.get("to") || "9999-99-99").slice(0, 10);
+      const data = [...byDay.entries()]
+        .filter(([day]) => day >= fromDay && day <= toDay)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([day, scores]) => {
+          const risky = scores.filter((s) => s >= 50);
+          const peak = Math.max(...scores);
+          const score = risky.length ? 10 + risky.length * 8 + peak * 0.35 : 4 + (scores.length % 9);
+          return { dia: day, pontuacao: Math.min(95, Math.round(score)) };
+        });
       return { status: 200, data };
+    }
+
+    // ---- Proteção ----
+    if (path === "/api/protecao/palavra-chave") {
+      return { status: 200, data: { definida: true } };
     }
 
     // ---- Atividades ----
@@ -466,7 +615,7 @@
       const type = params.get("tipo") || "";
       const minRisk = params.get("riscoMinimo");
 
-      let all = getMockActivities(deviceId);
+      let all = filterByRange(getMockActivities(deviceId), params);
       if (search) {
         all = all.filter(
           (a) =>
@@ -512,6 +661,7 @@
       const unreadOnly = params.get("apenasNaoLidos") === "true";
       let all = mockDB.alertas;
       if (unreadOnly) all = all.filter((a) => !a.lido);
+      if (params.get("tipo")) all = all.filter((a) => a.tipo === params.get("tipo"));
 
       const start = page * size;
       const items = all.slice(start, start + size);
@@ -731,14 +881,6 @@
   // ========== Auth ==========
   const auth = {
     async login(email, password) {
-      if (MOCK_MODE) {
-        await mockDelay(null, 300);
-        const data = { token: `mock-token-${Date.now()}` };
-        setToken(data.token);
-        setEmail(email);
-        return data;
-      }
-
       const response = await fetch(`${API_BASE_URL}/api/autenticacao/entrar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -760,11 +902,6 @@
     },
 
     async register(email, password) {
-      if (MOCK_MODE) {
-        await mockDelay(null, 300);
-        return true;
-      }
-
       const response = await fetch(
         `${API_BASE_URL}/api/autenticacao/registrar`,
         {
