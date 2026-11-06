@@ -144,7 +144,10 @@
     options = options || {};
     var headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
     if (token()) headers.Authorization = "Bearer " + token();
-    var res = await fetch(path, Object.assign({}, options, { headers: headers }));
+    var demo = window.GuardianAPI && window.GuardianAPI.isDemo && window.GuardianAPI.isDemo();
+    var res = demo
+      ? await window.GuardianAPI.mockFetch(path, options)
+      : await fetch(path, Object.assign({}, options, { headers: headers }));
     if (res.status === 401) {
       sessionStorage.removeItem(SETUP_TOKEN_KEY);
       if (!isMinor()) {

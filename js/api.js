@@ -7,9 +7,29 @@
   // URL vazia = URL relativa. nginx faz proxy /api/ → Spring Boot :8080
   const API_BASE_URL = "";
 
-  // MODO MOCK — liga dados fake sem precisar do backend. Ideal para prints/demo.
-  // Para voltar a usar o backend real, mude para false.
-  const MOCK_MODE = false;
+  // Modo demonstração: digitar "demo" no painel liga/desliga os dados simulados.
+  const DEMO_KEY = "guardian_demo";
+  const MOCK_MODE = localStorage.getItem(DEMO_KEY) === "1";
+
+  function setDemo(on) {
+    if (on) localStorage.setItem(DEMO_KEY, "1");
+    else localStorage.removeItem(DEMO_KEY);
+    window.location.reload();
+  }
+
+  (function setupDemoShortcut() {
+    let typed = "";
+    document.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+      typed = (typed + e.key.toLowerCase()).slice(-4);
+      if (typed === "demo") {
+        typed = "";
+        setDemo(!MOCK_MODE);
+      }
+    });
+  })();
 
   // ========== Utils ==========
   function getToken() {
@@ -1049,5 +1069,8 @@
     dashboard,
     activity,
     alerts,
+    isDemo: () => MOCK_MODE,
+    setDemo,
+    mockFetch,
   };
 })();
