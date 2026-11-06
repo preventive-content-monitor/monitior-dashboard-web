@@ -36,7 +36,11 @@
 }
 
 .ov-children.is-single {
-  grid-template-columns: minmax(0, 720px);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ov-children.is-single .ov-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .ov-child-card {
