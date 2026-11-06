@@ -372,28 +372,38 @@
   .onb-page #onb:is([data-cur="choose"],[data-cur="intro"],[data-cur="complete"],[data-cur="home"],[data-cur="restricted"]) .onb-top{margin-bottom:clamp(8px,2vh,20px)}
   .onb-page #onb[data-cur="choose"]{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}
   .onb-page #onb[data-cur="choose"] .onb-main{max-width:820px}
-  .onb-page #onb[data-cur="choose"] .screen h1{font-size:clamp(2.1rem,4.8vh,3rem)}
-  .onb-page #onb[data-cur="choose"] .lead{font-size:clamp(1.1rem,2.6vh,1.35rem);margin-bottom:clamp(20px,3.4vh,40px)}
-  .onb-page #onb[data-cur="choose"] .choices{gap:clamp(12px,2.8vh,26px)}
-  .onb-page #onb[data-cur="choose"] .choice{gap:22px;padding:clamp(16px,3.3vh,32px) 26px;border-radius:22px}
-  .onb-page #onb[data-cur="choose"] .choice .ico{width:clamp(56px,9vh,88px);height:clamp(56px,9vh,88px)}
-  .onb-page #onb[data-cur="choose"] .choice .ico svg{width:clamp(28px,4.4vh,44px);height:clamp(28px,4.4vh,44px)}
-  .onb-page #onb[data-cur="choose"] .choice strong{font-size:clamp(1.1rem,2.6vh,1.4rem)}
-  .onb-page #onb[data-cur="choose"] .choice .d{font-size:clamp(.95rem,2.05vh,1.1rem);margin-top:6px}
-  .onb-page #onb[data-cur="choose"] .choice .go{padding:clamp(12px,2vh,16px) 26px;font-size:clamp(.95rem,2vh,1.08rem);border-radius:12px}
-  .onb-page #onb[data-cur="choose"] .vis-choose{width:min(620px,100%);gap:clamp(22px,4vh,40px)}
-  .onb-page #onb[data-cur="choose"] .vis-choose .dev{width:clamp(140px,min(26vh,14vw),210px);padding:clamp(22px,4.4vh,40px) 14px;border-radius:24px;gap:6px}
-  .onb-page #onb[data-cur="choose"] .vis-choose .ni.big{width:clamp(70px,12vh,100px);height:clamp(70px,12vh,100px)}
-  .onb-page #onb[data-cur="choose"] .vis-choose .ni.big svg{width:clamp(34px,6vh,50px);height:clamp(34px,6vh,50px)}
-  .onb-page #onb[data-cur="choose"] .vis-choose .dev b{font-size:clamp(1rem,2.4vh,1.25rem);white-space:nowrap}
-  .onb-page #onb[data-cur="choose"] .vis-choose .dev small{font-size:clamp(.9rem,2vh,1.05rem)}
+  .onb-page #onb[data-cur="choose"] .screen h1{font-size:clamp(2.1rem,calc(4.8*var(--u)),3rem)}
+  .onb-page #onb[data-cur="choose"] .lead{font-size:clamp(1.1rem,calc(2.6*var(--u)),1.35rem);margin-bottom:clamp(20px,calc(3.4*var(--u)),40px)}
+  .onb-page #onb[data-cur="choose"] .choices{gap:clamp(12px,calc(2.8*var(--u)),26px)}
+  .onb-page #onb[data-cur="choose"] .choice{gap:22px;padding:clamp(16px,calc(3.3*var(--u)),32px) 26px;border-radius:22px}
+  .onb-page #onb[data-cur="choose"] .choice .ico{width:clamp(56px,calc(9*var(--u)),88px);height:clamp(56px,calc(9*var(--u)),88px)}
+  .onb-page #onb[data-cur="choose"] .choice .ico svg{width:clamp(28px,calc(4.4*var(--u)),44px);height:clamp(28px,calc(4.4*var(--u)),44px)}
+  .onb-page #onb[data-cur="choose"] .choice strong{font-size:clamp(1.1rem,calc(2.6*var(--u)),1.4rem)}
+  .onb-page #onb[data-cur="choose"] .choice .d{font-size:clamp(.95rem,calc(2.05*var(--u)),1.1rem);margin-top:6px}
+  .onb-page #onb[data-cur="choose"] .choice .go{padding:clamp(12px,calc(2*var(--u)),16px) 26px;font-size:clamp(.95rem,calc(2*var(--u)),1.08rem);border-radius:12px}
+  .onb-page #onb[data-cur="choose"] .vis-choose{width:min(620px,100%);gap:clamp(22px,calc(4*var(--u)),40px)}
+  .onb-page #onb[data-cur="choose"] .vis-choose .dev{width:clamp(140px,min(calc(26*var(--u)),14vw),210px);padding:clamp(22px,calc(4.4*var(--u)),40px) 14px;border-radius:24px;gap:6px}
+  .onb-page #onb[data-cur="choose"] .vis-choose .ni.big{width:clamp(70px,calc(12*var(--u)),100px);height:clamp(70px,calc(12*var(--u)),100px)}
+  .onb-page #onb[data-cur="choose"] .vis-choose .ni.big svg{width:clamp(34px,calc(6*var(--u)),50px);height:clamp(34px,calc(6*var(--u)),50px)}
+  .onb-page #onb[data-cur="choose"] .vis-choose .dev b{font-size:clamp(1rem,calc(2.4*var(--u)),1.25rem);white-space:nowrap}
+  .onb-page #onb[data-cur="choose"] .vis-choose .dev small{font-size:clamp(.9rem,calc(2*var(--u)),1.05rem)}
   .onb-page #onb[data-cur="choose"] .vis-choose .bridge{max-width:120px}
   .onb-page #onb[data-cur="choose"] .vis-choose .bridge span{width:54px;height:54px}
   .onb-page #onb[data-cur="choose"] .vis-choose .bridge svg{width:28px;height:28px}
-  .onb-page #onb[data-cur="choose"] .vis-choose .vcap{font-size:clamp(1.1rem,2.8vh,1.45rem)}
+  .onb-page #onb[data-cur="choose"] .vis-choose .vcap{font-size:clamp(1.1rem,calc(2.8*var(--u)),1.45rem)}
   .onb-page #onb:is([data-cur="choose"],[data-cur="intro"],[data-cur="complete"],[data-cur="home"],[data-cur="restricted"]) .dots{margin-top:clamp(14px,3vh,30px)}
   .onb-page #onb:is([data-cur="intro"],[data-cur="complete"],[data-cur="home"],[data-cur="restricted"]) .done-ico{width:clamp(64px,10vh,96px);height:clamp(64px,10vh,96px);margin-bottom:clamp(10px,2vh,20px)}
   .onb-page #onb:is([data-cur="intro"],[data-cur="complete"],[data-cur="home"],[data-cur="restricted"]) .perks{gap:clamp(8px,1.6vh,14px);margin-bottom:clamp(18px,3.4vh,32px)}
   .onb-page #onb:is([data-cur="intro"],[data-cur="complete"],[data-cur="home"],[data-cur="restricted"]) .onb-cta .btn-primary,
   .onb-page #onb:is([data-cur="intro"],[data-cur="complete"],[data-cur="home"],[data-cur="restricted"]) .onb-cta .btn-secondary{min-height:52px;padding:14px 26px;font-size:1rem}
+}
+
+/* Desktop: passo a passo sempre cabe na janela, sem rolar a página */
+@media (min-width:901px){
+  html:has(.onb-page),body:has(.onb-page){height:100%;overflow:hidden}
+  .onb-page #onb{--u:min(1vh,.6vw)}
+  .onb-page .onb{height:calc(100vh - 68px);height:calc(100dvh - 68px);min-height:0}
+  .onb-page .onb-main{max-height:100%;overflow-y:auto;scrollbar-width:thin}
+  .onb-page .onb-side{max-height:100%}
+  .onb-page #onb[data-cur="choose"] .onb-main{padding-block:clamp(16px,calc(4*var(--u)),56px)}
 }
