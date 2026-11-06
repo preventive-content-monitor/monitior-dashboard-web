@@ -1,0 +1,755 @@
+/* Desktop: cada página do painel ocupa exatamente a altura da tela.
+   Listas longas rolam dentro do próprio cartão; a página não rola. */
+@media (min-width: 1024px) and (min-height: 560px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .dashboard-layout {
+    height: 100vh;
+    min-height: 0;
+  }
+
+  .main-content {
+    height: 100vh;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px 20px 14px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    align-content: stretch;
+    gap: 10px 14px;
+  }
+
+  .main-content > * {
+    grid-column: 1 / -1;
+    margin: 0 !important;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /* ---------- Cabeçalho + filtros na mesma linha ---------- */
+  .main-content > .page-header {
+    align-self: center;
+  }
+
+  .main-content > .page-header h1 {
+    font-size: 1.45rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .main-content > .page-header p {
+    font-size: 0.85rem;
+    margin: 2px 0 0;
+    line-height: 1.3;
+  }
+
+  .main-content:has(> .fam-filters) > .page-header {
+    grid-column: 1 / 5;
+  }
+
+  .main-content:has(> .fam-filters) > .page-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .main-content:has(> .fam-filters) > .page-header p {
+    display: none;
+  }
+
+  .main-content > .fam-filters {
+    grid-column: 5 / -1;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    padding: 8px 12px;
+  }
+
+  .fam-filters .fam-filter-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fam-filters .fam-chips {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .fam-filters .fam-filter-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .fam-filters .fam-filter-group + .fam-filter-group {
+    padding-left: 14px;
+    border-left: 1px solid var(--border);
+  }
+
+  .fam-filters .fam-chip {
+    min-height: 34px;
+    padding: 4px 11px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .fam-filters .fam-refresh {
+    min-height: 34px;
+    padding: 4px 12px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .main-content > .fam-headline {
+    padding: 8px 14px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .fam-headline .fam-headline-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    font-size: 0.95rem;
+  }
+
+  .fam-headline .fam-headline-title {
+    font-size: 0.98rem;
+    line-height: 1.25;
+  }
+
+  .fam-headline .fam-headline-text {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  /* Cartões que preenchem a altura e rolam por dentro */
+  .main-content .fit-card,
+  .ov-grid > .card,
+  .rp-grid > .card,
+  .main-content > .rp-section,
+  .alerts-list-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .ov-grid > .card > .card-header,
+  .rp-grid > .card > .card-header,
+  .main-content > .rp-section > .card-header,
+  .alerts-list-card > .card-header {
+    padding: 10px 14px;
+    flex: 0 0 auto;
+  }
+
+  .ov-grid > .card .card-title,
+  .rp-grid > .card .card-title,
+  .main-content > .rp-section .card-title,
+  .alerts-list-card .card-title {
+    font-size: 0.98rem;
+  }
+
+  .ov-grid > .card > .card-body,
+  .rp-grid > .card > .card-body,
+  .main-content > .rp-section > .card-body,
+  .alerts-list-card > #alertsList {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px 14px;
+  }
+
+  /* ---------- Dashboard ---------- */
+  .main-content:has(> .ov-grid) {
+    grid-template-rows: auto auto minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .main-content > .ov-section {
+    grid-column: 1 / 6;
+    grid-row: 3 / 5;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ov-section > .ov-section-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .ov-section > .ov-children {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2px 4px 2px 0;
+  }
+
+  .ov-children > * {
+    flex: 0 0 auto;
+  }
+
+  .ov-children > .fam-empty {
+    flex: 1 1 auto;
+  }
+
+  .main-content .ov-children > .card.ov-child-card {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-head {
+    gap: 10px;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-name {
+    font-size: 1.05rem;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-meta {
+    font-size: 0.78rem;
+    margin: 0;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-risk-note {
+    display: none;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-avatar,
+  .main-content .ov-children > .card.ov-child-card .ov-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin: 0;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-metric {
+    padding: 4px 8px;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-metric dt {
+    font-size: 0.7rem;
+    line-height: 1.15;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-metric dd {
+    font-size: 1.15rem;
+    margin: 0;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-safe {
+    font-size: 0.8rem;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-safe > :not(.ov-safe-text) {
+    display: none;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-risk {
+    gap: 4px;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-head .badge,
+  .main-content .ov-children > .card.ov-child-card .ov-child-head [class*="pill"],
+  .main-content .ov-children > .card.ov-child-card .ov-child-head [class*="status"] {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+
+  .ov-alerts .ov-alert {
+    padding: 8px 4px;
+    gap: 10px;
+  }
+
+  .ov-alerts .ov-alert-title {
+    font-size: 0.88rem;
+  }
+
+  .ov-alerts .ov-alert-sub,
+  .ov-alerts .ov-alert-when {
+    font-size: 0.75rem;
+  }
+
+  .ov-alerts .ov-alert-icon {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-actions {
+    padding-top: 0;
+    gap: 8px;
+  }
+
+  .main-content .ov-children > .card.ov-child-card .ov-child-actions .btn {
+    min-height: 34px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+  }
+
+  .main-content > .ov-grid {
+    display: contents;
+  }
+
+  .ov-grid > .card:nth-child(1) {
+    grid-column: 6 / 10;
+    grid-row: 3;
+  }
+
+  .ov-grid > .card:nth-child(2) {
+    grid-column: 6 / 10;
+    grid-row: 4;
+  }
+
+  .ov-grid > .card:nth-child(3) {
+    grid-column: 10 / -1;
+    grid-row: 3 / 5;
+  }
+
+  .ov-grid > .card:nth-child(1) > .card-body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ov-grid .ov-help {
+    font-size: 0.78rem;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .ov-grid .ov-chart {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+  }
+
+  .ov-grid .ov-chart.has-empty,
+  .ov-grid .ov-chart .fam-empty {
+    min-height: 0;
+  }
+
+  /* ---------- Relatórios ---------- */
+  .main-content:has(> .rp-grid) {
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  }
+
+  .main-content > .rp-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .rp-stats .stat-card {
+    padding: 8px 12px;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .rp-stats .stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .rp-stats .stat-value {
+    font-size: 1.35rem;
+    line-height: 1.1;
+  }
+
+  .rp-stats .stat-label {
+    font-size: 0.78rem;
+  }
+
+  .main-content > .rp-section {
+    grid-column: 1 / 5;
+    grid-row: 4;
+  }
+
+  .main-content > .rp-section .btn {
+    min-height: 32px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+  }
+
+  .main-content > .rp-grid {
+    display: contents;
+  }
+
+  .rp-grid > .card:nth-child(1) {
+    grid-column: 5 / 10;
+    grid-row: 4;
+  }
+
+  .rp-grid > .card:nth-child(2) {
+    grid-column: 10 / -1;
+    grid-row: 4;
+  }
+
+  .rp-grid .rp-card-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .rp-grid .rp-mini-chips .fam-chip {
+    min-height: 30px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+  }
+
+  .main-content > .rp-history {
+    grid-row: 5;
+  }
+
+  .main-content > .rp-history > summary {
+    padding: 8px 14px;
+  }
+
+  .main-content > .rp-history[open] .table-container {
+    max-height: 38vh;
+    overflow: auto;
+  }
+
+  /* ---------- Alertas ---------- */
+  .main-content:has(> .alerts-list-card) {
+    grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.6fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .main-content:has(> .alerts-list-card) > .page-header {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .main-content:has(> .alerts-list-card) > .smtp-warning {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .main-content > .alerts-prefs-card {
+    grid-column: 1;
+    grid-row: 3;
+    overflow-y: auto;
+    align-self: start;
+    max-height: 100%;
+  }
+
+  .alerts-prefs-card .card-header {
+    padding: 10px 14px;
+  }
+
+  .alerts-prefs-card .card-body {
+    padding: 10px 14px;
+  }
+
+  .alerts-prefs-card .pref-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .main-content > .alerts-list-card {
+    grid-column: 2;
+    grid-row: 1 / 4;
+  }
+
+  .alerts-list-card > #alertsList {
+    padding: 0;
+  }
+
+  .alerts-list-card > #alertsPagination {
+    flex: 0 0 auto;
+  }
+
+  /* ---------- Políticas ---------- */
+  .main-content.pol-page {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    padding-bottom: 0;
+  }
+
+  .pol-page > .pol-hero {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 0;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .pol-page > .pol-hero .pol-hero-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  .pol-page > .pol-hero p {
+    font-size: 0.85rem;
+  }
+
+  .pol-page > .pol-step {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .pol-page > .pol-step .pol-step-head {
+    display: none;
+  }
+
+  .pol-page .pol-children {
+    gap: 10px;
+  }
+
+  .pol-page .pol-child {
+    padding: 8px 12px;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .pol-page .pol-child-avatar {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+
+  .pol-page .pol-child-name {
+    font-size: 0.98rem;
+  }
+
+  .pol-page .pol-child-meta {
+    font-size: 0.75rem;
+  }
+
+  .pol-page .pol-child .pol-pill {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+  }
+
+  .pol-page > #policyPanel {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    gap: 10px 14px;
+    min-height: 0;
+  }
+
+  #policyPanel > * {
+    grid-column: 1 / -1;
+    margin: 0 !important;
+    min-height: 0;
+  }
+
+  #policyPanel > .pol-banner {
+    padding: 8px 14px;
+    gap: 12px;
+  }
+
+  #policyPanel > .pol-banner .pol-banner-avatar {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+  }
+
+  #policyPanel > .pol-banner h2 {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  #policyPanel > .pol-banner p {
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  #policyPanel > .pol-banner .pol-pill-lg {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  #policyPanel > .pol-step {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  #policyPanel > .pol-step:nth-of-type(1) {
+    grid-column: 1;
+    grid-row: 2 / 4;
+  }
+
+  #policyPanel > .pol-step:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  #policyPanel > .pol-advanced {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  #policyPanel > .pol-advanced[open] .pol-advanced-body {
+    max-height: 32vh;
+    overflow-y: auto;
+  }
+
+  #policyPanel > .pol-savebar {
+    grid-row: 4;
+    position: relative;
+    margin: 0 !important;
+    padding: 8px 16px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  #policyPanel .pol-step-head {
+    gap: 10px;
+    margin: 0;
+  }
+
+  #policyPanel .pol-step-num {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    font-size: 0.85rem;
+  }
+
+  #policyPanel .pol-step-title {
+    font-size: 1rem;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  #policyPanel .pol-step-desc {
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  #policyPanel .pol-reco {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    margin: 0;
+  }
+
+  /* As três opções viram linhas horizontais, fáceis de comparar */
+  #policyPanel .pol-modes {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 0;
+  }
+
+  #policyPanel .pol-mode-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "icon title radio"
+      "icon desc radio"
+      "icon foot radio";
+    column-gap: 14px;
+    row-gap: 2px;
+    align-items: center;
+    padding: 10px 14px;
+    min-height: 0;
+    height: auto;
+    position: relative;
+  }
+
+  #policyPanel .pol-mode-top {
+    display: contents;
+  }
+
+  #policyPanel .pol-mode-icon {
+    grid-area: icon;
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem;
+  }
+
+  #policyPanel .pol-mode-radio {
+    grid-area: radio;
+  }
+
+  #policyPanel .pol-mode-title {
+    grid-area: title;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  #policyPanel .pol-mode-desc {
+    grid-area: desc;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  #policyPanel .pol-mode-foot {
+    grid-area: foot;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin: 2px 0 0;
+    padding: 4px 0 0;
+    font-size: 0.75rem;
+  }
+
+  #policyPanel .pol-mode-reco {
+    position: absolute;
+    top: 8px;
+    right: 44px;
+    left: auto;
+    transform: none;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    margin: 0;
+  }
+
+  #policyPanel .pol-extras {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  #policyPanel .pol-box {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  #policyPanel .pol-box-head h3 {
+    font-size: 0.98rem;
+  }
+
+  #policyPanel .pol-box-head p {
+    font-size: 0.8rem;
+  }
+
+  #policyPanel .pol-callout {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  #policyPanel .pol-advanced > summary {
+    padding: 10px 14px;
+  }
+}

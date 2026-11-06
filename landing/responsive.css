@@ -219,8 +219,147 @@
   .onb .choice .go{min-height:44px;display:grid;place-items:center}
   .onb-cta .btn-primary,.onb-cta .btn-secondary{width:100%;min-height:52px;height:auto;padding:12px 18px}
   #onb[data-cur="intro"] .onb-side,#onb[data-cur="choose"] .onb-side{display:none}
-  #onb[data-cur="choose"] .onb-mobile-note,#onb[data-cur="guide"] .onb-mobile-note,#onb[data-cur="home"] .onb-mobile-note,#onb[data-cur="reinstall"] .onb-mobile-note{display:block}
+  #onb[data-cur="guide"] .onb-mobile-note,#onb[data-cur="home"] .onb-mobile-note,#onb[data-cur="reinstall"] .onb-mobile-note{display:block}
   .onb-mobile-note{margin:0 0 20px;padding:12px 14px;border:1px solid #cde4f8;border-radius:14px;background:#edf7ff;color:var(--marinho);font-size:.88rem;line-height:1.5;text-align:left}
   .onb-desktop-label{display:none}
   .onb-mobile-label{display:inline}
+}
+
+/* Login e configuração com menos espaço vazio, sem cortar conteúdo. */
+.auth-page .page{min-height:100vh;min-height:100dvh}
+.auth-page .stage{padding:80px 16px 16px}
+.auth-page .stage>div{width:min(520px,100%)}
+.auth-page .stage .card{width:100%;padding:20px 26px;line-height:1.4}
+.auth-page .card-head{margin-bottom:12px}
+.auth-page .card-head h1{font-size:1.45rem;margin-bottom:4px}
+.auth-page .card-head p{font-size:.92rem;line-height:1.35}
+.auth-page .seg{margin-bottom:12px}
+.auth-page .seg button{height:44px}
+.auth-page .form{gap:8px}
+.auth-page .field{gap:4px;min-width:0}
+.auth-page .field label{font-size:.85rem}
+.auth-page .input input{height:44px;padding-left:12px}
+.auth-page .eye{top:1px;right:1px}
+.auth-page .submit{height:46px;margin-top:2px}
+.auth-page .secure{margin-top:10px}
+.auth-page .legal{margin-top:8px;line-height:1.35}
+.auth-page .error:empty{display:none}
+.auth-page .password-strength{flex-direction:column;gap:3px}
+.auth-page #auth[data-aba="cadastro"] .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}
+.auth-page #auth[data-aba="cadastro"] .field-email,
+.auth-page #auth[data-aba="cadastro"] .password-strength,
+.auth-page #auth[data-aba="cadastro"] .submit,
+.auth-page #auth[data-aba="cadastro"] .form>.error,
+.auth-page #auth[data-aba="cadastro"] .swap{grid-column:1/-1}
+
+.onb-page .stage.full{padding-top:68px}
+.onb-page .onb{min-height:calc(100vh - 68px);min-height:calc(100dvh - 68px)}
+.onb-page .onb-main{max-width:760px;padding:16px clamp(20px,3vw,40px)}
+.onb-page .screen h1{margin-bottom:6px}
+.onb-page .onb .lead{margin-bottom:14px;line-height:1.45}
+.onb-page .onb-top{margin-bottom:4px}
+.onb-page #onb[data-cur="intro"] .onb-top,
+.onb-page #onb[data-cur="loading"] .onb-top,
+.onb-page #onb[data-cur="home"] .onb-top,
+.onb-page #onb[data-cur="restricted"] .onb-top{display:none}
+.onb-page .onb .dots{margin-top:10px}
+.onb-page .perks{gap:8px;margin-bottom:18px}
+.onb-page .onb .choices{gap:8px}
+.onb-page .onb .choice{gap:12px;padding:10px 12px}
+.onb-page .onb .choice .ico{width:48px;height:48px}
+.onb-page .onb .choice .ico svg{width:26px;height:26px}
+.onb-page .onb .choice .d{margin-top:2px;line-height:1.35}
+.onb-page .onb .done-ico{width:64px;height:64px;margin:0 0 10px}
+.onb-page .onb .done-ico svg{width:34px;height:34px}
+.onb-page .onb-cta{gap:10px 12px}
+.onb-page .onb-note{margin-top:10px;line-height:1.4}
+.onb-page .gf-check{gap:7px;margin-bottom:12px}
+.onb-page .gf-check li{gap:9px;padding:8px 10px;line-height:1.35}
+.onb-page #homeDevices{grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}
+.onb-page #homeDevices li>span:last-child{min-width:0;overflow-wrap:anywhere}
+.onb-page #guideExtra,.onb-page #reinstallGuide{margin-top:12px}
+.onb-page .next-pc{padding:12px 14px;margin-bottom:12px}
+.onb-page .next-pc h2{margin-bottom:5px}
+.onb-page .next-pc ol{gap:4px}
+.onb-page .gf-steps{gap:8px}
+.onb-page .gf-steps li{grid-template-columns:28px minmax(0,1fr);gap:8px;padding:10px}
+.onb-page .gf-n{width:28px;height:28px;font-size:.85rem}
+.onb-page .gf-steps h3{margin:1px 0 3px;font-size:.92rem}
+.onb-page .gf-steps p{font-size:.87rem;line-height:1.4}
+.onb-page .gf-copy{gap:6px;margin-top:6px}
+.onb-page .gf-copy code{max-width:100%;overflow-wrap:anywhere}
+.onb-page .gf-mock{gap:6px;margin-top:6px;padding:7px 8px}
+.onb-page .gf-alert{margin-bottom:8px;padding:9px 10px;font-size:.86rem;line-height:1.4}
+.onb-page .gf-wait{margin-top:8px;padding:9px 10px;line-height:1.35}
+.onb-page #onb[data-cur="reinstall"] .dots{display:none}
+.onb-page #onb[data-cur="reinstall"] #reinstallGuide{margin-top:0}
+.onb-page #onb[data-cur="reinstall"] [data-screen="reinstall"]>.onb-cta{margin-bottom:8px!important}
+
+@media (min-width:901px){
+  #onb[data-cur="reinstall"],
+  #onb[data-cur="handoff"],
+  #onb[data-cur="guide"][data-role="resp"],
+  #onb[data-cur="guide"][data-role="minor"]:has(#guideExtra:not(:empty)){grid-template-columns:1fr}
+  #onb[data-cur="reinstall"] .onb-main,
+  #onb[data-cur="handoff"] .onb-main,
+  #onb[data-cur="guide"][data-role="resp"] .onb-main,
+  #onb[data-cur="guide"][data-role="minor"]:has(#guideExtra:not(:empty)) .onb-main{max-width:1120px}
+  #onb[data-cur="reinstall"] .onb-side,
+  #onb[data-cur="handoff"] .onb-side,
+  #onb[data-cur="guide"][data-role="resp"] .onb-side,
+  #onb[data-cur="guide"][data-role="minor"]:has(#guideExtra:not(:empty)) .onb-side{display:none}
+  #onb[data-cur="reinstall"] .onb-main{padding-top:8px;padding-bottom:8px}
+  #onb[data-cur="handoff"] [data-screen="handoff"].active{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px}
+  #onb[data-cur="handoff"] [data-screen="handoff"]>h1,
+  #onb[data-cur="handoff"] [data-screen="handoff"]>.lead,
+  #onb[data-cur="handoff"] [data-screen="handoff"]>.alert,
+  #onb[data-cur="handoff"] [data-screen="handoff"]>.onb-cta{grid-column:1/-1;margin:0}
+  #onb[data-cur="handoff"] .next-pc{margin:0}
+  #onb[data-cur="guide"][data-role="resp"] [data-screen="guide"].active,
+  #onb[data-cur="guide"][data-role="minor"]:has(#guideExtra:not(:empty)) [data-screen="guide"].active{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:10px 24px;align-items:start}
+  #onb[data-cur="guide"][data-role="resp"] #guideExtra,
+  #onb[data-cur="guide"][data-role="minor"]:has(#guideExtra:not(:empty)) #guideExtra{grid-column:2;grid-row:1/3;margin-top:0}
+  #onb[data-cur="guide"][data-role="resp"] #guideNote,
+  #onb[data-cur="guide"][data-role="minor"]:has(#guideExtra:not(:empty)) #guideNote{grid-column:1}
+  #onb[data-cur="reinstall"] .gf-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #onb[data-cur="guide"] .gf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media (max-width:900px){
+  .auth-page .stage{padding-top:68px}
+  .onb-page .stage.full{padding-top:64px}
+  .onb-page .onb{min-height:calc(100vh - 64px);min-height:calc(100dvh - 64px)}
+  .onb-page .onb-main{padding:16px 20px}
+}
+@media (max-width:600px){
+  .auth-page .stage .card{padding:16px}
+  .onb-page .onb-main{padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+  .onb-page .onb-mobile-note{margin-bottom:10px;padding:8px 10px;line-height:1.35}
+  .onb-page .onb .choice{flex-wrap:nowrap}
+  .onb-page .onb .choice .ico{width:42px;height:42px}
+  .onb-page .onb .choice .ico svg{width:24px;height:24px}
+  .onb-page .onb .choice .go{display:grid;place-items:center;flex:none;width:30px;min-height:30px;height:30px;padding:0;border-radius:50%;font-size:0}
+  .onb-page .onb .choice .go::after{content:"\203a";font-size:1.5rem;line-height:1}
+  .onb-page .onb-cta .btn-primary,.onb-page .onb-cta .btn-secondary{min-height:46px;padding:10px 14px}
+  .onb-page #onb[data-cur="home"] .dots{display:none}
+  .onb-page #onb[data-cur="home"] .onb-mobile-note{margin-bottom:6px;padding:6px 8px}
+  .onb-page #homeDevices li{padding:6px 8px}
+}
+@media (max-width:380px){
+  .onb-page .onb .choice{gap:8px;padding:8px}
+  .onb-page .onb .choice .ico{width:36px;height:36px}
+  .onb-page .onb .choice .go{width:24px;min-height:24px;height:24px}
+  .onb-page .onb .choice strong{font-size:.94rem}
+  .onb-page .onb .choice .d{font-size:.87rem}
+  .onb-page #onb[data-cur="home"] .done-ico{width:48px;height:48px}
+}
+@media (max-height:650px){
+  .auth-page .stage{padding-top:64px;padding-bottom:8px}
+  .auth-page .stage .card{padding:12px 16px}
+  .auth-page .form,.auth-page #auth[data-aba="cadastro"] .form{gap:6px 10px}
+  .auth-page .secure{margin-top:6px}
+  .auth-page .legal{margin-top:4px;font-size:.77rem;line-height:1.25}
+}
+@media (min-width:360px) and (max-width:900px){
+  .onb-page .gf-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
 }

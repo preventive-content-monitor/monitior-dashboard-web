@@ -36,7 +36,8 @@
       }
       try { var gE = (localStorage.getItem("guardian_email") || "").toLowerCase(); if ((JSON.parse(localStorage.getItem("guardian_flow:" + gE)) || {}).role === "minor") window.location.replace("/onboarding.html?restrito=1"); } catch (e) {}
     </script>
-    <link rel="stylesheet" href="css/mobile-app.css?v=4" />
+    <link rel="stylesheet" href="css/mobile-app.css?v=5" />
+    <link rel="stylesheet" href="css/desktop-fit.css?v=1" />
   </head>
   <body>
     <div class="dashboard-layout">
