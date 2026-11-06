@@ -2,7 +2,7 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guardian - Alertas</title>
     <link rel="icon" type="image/png" href="assets/icon128.png" />
     <script>
@@ -287,8 +287,6 @@
         box-shadow: var(--shadow-sm);
       }
     </style>
-    <link rel="stylesheet" href="css/mobile-app.css?v=5" />
-    <link rel="stylesheet" href="css/desktop-fit.css?v=1" />
   </head>
   <body>
     <div class="dashboard-layout">
@@ -380,7 +378,7 @@
         </div>
 
         <!-- Preferências de notificação -->
-        <div class="card alerts-prefs-card" style="margin-bottom: var(--space-lg)">
+        <div class="card" style="margin-bottom: var(--space-lg)">
           <div class="card-header">
             <h3 class="card-title">⚙️ Quando você quer ser notificado</h3>
           </div>
@@ -434,7 +432,7 @@
         </div>
 
         <!-- Central de alertas -->
-        <div class="card alerts-list-card">
+        <div class="card">
           <div class="card-header">
             <h3 class="card-title">
               🔔 Central de Alertas
@@ -497,7 +495,6 @@
 
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/mobile-app.js?v=2"></script>
     <script>
       const { $, $$, requireAuth, showToast, formatRelativeTime, formatDateTime } =
         GuardianUtils;
@@ -841,6 +838,6 @@
       init();
     </script>
     <script src="js/guardian-flow.js"></script>
-    <script src="js/guardian-tour.js?v=2"></script>
+    <script src="js/guardian-tour.js"></script>
   </body>
 </html>

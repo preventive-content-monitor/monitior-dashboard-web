@@ -35,14 +35,6 @@ Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar polít
 
 ## Fluxo de Uso
 
-### Uso no celular
-
-O painel se adapta ao tamanho da tela. No celular, a barra inferior dá acesso
-ao início, filhos, atividades e regras; em **Mais** ficam dispositivos, alertas,
-tema e saída da conta. A extensão que monitora a navegação deve ser instalada
-no computador que será protegido, não no navegador do celular. Deslize para
-rolar as telas: a barra de rolagem fica oculta no celular.
-
 ### 1. Primeiro acesso
 
 1. Acesse `https://<EC2-IP>/dashboard/` ou clique em **Entrar no painel** na landing pública

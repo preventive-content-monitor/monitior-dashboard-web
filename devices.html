@@ -2,7 +2,7 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guardian - Dispositivos</title>
     <link rel="icon" type="image/png" href="assets/icon128.png" />
     <script>
@@ -32,8 +32,6 @@
       }
       try { var gE = (localStorage.getItem("guardian_email") || "").toLowerCase(); if ((JSON.parse(localStorage.getItem("guardian_flow:" + gE)) || {}).role === "minor") window.location.replace("/onboarding.html?restrito=1"); } catch (e) {}
     </script>
-    <link rel="stylesheet" href="css/mobile-app.css?v=5" />
-    <link rel="stylesheet" href="css/desktop-fit.css?v=1" />
   </head>
   <body>
     <div class="dashboard-layout">
@@ -135,7 +133,7 @@
         </div>
 
         <!-- Filter -->
-        <div class="card device-filter-card" style="margin-bottom: var(--space-lg)">
+        <div class="card" style="margin-bottom: var(--space-lg)">
           <div
             class="card-body"
             style="padding: var(--space-md) var(--space-lg)"
@@ -319,7 +317,6 @@
 
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/mobile-app.js?v=2"></script>
     <script>
       const {
         $,
@@ -453,7 +450,6 @@
             return `
           <tr data-id="${device.id}">
             <td>
-              <span class="app-cell-label">Dispositivo</span>
               <div style="display: flex; align-items: center; gap: var(--space-sm);">
                 <span style="font-size: 1.5rem;">${deviceIcon}</span>
                 <div>
@@ -463,26 +459,23 @@
               </div>
             </td>
             <td>
-              <span class="app-cell-label">Dependente</span>
               <div style="display: flex; align-items: center; gap: var(--space-sm);">
                 <span>👦</span>
                 <span>${device.dependentNickname || "-"}</span>
               </div>
             </td>
-            <td><span class="app-cell-label">Vinculado em</span>${formatDate(device.enrolledAt)}</td>
-            <td><span class="app-cell-label">Última atividade</span>${device.lastSeenAt ? formatRelativeTime(device.lastSeenAt) : "Nunca"}</td>
+            <td>${formatDate(device.enrolledAt)}</td>
+            <td>${device.lastSeenAt ? formatRelativeTime(device.lastSeenAt) : "Nunca"}</td>
             <td>
-              <span class="app-cell-label">Status</span>
               <span class="badge badge-${statusClass}">${statusText}</span>
               <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">${statusHint}</div>
             </td>
             <td>
-              <span class="app-cell-label">Ações</span>
-              <button class="btn btn-ghost btn-small policy-btn" data-id="${device.id}" title="Configurar Política" aria-label="Configurar política">
-                ⚙️ <span class="app-device-action-text">Regras</span>
+              <button class="btn btn-ghost btn-small policy-btn" data-id="${device.id}" title="Configurar Política">
+                ⚙️
               </button>
-              <button class="btn btn-ghost btn-small delete-btn" data-id="${device.id}" data-name="${device.name || 'Dispositivo'}" title="Remover Dispositivo" aria-label="Remover dispositivo" style="color: var(--danger); margin-left: var(--space-xs);">
-                🗑️ <span class="app-device-action-text">Remover</span>
+              <button class="btn btn-ghost btn-small delete-btn" data-id="${device.id}" data-name="${device.name || 'Dispositivo'}" title="Remover Dispositivo" style="color: var(--danger); margin-left: var(--space-xs);">
+                🗑️
               </button>
             </td>
           </tr>
@@ -634,6 +627,6 @@
       window.addEventListener("DOMContentLoaded", init);
     </script>
     <script src="js/guardian-flow.js"></script>
-    <script src="js/guardian-tour.js?v=2"></script>
+    <script src="js/guardian-tour.js"></script>
   </body>
 </html>

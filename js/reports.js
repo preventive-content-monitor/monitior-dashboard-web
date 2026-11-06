@@ -590,17 +590,14 @@
         return `
           <tr class="activity-row" data-id="${escapeHtml(item.id)}" tabindex="0">
             <td class="activity-when">
-              <span class="app-cell-label">Data e hora</span>
               <div class="activity-when-time">${when.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
               <div class="activity-when-date">${when.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}</div>
             </td>
             <td class="activity-content">
-              <span class="app-cell-label">Site</span>
               <div class="activity-host">${escapeHtml(F.prettyHost(item.urlHost))}</div>
               ${item.titulo ? `<div class="activity-title" title="${escapeHtml(item.titulo)}">${escapeHtml(item.titulo)}</div>` : ""}
             </td>
             <td class="risk-cell">
-              <span class="app-cell-label">Risco</span>
               ${
                 score === null || score === undefined
                   ? '<span class="label-name">Sem análise</span>'
@@ -609,7 +606,7 @@
                      <div class="label-name">${escapeHtml(labelText(item.rotulo))}</div>`
               }
             </td>
-            <td class="col-optional"><span class="app-cell-label">O que aconteceu</span><span class="fam-pill tone-${action.tone}">${action.text}</span></td>
+            <td class="col-optional"><span class="fam-pill tone-${action.tone}">${action.text}</span></td>
           </tr>`;
       })
       .join("");
