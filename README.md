@@ -1,4 +1,4 @@
-# monitior-dashboard-web — Painel Web do Responsável (GuardIAn)
+# monitor-dashboard-web — Painel Web do Responsável (GuardIAn)
 
 Dashboard HTML/CSS/JS puro para o **responsável** (pai/tutor) configurar políticas, visualizar relatórios e gerenciar dispositivos. Servido pelo nginx na EC2.
 
@@ -131,7 +131,7 @@ em `/downloads/`. Instalações antigas precisam ser atualizadas e reautorizadas
 ## Assets
 
 ```
-monitior-dashboard-web/
+monitor-dashboard-web/
 ├── index.html          ← Painel principal com métricas
 ├── login.html          ← Login do responsável
 ├── dependents.html     ← Gestão de dependentes
