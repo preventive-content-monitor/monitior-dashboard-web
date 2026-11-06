@@ -116,10 +116,6 @@ h1,h2,h3{font-family:var(--titulo);line-height:1.15;color:var(--marinho)}
 .acc-panel p{overflow:hidden;padding:0 22px;color:var(--muted)}
 .acc-btn[aria-expanded="true"]+.acc-panel p{padding-bottom:18px}
 
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *{animation:none!important;transition:none!important}
-}
 
 /* Mockup da tela inicial */
 .hero-visual{position:relative;padding:30px 0 10px}

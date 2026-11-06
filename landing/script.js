@@ -1,6 +1,5 @@
 (function () {
   'use strict';
-  var reduzMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- Frase com animação de scroll (palavra por palavra) ---------- */
   var secao = document.getElementById('statement');
@@ -22,7 +21,7 @@
     var total = secao.offsetHeight - window.innerHeight;
     var prog = Math.min(1, Math.max(0, -r.top / total));
     // as palavras terminam de acender com ~85% do percurso
-    var alvo = reduzMovimento ? spans.length : Math.ceil(Math.min(1, prog / 0.9) * spans.length);
+    var alvo = Math.ceil(Math.min(1, prog / 0.9) * spans.length);
     spans.forEach(function (s, i) { s.classList.toggle('on', i < alvo); });
     barra.style.width = (prog * 100) + '%';
   }
@@ -65,7 +64,6 @@
   var contadores = document.querySelectorAll('.count');
   function animar(el) {
     var fim = +el.dataset.to;
-    if (reduzMovimento) { el.textContent = fim; return; }
     var ini = null, dur = 1600;
     function passo(t) {
       if (!ini) ini = t;
