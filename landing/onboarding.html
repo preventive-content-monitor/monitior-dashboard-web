@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Passo a passo | GuardIAn</title>
   <link rel="icon" type="image/png" href="img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="telas.css">
-  <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="responsive.css?v=4">
   <link rel="stylesheet" href="/dashboard/css/guardian-tour.css">
 </head>
 <body>
@@ -27,6 +27,8 @@
           <button class="back" id="back" hidden aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true" ><path d="M19 12H5m6-6-6 6 6 6"/></svg></button>
           <span class="step-label" id="stepLabel">&nbsp;</span>
         </div>
+
+        <p class="onb-mobile-note">Você pode acompanhar o painel pelo celular. Para instalar a extensão, use o computador que será protegido.</p>
 
         <div class="screen" data-screen="intro">
           <h1 tabindex="-1">Seja bem-vindo ao GuardIAn</h1>
@@ -107,15 +109,15 @@
           <div class="onb-cta">
             <a class="btn-primary r-not-minor" href="/dashboard/">Acessar o painel</a>
             <button class="btn-primary r-minor" type="button" data-reauth="resp">Abrir o painel (pede e-mail e senha)</button>
-            <button class="btn-secondary r-not-minor" type="button" data-go="reinstall">Instalar a extensão neste computador</button>
+            <button class="btn-secondary r-not-minor" type="button" data-go="reinstall"><span class="onb-desktop-label">Instalar a extensão neste computador</span><span class="onb-mobile-label">Ver como instalar a extensão</span></button>
             <button class="btn-secondary r-minor" type="button" data-go="guide">Ver instruções da extensão</button>
           </div>
           <p class="onb-note"><button type="button" class="link" data-logout>Sair da conta</button></p>
         </div>
 
         <div class="screen" data-screen="reinstall">
-          <h1 tabindex="-1">Instalar a extensão neste computador</h1>
-          <p class="lead">Siga os passos. Quando a extensão aparecer, escolha qual filho usa este computador e vinculamos automaticamente.</p>
+          <h1 tabindex="-1"><span class="onb-desktop-label">Instalar a extensão neste computador</span><span class="onb-mobile-label">Como instalar a extensão</span></h1>
+          <p class="lead"><span class="onb-desktop-label">Siga os passos. Quando a extensão aparecer, escolha qual filho usa este computador e vinculamos automaticamente.</span><span class="onb-mobile-label">Abra esta página no computador que será protegido para instalar a extensão e vinculá-la ao perfil do seu filho.</span></p>
           <div class="onb-cta" style="margin-bottom:16px"><button class="btn-primary" type="button" data-download>Baixar a extensão</button></div>
           <div id="reinstallGuide"></div>
           <div id="reinstallLink" hidden>

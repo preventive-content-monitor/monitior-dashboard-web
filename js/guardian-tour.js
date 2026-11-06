@@ -158,6 +158,8 @@
     return !!(el && el.classList.contains("show"));
   }
   function navLink(href) {
+    var mobileLink = document.querySelector('.app-mobile-nav a[href="' + href + '"]');
+    if (mobileLink && mobileLink.getClientRects().length) return mobileLink;
     return document.querySelector('.sidebar a[href="' + href + '"]');
   }
   function totalFor(role) { return role === "resp" ? 2 : 3; }
@@ -435,7 +437,7 @@
         return spot("dep-nav", navLink("dependents.html"), {
           badge: "Passo 1 de " + total, step: 1, total: total, placement: "right",
           title: "Comece cadastrando seu filho",
-          text: "Clique em “Dependentes” no menu ao lado.",
+          text: "Abra a página de Dependentes para cadastrar seu filho.",
           fallbackLabel: "Abrir Dependentes",
         });
       }
