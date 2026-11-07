@@ -157,7 +157,7 @@
   function childCard(child) {
     const stats = state.data.stats.get(child.id);
     const level = childLevel(child, stats);
-    const meta = [F.ageText(child), plural(child.devices.length, "computador", "computadores")]
+    const meta = [F.ageText(child), plural(child.devices.filter((d) => !d.removedAt).length, "computador", "computadores")]
       .filter(Boolean)
       .join(" · ");
 
