@@ -290,6 +290,7 @@
       wrap.className = "gf-kw-overlay";
       wrap.innerHTML =
         '<form class="gf-kw" role="dialog" aria-modal="true" aria-labelledby="gfKwTitle">' +
+          '<button type="button" class="gf-kw-x" data-kw-close aria-label="Fechar">&times;</button>' +
           '<div class="gf-kw-ico" aria-hidden="true">🔑</div>' +
           '<h2 id="gfKwTitle">' + escapeHTML(opts.title || "Crie sua palavra-chave") + '</h2>' +
           '<p>Só você vai saber. Ela é pedida para mexer na extensão — assim seu filho não consegue desligar a proteção.</p>' +
@@ -305,8 +306,15 @@
       var form = wrap.querySelector("form");
       var err = wrap.querySelector(".gf-kw-err");
       form.a.focus();
-      var cancel = wrap.querySelector("[data-kw-cancel]");
-      if (cancel) cancel.addEventListener("click", function () { wrap.remove(); reject(new Error("cancelado")); });
+      function close() {
+        document.removeEventListener("keydown", onKey, true);
+        wrap.remove();
+        reject(new Error("cancelado"));
+      }
+      function onKey(e) { if (e.key === "Escape") { e.stopPropagation(); close(); } }
+      document.addEventListener("keydown", onKey, true);
+      wrap.querySelectorAll("[data-kw-cancel],[data-kw-close]").forEach(function (b) { b.addEventListener("click", close); });
+      wrap.addEventListener("mousedown", function (e) { if (e.target === wrap) close(); });
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         var a = form.a.value.trim(), b = form.b.value.trim();
@@ -316,6 +324,7 @@
         btn.disabled = true; btn.textContent = "Salvando…";
         try {
           await saveKeyword(a);
+          document.removeEventListener("keydown", onKey, true);
           wrap.remove();
           resolve();
         } catch (failure) {

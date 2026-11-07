@@ -276,7 +276,7 @@
       if (!await closeMinorSession()) return;
       await refresh();
     } catch (err) {
-      guideLink.error = (err && err.message) || 'Não foi possível vincular. Tente de novo.';
+      guideLink.error = err && err.message === 'cancelado' ? '' : ((err && err.message) || 'Não foi possível vincular. Tente de novo.');
     } finally {
       guideLink.busy = false;
       if (current === 'guide') renderGuide();
@@ -399,7 +399,7 @@
       reinstallLinked = true;
       await refresh();
     } catch (e) {
-      err.textContent = e.message;
+      if (e.message !== 'cancelado') err.textContent = e.message;
     } finally {
       btn.disabled = false; btn.textContent = 'Vincular este navegador';
       renderReinstall();
