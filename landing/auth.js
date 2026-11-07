@@ -113,9 +113,9 @@
         localStorage.setItem('guardian_minor_email', email);
         localStorage.removeItem('guardian_token');
         localStorage.removeItem('guardian_email');
-        sessionStorage.setItem('guardian_setup_token', data.token);
+        localStorage.setItem('guardian_setup_token', data.token);
       } else {
-        sessionStorage.removeItem('guardian_setup_token');
+        localStorage.removeItem('guardian_setup_token');
         localStorage.removeItem('guardian_minor_email');
         localStorage.setItem('guardian_token', data.token);
         localStorage.setItem('guardian_email', email);
@@ -152,8 +152,8 @@
     form.querySelectorAll('.swap').forEach(function (el) { el.style.display = 'none'; });
     document.getElementById('titulo').textContent = 'Confirme que você é o responsável';
     document.getElementById('subtitulo').textContent = setupMode
-      ? 'Entre para receber uma autorização temporária, sem acesso ao painel. Por segurança, suas outras sessões de painel serão encerradas.'
-      : 'Este computador está protegido como computador do menor. Para mudar isso, entre com o e-mail e a senha do responsável.';
+      ? 'Por segurança, digite sua senha para liberar a configuração deste computador por 30 minutos.'
+      : 'Este computador está protegido como computador do menor. Para mudar isso, digite a senha do responsável.';
     document.getElementById('email').value = setupMode ? localStorage.getItem('guardian_minor_email') : (pendingReauth().email || '');
     document.getElementById('senha').focus();
   }

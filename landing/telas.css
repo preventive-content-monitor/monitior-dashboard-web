@@ -205,3 +205,105 @@ details.next-pc[open] summary{margin-bottom:10px}
 .dep-form .field-row{margin:12px 0 4px}
 .dep-sex{display:flex;gap:18px}
 .dep-sex label{display:flex;align-items:center;gap:8px;cursor:pointer}
+
+/* ===== Desktop: login e passo a passo cabem na tela, sem barra de rolagem ===== */
+@media (min-width:901px){
+  html:has(.page){overflow:hidden}
+  .page{height:100vh;height:100dvh;min-height:0}
+  .page .header{padding-block:6px}
+  .page .brand-icon{height:40px}.page .brand-text{height:30px}
+  .stage,.onb-main{scrollbar-width:none;-ms-overflow-style:none}
+  .stage::-webkit-scrollbar,.onb-main::-webkit-scrollbar{display:none}
+
+  .stage{min-height:0;overflow-y:auto;place-items:safe center;padding:66px 20px 10px}
+  .card{padding:clamp(18px,3.4vh,40px) clamp(24px,3vw,40px)}
+  .card-head{margin-bottom:clamp(10px,2vh,24px)}
+  .card-head h1{font-size:clamp(1.3rem,3.4vh,1.6rem);margin-bottom:4px}
+  .card-head p{font-size:clamp(.88rem,1.9vh,.97rem);line-height:1.5}
+  .seg{margin-bottom:clamp(10px,2vh,24px)}
+  .seg button{height:clamp(36px,5.4vh,44px)}
+  .form{gap:clamp(8px,1.7vh,18px)}
+  .field{gap:4px}
+  .input input{height:clamp(40px,6vh,50px)}
+  .eye{top:50%;transform:translateY(-50%);width:38px;height:38px}
+  .submit{height:clamp(42px,6.2vh,52px);margin-top:2px}
+  .swap{font-size:.9rem}
+  .secure{margin-top:clamp(8px,1.6vh,18px)}
+  .legal{margin-top:clamp(6px,1.6vh,20px)}
+
+  .stage.full{height:100%;overflow:hidden;padding:58px 0 0}
+  .onb{height:100%;min-height:0}
+  .onb-main{min-height:0;overflow-y:auto;justify-content:safe center;padding:clamp(12px,3vh,40px) clamp(24px,5vw,72px)}
+  .onb-side{padding:clamp(16px,3vh,40px)}
+  .onb-top{min-height:36px;margin-bottom:clamp(0px,.6vh,8px)}
+  .back{width:36px;height:36px}
+  .screen h1{font-size:clamp(1.35rem,3.8vh,2rem);line-height:1.2;margin-bottom:clamp(4px,1vh,10px)}
+  .onb .lead{margin-bottom:clamp(10px,2.4vh,24px);font-size:clamp(.9rem,2vh,1.02rem);line-height:1.5}
+  .perks{gap:clamp(6px,1.3vh,12px);margin-bottom:clamp(14px,3vh,30px)}
+  .onb .dots{margin-top:clamp(12px,3vh,32px)}
+  .onb .choices{gap:clamp(8px,1.4vh,14px)}
+  .onb .choice{padding:clamp(9px,1.7vh,18px) 18px;gap:14px}
+  .onb .choice .ico{width:clamp(42px,7vh,64px);height:clamp(42px,7vh,64px)}
+  .onb .choice .ico svg{width:clamp(22px,3.6vh,32px);height:clamp(22px,3.6vh,32px)}
+  .onb .choice strong{font-size:clamp(.92rem,2vh,1.05rem)}
+  .onb .choice span.d{font-size:clamp(.8rem,1.8vh,.92rem);line-height:1.4}
+  .onb .choice .go{padding:8px 16px}
+  .btn-primary,.btn-secondary{height:clamp(42px,6.2vh,52px)}
+  .onb-cta{gap:10px 16px}
+  .onb-note{margin-top:clamp(8px,1.8vh,20px)}
+  .gf-check{gap:clamp(5px,1vh,10px);margin-bottom:clamp(10px,2.2vh,22px)}
+  .gf-check li{padding:clamp(6px,1.2vh,12px) 14px;line-height:1.3}
+  #guideExtra,#reinstallGuide{margin-top:clamp(10px,2vh,22px)}
+
+  .next-pc{padding:clamp(10px,1.8vh,18px) 18px;margin-bottom:clamp(10px,2vh,22px)}
+  .field-row{margin:clamp(8px,1.4vh,18px) 0 4px}
+  .dep-form .field-row{margin:clamp(6px,1vh,12px) 0 2px}
+  .done-ico,.onb .done-ico{width:clamp(56px,9vh,88px);height:clamp(56px,9vh,88px);margin-bottom:clamp(8px,1.8vh,18px)}
+  .vis{gap:clamp(10px,2.2vh,22px)}
+  .node{padding:clamp(8px,1.6vh,14px) 16px}
+  .arrow{height:clamp(14px,3vh,30px)}
+  .big-shield{width:clamp(120px,24vh,200px);height:clamp(120px,24vh,200px)}
+}@media (min-width:901px) and (max-height:820px){
+  .page .header{padding-block:3px}
+  .page .brand-icon{height:34px}.page .brand-text{height:24px}
+  .stage{padding-top:50px}
+  .stage.full{padding-top:46px}
+  .card{padding:16px 28px}
+  .card-head{margin-bottom:8px}
+  .card-head p{font-size:.85rem}
+  .seg{margin-bottom:10px;padding:4px}
+  .seg-ind{top:4px;bottom:4px;left:4px;width:calc(50% - 4px)}
+  .form{gap:7px}
+  .field label{font-size:.82rem}
+  .input input{height:40px}
+  .error:empty{display:none}
+  .submit{height:42px}
+  .secure{margin-top:6px}
+  .legal{margin-top:4px;font-size:.76rem}
+  .onb-top{min-height:30px;margin-bottom:0}
+  .onb .choice{padding:9px 14px}
+  .onb .choice .go{display:none}
+  .onb .lead{margin-bottom:10px}
+  .gf-check{margin-bottom:10px}
+  .gf-check li{padding:6px 12px}
+}
+/* Guia de instalação em etapas (onboarding.js) */
+.gf-steps li[hidden]{display:none}
+.gf-stepnav{display:flex;align-items:center;gap:14px;margin-top:12px}
+.gf-stepnav .btn-primary,.gf-stepnav .btn-secondary{min-width:0;height:44px;padding:0 22px}
+.gf-stepnav [data-step-next]{margin-left:auto}
+.gf-stepcount{font-family:var(--titulo);font-weight:600;font-size:.88rem;color:var(--muted)}
+.gf-stepnav .btn-secondary[disabled]{opacity:.45;cursor:default;transform:none}
+.installing #guideLead,.installing #guideCheck,.installing .onb-cta{display:none}
+.installing #guideExtra{margin-top:8px}.gf-stepnav [hidden]{display:none}
+@media (min-width:901px) and (max-height:820px){
+  .screen h1{font-size:1.3rem}
+  .onb-note{margin-top:6px;line-height:1.5}
+  #guideExtra h2{font-size:1.05rem;margin-bottom:6px!important}
+  .gf-steps li{padding:10px 12px}
+  .gf-steps p{font-size:.87rem;line-height:1.45}
+  .gf-mock{margin-top:6px;padding:7px 10px}
+  .gf-wait{margin-top:8px;padding:8px 12px}
+  .gf-stepnav{margin-top:8px}
+  .gf-stepnav .btn-primary,.gf-stepnav .btn-secondary{height:38px}
+}

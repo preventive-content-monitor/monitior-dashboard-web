@@ -143,9 +143,11 @@
       var picked = keep ? keep.value : '';
       extra.innerHTML = guideExtraHTML(role, st, inst, deps, outdated, needsAuth);
       F.bindInstallGuide(extra);
+      stepper(extra);
       var sel = extra.querySelector('#guideDep');
       if (sel && picked) sel.value = picked;
     }
+    document.querySelector('[data-screen="guide"]').classList.toggle('installing', !!extra.querySelector('.gf-steps'));
 
     var notes = [];
     if (!isLinked) {
@@ -154,6 +156,35 @@
       notes.push('<button type="button" class="link" data-change-role>Mudar a escolha do computador</button>');
     }
     $('guideNote').innerHTML = (guideLink.error ? '<span class="error" role="alert">' + esc(guideLink.error) + '</span><br>' : '') + notes.join('<br>');
+  }
+
+  // Guia de instalação um passo por vez, para caber na tela sem rolagem.
+  var installStep = 0;
+  function stepper(root) {
+    var ol = root.querySelector('.gf-steps');
+    if (!ol) return;
+    root.querySelectorAll('.gf-alert').forEach(function (a) {
+      if (/^(Já tinha|Depois de vincular)/.test(a.textContent.trim())) a.remove();
+    });
+    var items = Array.prototype.slice.call(ol.children);
+    var nav = document.createElement('div');
+    nav.className = 'gf-stepnav';
+    nav.innerHTML = '<button type="button" class="btn-secondary" data-step-prev>Anterior</button>' +
+      '<span class="gf-stepcount" aria-live="polite"></span>' +
+      '<button type="button" class="btn-primary" data-step-next>Próximo</button>';
+    ol.after(nav);
+    function show(i) {
+      installStep = Math.max(0, Math.min(i, items.length - 1));
+      items.forEach(function (li, j) { li.hidden = j !== installStep; });
+      nav.querySelector('.gf-stepcount').textContent = 'Etapa ' + (installStep + 1) + ' de ' + items.length;
+      nav.querySelector('[data-step-prev]').disabled = installStep === 0;
+      nav.querySelector('[data-step-next]').hidden = installStep === items.length - 1;
+    }
+    nav.addEventListener('click', function (e) {
+      if (e.target.closest('[data-step-prev]')) show(installStep - 1);
+      if (e.target.closest('[data-step-next]')) show(installStep + 1);
+    });
+    show(installStep);
   }
 
   function panelStepsHTML(withCode) {
@@ -343,7 +374,7 @@
   // ---------- Reinstalar / vincular outro navegador ----------
   function renderReinstall() {
     var g = $('reinstallGuide');
-    if (!g.dataset.ready) { g.innerHTML = F.installGuideHTML(); F.bindInstallGuide(g); g.dataset.ready = '1'; }
+    if (!g.dataset.ready) { g.innerHTML = F.installGuideHTML(); F.bindInstallGuide(g); stepper(g); g.dataset.ready = '1'; }
     var inst = extInstalled();
     g.hidden = inst || reinstallLinked;
     $('reinstallLink').hidden = !inst || reinstallLinked;

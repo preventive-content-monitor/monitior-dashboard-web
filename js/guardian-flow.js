@@ -36,14 +36,14 @@
   }
 
   // ---------- Sessão ----------
-  function token() { return sessionStorage.getItem(SETUP_TOKEN_KEY) || localStorage.getItem(TOKEN_KEY); }
+  function token() { return localStorage.getItem(SETUP_TOKEN_KEY) || localStorage.getItem(TOKEN_KEY); }
   function email() { return localStorage.getItem(EMAIL_KEY) || localStorage.getItem(MINOR_EMAIL_KEY) || ""; }
   function isLoggedIn() { return !!token(); }
   function isMinor() { return !!localStorage.getItem(MINOR_EMAIL_KEY); }
-  function hasSetupSession() { return !!sessionStorage.getItem(SETUP_TOKEN_KEY); }
+  function hasSetupSession() { return !!localStorage.getItem(SETUP_TOKEN_KEY); }
   function hasParentSession() { return !!localStorage.getItem(TOKEN_KEY); }
   function saveSession(tk, mail) {
-    sessionStorage.removeItem(SETUP_TOKEN_KEY);
+    localStorage.removeItem(SETUP_TOKEN_KEY);
     localStorage.removeItem(MINOR_EMAIL_KEY);
     localStorage.setItem(TOKEN_KEY, tk);
     localStorage.setItem(EMAIL_KEY, mail);
@@ -70,7 +70,7 @@
     var tk = token();
     var error = null;
     try { await revokeSession(tk); } catch (e) { error = e; }
-    sessionStorage.removeItem(SETUP_TOKEN_KEY);
+    localStorage.removeItem(SETUP_TOKEN_KEY);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(EMAIL_KEY);
     if (error) throw new Error("A sessão foi removida deste navegador, mas não foi possível confirmar seu encerramento no servidor. Verifique a conexão.");
@@ -85,7 +85,7 @@
       var data = await api("/api/autenticacao/sessao-menor", { method: "POST", body: "{}" });
       if (!data || !data.token) throw new Error("O servidor não retornou a autorização temporária.");
       setState({ role: "minor", startedAt: getState().startedAt || Date.now() });
-      sessionStorage.setItem(SETUP_TOKEN_KEY, data.token);
+      localStorage.setItem(SETUP_TOKEN_KEY, data.token);
       localStorage.setItem(MINOR_EMAIL_KEY, mail);
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(EMAIL_KEY);
@@ -94,7 +94,7 @@
       try { await revokeSession(original); } catch (failure) { revokeError = failure; }
       setState({ role: "minor" });
       localStorage.setItem(MINOR_EMAIL_KEY, mail);
-      sessionStorage.removeItem(SETUP_TOKEN_KEY);
+      localStorage.removeItem(SETUP_TOKEN_KEY);
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(EMAIL_KEY);
       if (revokeError) {
@@ -105,13 +105,29 @@
   }
 
   async function finishMinor() {
-    var tk = sessionStorage.getItem(SETUP_TOKEN_KEY);
+    var tk = localStorage.getItem(SETUP_TOKEN_KEY);
     await revokeSession(tk);
-    sessionStorage.removeItem(SETUP_TOKEN_KEY);
+    localStorage.removeItem(SETUP_TOKEN_KEY);
   }
 
   async function reauth(nextRole) {
-    localStorage.setItem("guardian_reauth", JSON.stringify({ email: email().toLowerCase(), role: nextRole || "" }));
+    var setup = localStorage.getItem(SETUP_TOKEN_KEY), mail = email();
+    if (setup && mail) {
+      try {
+        var res = await fetch("/api/autenticacao/retomar-responsavel", { method: "POST", headers: { Authorization: "Bearer " + setup } });
+        var data = res.ok ? await res.json() : null;
+        if (data && data.token) {
+          saveSession(data.token, mail);
+          var st = getState();
+          if (nextRole) st.role = nextRole; else delete st.role;
+          st.updatedAt = Date.now();
+          localStorage.setItem(stateKey(), JSON.stringify(st));
+          location.href = URLS.onboarding;
+          return;
+        }
+      } catch (e) { /* segue para o login */ }
+    }
+    localStorage.setItem("guardian_reauth", JSON.stringify({ email: mail.toLowerCase(), role: nextRole || "" }));
     await logout(false);
     location.href = URLS.auth + "?reauth=1";
   }
@@ -150,7 +166,7 @@
       ? await window.GuardianAPI.mockFetch(path, options)
       : await fetch(path, Object.assign({}, options, { headers: headers }));
     if (res.status === 401) {
-      sessionStorage.removeItem(SETUP_TOKEN_KEY);
+      localStorage.removeItem(SETUP_TOKEN_KEY);
       if (!isMinor()) {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(EMAIL_KEY);
