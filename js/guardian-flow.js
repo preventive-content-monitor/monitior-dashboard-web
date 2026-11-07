@@ -21,7 +21,6 @@
     devices: "/dashboard/devices.html",
     download: "/downloads/GuardIAn-Extensao.zip",
     protection: "/downloads/GuardIAn-Protecao.bat",
-    installer: "/downloads/Instalar-GuardIAn.bat",
   };
 
   var listeners = {};
@@ -380,27 +379,14 @@
     return { name: "este navegador", page: "chrome://extensions", dev: "Modo do desenvolvedor", devWhere: "no canto superior direito", load: "Carregar sem compactação", incognito: "Permitir no modo anônimo", supported: false };
   }
 
-  function saveFile(blobOrUrl, name) {
+  function downloadExtension() {
     var a = document.createElement("a");
-    a.href = typeof blobOrUrl === "string" ? blobOrUrl : URL.createObjectURL(blobOrUrl);
-    a.download = name;
+    a.href = URLS.download;
+    a.download = "GuardIAn-Extensao.zip";
     document.body.appendChild(a);
     a.click();
     a.remove();
-    if (typeof blobOrUrl !== "string") setTimeout(function () { URL.revokeObjectURL(a.href); }, 10000);
-  }
-
-  // O instalador sai com o endereço deste servidor e o navegador atual já preenchidos.
-  function downloadExtension() {
     setState({ downloadedAt: Date.now() });
-    var nav = /Edg\//.test(navigator.userAgent) ? "edge" : "chrome";
-    fetch(URLS.installer, { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-      .then(function (text) {
-        text = text.replace(/__SERVIDOR__/g, location.origin).replace(/__NAVEGADOR__/g, nav);
-        saveFile(new Blob([text], { type: "application/octet-stream" }), "Instalar-GuardIAn.bat");
-      })
-      .catch(function () { saveFile(URLS.download, "GuardIAn-Extensao.zip"); });
   }
 
   function downloadProtection() {
@@ -419,7 +405,7 @@
         '<li>Clique em <strong>Baixar arquivo de proteção</strong>. Se o ' + (b.name === "Microsoft Edge" ? "Edge" : "Chrome") + ' avisar sobre o arquivo, clique em <strong>Manter</strong>.</li>' +
         '<li>Abra o arquivo <strong>GuardIAn-Protecao</strong> (na lista de downloads, no canto superior direito).</li>' +
         '<li>Se aparecer “O Windows protegeu o computador”, clique em <strong>Mais informações</strong> → <strong>Executar assim mesmo</strong>.</li>' +
-        '<li>Clique em <strong>Sim</strong> quando o Windows pedir permissão.</li>' +
+        '<li>Clique em <strong>Sim</strong> quando o Windows pedir permissão. Pronto: nada mais vai abrir e esta tela confirma sozinha.</li>' +
       '</ol>' +
       '<button type="button" class="gf-btn gf-btn-soft" data-gf-protect>Baixar arquivo de proteção</button>';
   }
@@ -445,28 +431,43 @@
     var b = browserInfo();
     var warn = b.supported ? "" :
       '<div class="gf-alert">Para instalar a extensão, abra este site no <strong>Google Chrome</strong> ou no <strong>Microsoft Edge</strong>.</div>';
+    var protection = '<div class="gf-alert">Depois de vincular, o GuardIAn bloqueia a guia anônima e protege as páginas de extensões e de restauração. O responsável pode liberar essas configurações por 5 minutos com a palavra-chave.</div>';
     return (
       warn +
+      '<div class="gf-alert">Já tinha o Guardian instalado? Não digite sua senha na versão antiga. Baixe este ZIP, substitua os arquivos na pasta anterior e clique em <strong>Recarregar</strong> na página de extensões.</div>' +
+      protection +
       '<ol class="gf-steps">' +
         '<li data-gf-step="download"><span class="gf-n">1</span><div>' +
-          '<h3>Abra o instalador</h3>' +
-          '<p>Na lista de downloads (canto superior direito do navegador), clique em <strong>Instalar-GuardIAn</strong>. Se o navegador avisar sobre o arquivo, clique em <strong>Manter</strong>.</p>' +
-          '<p>Se aparecer “O Windows protegeu o computador”, clique em <strong>Mais informações</strong> → <strong>Executar assim mesmo</strong>. Depois clique em <strong>Sim</strong>.</p>' +
-          '<button type="button" class="gf-btn gf-btn-soft" data-gf-download>Baixar o instalador de novo</button>' +
+          '<h3>Baixe a extensão</h3>' +
+          '<p>O arquivo <strong>GuardIAn-Extensao.zip</strong> vai para a pasta <strong>Downloads</strong>.</p>' +
+          '<button type="button" class="gf-btn gf-btn-soft" data-gf-download>Baixar novamente</button>' +
         '</div></li>' +
         '<li><span class="gf-n">2</span><div>' +
-          '<h3>Ative o “' + b.dev + '”</h3>' +
-          '<p>O instalador abre sozinho a página de extensões. Ligue o botão ' + b.devWhere + '.</p>' +
-          '<div class="gf-mock"><span class="gf-mock-title">Extensões</span><span class="gf-toggle"><i></i></span><small>' + b.dev + '</small></div>' +
+          '<h3>Extraia o arquivo</h3>' +
+          '<p>Abra a pasta <strong>Downloads</strong>, clique com o <strong>botão direito</strong> em <strong>GuardIAn-Extensao.zip</strong> → <strong>Extrair tudo…</strong> → <strong>Extrair</strong>. Vai aparecer a pasta <strong>GuardIAn-Extensao</strong>. Não apague essa pasta.</p>' +
         '</div></li>' +
         '<li><span class="gf-n">3</span><div>' +
-          '<h3>Clique em “' + b.load + '” e cole</h3>' +
-          '<p>Na janela que abrir, clique no campo <strong>Pasta</strong>, aperte <kbd>Ctrl</kbd>+<kbd>V</kbd> e clique em <strong>Selecionar pasta</strong>. O caminho já foi copiado pelo instalador.</p>' +
-          '<div class="gf-mock"><span class="gf-mock-btn">' + b.load + '</span><span class="gf-mock-btn ghost">Compactar extensão</span></div>' +
+          '<h3>Abra a página de extensões</h3>' +
+          '<p>Clique em copiar, abra uma <strong>nova aba</strong> (<kbd>Ctrl</kbd>+<kbd>T</kbd>), cole (<kbd>Ctrl</kbd>+<kbd>V</kbd>) e aperte <kbd>Enter</kbd>.</p>' +
+          '<div class="gf-copy"><code>' + b.page + '</code><button type="button" class="gf-btn" data-gf-copy="' + b.page + '">Copiar endereço</button></div>' +
         '</div></li>' +
         '<li><span class="gf-n">4</span><div>' +
+          '<h3>Ative o “' + b.dev + '”</h3>' +
+          '<p>É um botão de liga/desliga ' + b.devWhere + ' da página de extensões.</p>' +
+          '<div class="gf-mock"><span class="gf-mock-title">Extensões</span><span class="gf-toggle"><i></i></span><small>' + b.dev + '</small></div>' +
+        '</div></li>' +
+        '<li><span class="gf-n">5</span><div>' +
+          '<h3>Clique em “' + b.load + '”</h3>' +
+          '<p>Escolha a pasta <strong>GuardIAn-Extensao</strong> (dentro de Downloads) e clique em <strong>Selecionar pasta</strong>.</p>' +
+          '<div class="gf-mock"><span class="gf-mock-btn">' + b.load + '</span><span class="gf-mock-btn ghost">Compactar extensão</span></div>' +
+        '</div></li>' +
+        '<li><span class="gf-n">6</span><div>' +
+          '<h3>Desligue a guia anônima</h3>' +
+          protectionStepsHTML() +
+        '</div></li>' +
+        '<li><span class="gf-n">7</span><div>' +
           '<h3>Volte para cá</h3>' +
-          '<p>Esta tela percebe sozinha quando você terminar. A guia anônima já foi desligada e as atualizações serão automáticas.</p>' +
+          '<p>Esta tela percebe sozinha quando você terminar e continua o passo a passo.</p>' +
         '</div></li>' +
       '</ol>' +
       '<div class="gf-wait" data-gf-wait><span class="gf-spin"></span>Aguardando a extensão ser instalada neste navegador…</div>'
@@ -477,14 +478,17 @@
     var b = browserInfo();
     return '<div class="gf-alert"><strong>Não digite sua senha na versão antiga.</strong> Atualize a extensão antes de continuar.</div>' +
       '<ol class="gf-steps">' +
-      '<li><span class="gf-n">1</span><div><h3>Abra o instalador</h3>' +
-      '<p>Abra o arquivo <strong>Instalar-GuardIAn</strong> e clique em <strong>Sim</strong>. A partir dele, as próximas atualizações são automáticas.</p>' +
-      '<button type="button" class="gf-btn gf-btn-soft" data-gf-download>Baixar o instalador</button></div></li>' +
-      '<li><span class="gf-n">2</span><div><h3>Troque a extensão antiga</h3>' +
-      '<p>Na página de extensões, no quadro <strong>Guardian - Proteção Familiar</strong>, clique em <strong>Remover</strong>. Depois clique em <strong>' + b.load + '</strong>, aperte <kbd>Ctrl</kbd>+<kbd>V</kbd> no campo <strong>Pasta</strong> e clique em <strong>Selecionar pasta</strong>.</p></div></li>' +
-      '<li><span class="gf-n">3</span><div><h3>Volte para cá</h3>' +
-      '<p>Esta tela percebe sozinha quando terminar.</p></div></li></ol>';
+      '<li><span class="gf-n">1</span><div><h3>Baixe a versão atualizada</h3>' +
+      '<button type="button" class="gf-btn gf-btn-soft" data-gf-download>Baixar extensão atualizada</button></div></li>' +
+      '<li><span class="gf-n">2</span><div><h3>Substitua os arquivos antigos</h3>' +
+      '<p>Extraia o ZIP na mesma pasta que você escolheu ao instalar a extensão e confirme a substituição dos arquivos.</p></div></li>' +
+      '<li><span class="gf-n">3</span><div><h3>Recarregue a extensão</h3>' +
+      '<p>Abra uma nova aba, cole o endereço abaixo e procure o quadro com o nome <strong>Guardian - Proteção Familiar</strong> e clique na setinha redonda ⟳ (Recarregar) dentro dele.</p>' +
+      '<div class="gf-copy"><code>' + b.page + '</code><button type="button" class="gf-btn" data-gf-copy="' + b.page + '">Copiar endereço</button></div></div></li>' +
+      '<li><span class="gf-n">4</span><div><h3>Autorize novamente</h3>' +
+      '<p>Abra o ícone do Guardian e entre com a conta do responsável. Se já havia um vínculo, ele será mantido.</p></div></li></ol>';
   }
+
   function bindInstallGuide(root) {
     root.querySelectorAll("[data-gf-download]").forEach(function (btn) {
       btn.addEventListener("click", downloadExtension);

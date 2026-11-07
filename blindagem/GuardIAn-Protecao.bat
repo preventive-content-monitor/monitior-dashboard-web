@@ -4,7 +4,7 @@
 :: onde a extensao nao consegue atuar. Para desfazer, use "Remover-Protecao.bat".
 net session >nul 2>&1
 if %errorlevel% neq 0 (
-  powershell -NoProfile -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
+  powershell -NoProfile -WindowStyle Hidden -Command "Start-Process -FilePath '%~f0' -Verb RunAs -WindowStyle Hidden"
   exit /b
 )
 set ID=ffceadefofipolmioklfilgepmnlammo
@@ -23,14 +23,4 @@ reg delete "%C%\URLBlocklist" /v 9001 /f >nul 2>&1
 reg delete "%C%\URLBlocklist" /v 9002 /f >nul 2>&1
 reg delete "%E%\URLBlocklist" /v 9001 /f >nul 2>&1
 reg delete "%E%\URLBlocklist" /v 9002 /f >nul 2>&1
-echo.
-echo  ============================================
-echo   GuardIAn: computador protegido!
-echo  ============================================
-echo.
-echo  - Guia anonima e InPrivate: desativadas
-echo  - Modo visitante e novos perfis: desativados
-echo.
-echo  Pode fechar esta janela e voltar ao navegador.
-echo.
-timeout /t 15
+exit /b 0
