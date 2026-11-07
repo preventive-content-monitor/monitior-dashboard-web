@@ -483,7 +483,7 @@
       '<li><span class="gf-n">2</span><div><h3>Substitua os arquivos antigos</h3>' +
       '<p>Extraia o ZIP na mesma pasta que você escolheu ao instalar a extensão e confirme a substituição dos arquivos.</p></div></li>' +
       '<li><span class="gf-n">3</span><div><h3>Recarregue a extensão</h3>' +
-      '<p>Abra uma nova aba, cole o endereço abaixo e clique em <strong>Recarregar</strong> no cartão do Guardian.</p>' +
+      '<p>Abra uma nova aba, cole o endereço abaixo e procure o quadro com o nome <strong>Guardian - Proteção Familiar</strong> e clique na setinha redonda ⟳ (Recarregar) dentro dele.</p>' +
       '<div class="gf-copy"><code>' + b.page + '</code><button type="button" class="gf-btn" data-gf-copy="' + b.page + '">Copiar endereço</button></div></div></li>' +
       '<li><span class="gf-n">4</span><div><h3>Autorize novamente</h3>' +
       '<p>Abra o ícone do Guardian e entre com a conta do responsável. Se já havia um vínculo, ele será mantido.</p></div></li></ol>';
