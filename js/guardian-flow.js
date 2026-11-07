@@ -462,8 +462,10 @@
           '<div class="gf-mock"><span class="gf-mock-btn">' + b.load + '</span><span class="gf-mock-btn ghost">Compactar extensão</span></div>' +
         '</div></li>' +
         '<li><span class="gf-n">6</span><div>' +
-          '<h3>Desligue a guia anônima</h3>' +
-          protectionStepsHTML() +
+          '<h3>Ative no modo anônimo</h3>' +
+          '<p>Na mesma página, no quadro <strong>Guardian - Proteção Familiar</strong>, clique em <strong>Saiba mais</strong> (em alguns navegadores aparece <strong>Detalhes</strong>). Desça a tela e ligue <strong>' + b.incognito + '</strong>.</p>' +
+          '<div class="gf-mock"><span class="gf-mock-title">Guardian - Proteção Familiar</span><span class="gf-mock-btn ghost">Saiba mais</span></div>' +
+          '<div class="gf-mock"><span class="gf-toggle"><i></i></span><small>' + b.incognito + '</small></div>' +
         '</div></li>' +
         '<li><span class="gf-n">7</span><div>' +
           '<h3>Volte para cá</h3>' +

@@ -88,7 +88,7 @@
 
     if (role === 'minor') {
       list.push(item(inst, !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'Siga o guia abaixo'));
-      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Desligar a guia anônima', incognitoAllowed ? 'Guia anônima protegida' : 'Um arquivo, um clique'));
+      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Ativar no modo anônimo', incognitoAllowed ? 'Ativado' : 'Saiba mais → Permitir no modo anônimo'));
       list.push(item(hasDep, inst && !hasDep, 'Cadastrar o filho', F.hasSetupSession() ? (depSub || 'Aqui mesmo, só o nome e a idade') : 'No painel do responsável'));
       list.push(item(isLinked, inst && !isLinked, 'Vincular este computador ao filho', F.hasSetupSession() ? 'Aqui mesmo, com um clique' : 'Com o código do painel'));
       $('guideTitle').textContent = inst ? 'Extensão instalada! Falta vincular' : 'Vamos proteger este computador';
@@ -119,7 +119,7 @@
     } else {
       list.push(item(hasDep, !hasDep, 'Cadastrar o filho no painel', depSub || 'Primeiro passo, no painel'));
       list.push(item(inst, hasDep && !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'O painel mostra como baixar e instalar'));
-      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Desligar a guia anônima', incognitoAllowed ? 'Guia anônima protegida' : 'Um arquivo, um clique'));
+      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Ativar no modo anônimo', incognitoAllowed ? 'Ativado' : 'Saiba mais → Permitir no modo anônimo'));
       list.push(item(isLinked, hasDep && inst && !isLinked, 'Vincular este navegador ao filho', 'Um clique no painel, no botão destacado'));
       $('guideTitle').textContent = 'Vamos configurar tudo neste computador';
       $('guideLead').textContent = 'Primeiro o painel, depois a extensão. O painel abre em outra aba com cada passo destacado; esta aba fica aqui acompanhando.';
@@ -201,8 +201,7 @@
   function guideExtraHTML(role, st, inst, deps, outdated, needsAuth) {
     if (outdated) return F.updateGuideHTML();
     var incognitoSetup = inst && extStatus && extStatus.anonimoPermitido === false
-      ? '<div class="gf-alert"><strong>Falta 1 passo:</strong> desligue a guia anônima neste computador. Baixe o arquivo, abra-o (clique em <strong>Manter</strong> e depois em <strong>Sim</strong> se o navegador ou o Windows perguntar). Esta tela confirma sozinha. ' +
-        '<button type="button" class="gf-btn gf-btn-soft" data-gf-protect>Baixar arquivo de proteção</button></div>'
+      ? '<div class="gf-alert"><strong>Falta 1 passo:</strong> em <code>' + F.browserInfo().page + '</code>, no quadro <strong>Guardian - Proteção Familiar</strong>, clique em <strong>Saiba mais</strong> e ligue <strong>' + F.browserInfo().incognito + '</strong>. Esta tela confirma sozinha.</div>'
       : '';
     if (role === 'minor') {
       if (needsAuth) {
