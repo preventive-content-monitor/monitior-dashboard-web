@@ -383,24 +383,12 @@
           filter.value = currentValue;
 
           // Load all devices
-          devicesList = collapseReinstalls(await devices.list());
+          devicesList = await devices.list();
 
           renderDevices();
         } catch (error) {
           showToast("Erro ao carregar dados: " + error.message, "error");
         }
-      }
-
-      // Reinstalar a extensão cria um novo registro; os antigos removidos do mesmo computador não devem aparecer repetidos.
-      function collapseReinstalls(list) {
-        const key = (d) => `${d.dependentId}|${d.name || ""}`;
-        const active = new Set(list.filter((d) => !d.removedAt).map(key));
-        const latestRemoved = new Map();
-        list.filter((d) => d.removedAt && !active.has(key(d))).forEach((d) => {
-          const prev = latestRemoved.get(key(d));
-          if (!prev || new Date(d.removedAt) > new Date(prev.removedAt)) latestRemoved.set(key(d), d);
-        });
-        return list.filter((d) => !d.removedAt || latestRemoved.get(key(d)) === d);
       }
 
       function renderDevices() {
