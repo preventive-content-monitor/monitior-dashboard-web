@@ -72,6 +72,9 @@
 .gt-ring { position: fixed; border-radius: 12px; box-shadow: 0 0 0 3px #fff, 0 0 0 7px rgba(125,65,196,.85), 0 0 40px 10px rgba(125,65,196,.45); pointer-events: none; transition: all .18s ease; animation: gt-glow 1.8s ease-in-out infinite; }
 .gt-card { position: fixed; width: min(380px, calc(100vw - 24px)); background: #fff; color: var(--gf-text); border-radius: 16px; padding: 18px 18px 16px; box-shadow: 0 30px 60px -20px rgba(10,15,40,.6); pointer-events: auto; transition: top .18s ease, left .18s ease; }
 .gt-card.gt-panel { width: min(640px, calc(100vw - 24px)); max-height: calc(100vh - 40px); overflow: auto; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%); padding: 26px; }
+.gt-card .gt-x { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #f1f2f7; color: #4a5070; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 1; }
+.gt-card .gt-x:hover { background: #e2e4ee; color: var(--gf-navy); }
+.gt-card .gt-x + .gt-step, .gt-card .gt-x + h2 { margin-right: 38px; }
 .gt-card .gt-step { display: inline-block; margin-bottom: 8px; padding: 3px 10px; border-radius: 20px; background: rgba(125,65,196,.12); color: var(--gf-purple); font: 700 .75rem var(--gf-font-title); letter-spacing: .02em; text-transform: uppercase; }
 .gt-card h2 { margin: 0 0 6px; font: 800 1.15rem/1.3 var(--gf-font-title); color: var(--gf-navy); }
 .gt-card.gt-panel h2 { font-size: 1.45rem; }

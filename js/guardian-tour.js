@@ -1,7 +1,7 @@
 /**
- * GuardIAn Tour — tutorial guiado e obrigatório do painel.
+ * GuardIAn Tour — tutorial guiado do painel.
  * Fica ativo até existir o primeiro dispositivo vinculado (verificado no backend).
- * Só a área destacada recebe cliques; o restante da tela fica bloqueado.
+ * Só a área destacada recebe cliques; o X (ou Esc) fecha o tutorial até recarregar a página.
  */
 (function () {
   "use strict";
@@ -13,6 +13,7 @@
   var lastCode = null;
   var enroll = { busy: false, error: "", manual: false };
   var manualCode = null;
+  var dismissed = false;
   var CODE_TTL_MS = 4.5 * 60 * 1000;
   var esc = F.escapeHTML;
 
@@ -85,10 +86,22 @@
       '</span><button type="button" data-gt-logout>Sair da conta</button></div>';
   }
 
+  function dismiss() {
+    dismissed = true;
+    if (current.key === "done") F.setState({ doneAck: Date.now() });
+    var codeClose = shown("#codeModal") && document.querySelector("#codeModal .modal-close");
+    if (codeClose) codeClose.click();
+    hide();
+  }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !root.hidden) dismiss();
+  });
+
   function paint(key, html, bind) {
     if (current.key === key) return false;
     current.key = key;
-    card.innerHTML = html;
+    card.innerHTML = '<button type="button" class="gt-x" aria-label="Fechar tutorial" title="Fechar">&times;</button>' + html;
+    card.querySelector(".gt-x").addEventListener("click", dismiss);
     var out = card.querySelector("[data-gt-logout]");
     if (out) out.addEventListener("click", function () {
       F.logout("/").catch(function (error) { alert(error.message); location.href = "/"; });
@@ -414,6 +427,7 @@
   // ---------- Máquina de estados ----------
   function render() {
     if (!data) return;
+    if (dismissed) return hide();
     var st = F.getState();
     var role = st.role;
     var extension = F.extension.current();
