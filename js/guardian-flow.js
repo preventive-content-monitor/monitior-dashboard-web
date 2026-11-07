@@ -297,7 +297,7 @@
           '<label>Repita<input name="b" type="password" autocomplete="new-password" required></label>' +
           '<p class="gf-kw-err" role="alert"></p>' +
           '<div class="gf-kw-actions">' +
-            (opts.cancelable ? '<button type="button" class="gf-btn gf-btn-ghost" data-kw-cancel>Cancelar</button>' : "") +
+            (opts.cancelable ? '<button type="button" class="gf-btn gf-btn-ghost" data-kw-cancel>' + escapeHTML(opts.cancelLabel || "Cancelar") + '</button>' : "") +
             '<button type="submit" class="gf-btn gf-btn-lg">Salvar palavra-chave</button>' +
           "</div>" +
         "</form>";

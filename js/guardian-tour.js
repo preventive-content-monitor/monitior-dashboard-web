@@ -424,6 +424,27 @@
       : '<div class="gt-actions"><button class="gf-btn gf-btn-lg" data-gt-finish="devices">Ver dispositivo vinculado</button><button class="gf-btn gf-btn-ghost" data-gt-finish="panel">Ir para o painel</button></div>');
   }
 
+  // No PC do responsável, a palavra-chave é pedida logo após cadastrar o filho (uma vez; dá para adiar).
+  var keywordAsking = false;
+  function askKeywordOnce() {
+    if (keywordAsking || F.getState().keywordAskedAt) return;
+    keywordAsking = true;
+    F.keyword.defined().then(function (defined) {
+      if (defined) return;
+      return F.keyword.ask({
+        title: "Crie a palavra-chave do GuardIAn",
+        cancelable: true,
+        cancelLabel: "Agora não",
+      }).then(function () {
+        if (window.showToast) showToast("Palavra-chave salva!", "success");
+      }, function () {});
+    }).catch(function (e) {
+      console.warn("[GuardIAn tour]", e);
+    }).finally(function () {
+      F.setState({ keywordAskedAt: Date.now() });
+    });
+  }
+
   // ---------- Máquina de estados ----------
   function render() {
     if (!data) return;
@@ -469,7 +490,10 @@
       });
     }
 
-    if (role === "resp") return waitChildPanel();
+    if (role === "resp") {
+      askKeywordOnce();
+      return waitChildPanel();
+    }
 
     if (!F.extension.current()) return installPanel(role);
 
