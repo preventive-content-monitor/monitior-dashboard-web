@@ -97,13 +97,13 @@
         : st.downloadedAt
           ? 'Siga o guia abaixo para instalar. Esta tela percebe sozinha quando você terminar.'
           : 'Neste computador vamos apenas instalar a extensão que protege a navegação. O painel com os alertas fica no seu computador.';
-      cta.textContent = st.downloadedAt ? 'Baixar a extensão novamente' : 'Baixar a extensão';
+      cta.textContent = st.downloadedAt ? 'Baixar o instalador de novo' : 'Baixar o instalador';
       cta.className = st.downloadedAt ? 'btn-secondary' : 'btn-primary';
       if (inst) cta.style.display = 'none';
       if (outdated) {
         $('guideTitle').textContent = 'Atualize a extensão neste computador';
         $('guideLead').textContent = 'A versão antiga precisa ser atualizada antes de você digitar sua senha.';
-        cta.textContent = 'Baixar a versão atualizada';
+        cta.textContent = 'Baixar o instalador';
         cta.className = 'btn-primary';
       } else if (needsAuth) {
         $('guideTitle').textContent = 'Autorize novamente a proteção';
@@ -129,7 +129,7 @@
     if (outdated && role !== 'minor') {
       $('guideTitle').textContent = 'Atualize a extensão neste computador';
       $('guideLead').textContent = 'A versão atual precisa ser instalada para proteger as configurações do navegador e as janelas anônimas.';
-      cta.textContent = 'Baixar a versão atualizada';
+      cta.textContent = 'Baixar o instalador';
       cta.className = 'btn-primary';
     }
     $('guideCheck').innerHTML = list.join('');

@@ -8,6 +8,7 @@ if %errorlevel% neq 0 (
 set ID=ffceadefofipolmioklfilgepmnlammo
 set C=HKLM\SOFTWARE\Policies\Google\Chrome
 set E=HKLM\SOFTWARE\Policies\Microsoft\Edge
+schtasks /delete /tn "GuardIAn Atualizar" /f >nul 2>&1
 reg delete "%C%" /v IncognitoModeAvailability /f >nul 2>&1
 reg delete "%C%" /v BrowserGuestModeEnabled /f >nul 2>&1
 reg delete "%C%" /v BrowserAddPersonEnabled /f >nul 2>&1
