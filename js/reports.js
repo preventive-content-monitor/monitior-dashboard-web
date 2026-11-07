@@ -704,6 +704,198 @@
     showToast(`${hist.last.items.length} acessos baixados`, "success");
   }
 
+  // ---------- Exportar relatório completo ----------
+  const EXPORT_PAGE_SIZE = 200;
+  const EXPORT_MAX_PAGES = 50;
+
+  async function loadAllAccesses(children, range) {
+    const rows = [];
+    for (const child of children) {
+      for (const device of child.devices) {
+        for (let page = 0; page < EXPORT_MAX_PAGES; page++) {
+          const result = await activity.list(device.id, { from: range.from, to: range.to, page, size: EXPORT_PAGE_SIZE });
+          result.items.forEach((item) => rows.push({ ...item, childName: child.nickname, deviceName: device.name }));
+          if (page >= result.totalPages - 1 || !result.items.length) break;
+        }
+      }
+    }
+    return rows.sort((a, b) => new Date(b.ocorridoEm) - new Date(a.ocorridoEm));
+  }
+
+  function dayBr(isoDay) {
+    const [y, m, d] = String(isoDay).split("-");
+    return d && m && y ? `${d}/${m}/${y}` : isoDay;
+  }
+
+  function actionText(item) {
+    return (ACTION_TEXT[item.acao] || (F.isBlocked(item) ? ACTION_TEXT.BLOCK : ACTION_TEXT.UNKNOWN)).text;
+  }
+
+  function riskText(score) {
+    return score === null || score === undefined ? "Sem análise" : `${F.riskLevel(score).short} (${score})`;
+  }
+
+  async function collectReport() {
+    const children = visibleChildren();
+    const range = F.periodRange(state.period);
+    const totals = sumStats(children);
+    const sites = new Map();
+    children.forEach((child) => {
+      state.data.stats.get(child.id)?.domains.forEach((count, host) => sites.set(host, (sites.get(host) || 0) + count));
+    });
+    return {
+      who: state.selected === "all" ? "Todos os filhos" : children[0]?.nickname || "",
+      period: `${F.PERIODS[state.period].label} (${dayBr(range.fromDay)} a ${dayBr(range.toDay)})`,
+      generated: formatDateTime(new Date().toISOString()),
+      totals,
+      perChild: children.map((child) => ({ child, stats: state.data.stats.get(child.id) })),
+      sentences: state.family.length ? buildSentences(children) : [],
+      attention: children
+        .flatMap((child) => state.data.attention.get(child.id) || [])
+        .sort((a, b) => new Date(b.ocorridoEm) - new Date(a.ocorridoEm)),
+      sites: [...sites.entries()].sort((a, b) => b[1] - a[1]),
+      accesses: await loadAllAccesses(children, range),
+    };
+  }
+
+  function reportToSheets(r) {
+    const head = (list) => list.map((v) => ({ v, s: "head" }));
+    const summary = [
+      [{ v: "Relatório GuardIAn", s: "title" }],
+      [{ v: "Filho", s: "bold" }, r.who],
+      [{ v: "Período", s: "bold" }, r.period],
+      [{ v: "Gerado em", s: "bold" }, r.generated],
+      [],
+      head(["Total", "Quantidade"]),
+      ["Acessos à internet", r.totals.totalEvents],
+      ["Bloqueados pelo GuardIAn", r.totals.blockAttempts],
+      ["Conteúdos sensíveis vistos", r.totals.sensitiveEvents],
+      ["Sites diferentes", r.totals.sites.size],
+      [],
+      head(["Filho", "Acessos", "Bloqueados", "Sensíveis", "Sites diferentes"]),
+      ...r.perChild.map(({ child, stats }) => [
+        child.nickname,
+        stats?.totalEvents ?? 0,
+        stats?.blockAttempts ?? 0,
+        stats?.sensitiveEvents ?? 0,
+        stats?.domains.size ?? 0,
+      ]),
+      [],
+      head(["Resumo em poucas palavras", ""]),
+      ...r.sentences.map((s) => [s.text, s.sites || ""]),
+    ];
+    const itemRow = (item) => [
+      formatDateTime(item.ocorridoEm),
+      item.childName || "",
+      item.deviceName || "",
+      item.urlHost || "",
+      item.urlConteudo || "",
+      item.titulo || "",
+      labelText(item.rotulo),
+      item.pontuacaoRisco ?? "",
+      actionText(item),
+      item.justificativa || "",
+    ];
+    const itemHead = head(["Data/Hora", "Filho", "Computador", "Site", "Endereço exato", "Título", "Assunto", "Risco (0-100)", "O que aconteceu", "Explicação"]);
+    const itemCols = [18, 16, 20, 26, 40, 40, 22, 13, 20, 60];
+    return [
+      { name: "Resumo", cols: [34, 50, 14, 14, 16], rows: summary },
+      { name: "Precisa de atenção", cols: itemCols, freezeRow: 1, rows: [itemHead, ...r.attention.map(itemRow)] },
+      { name: "Sites mais visitados", cols: [40, 12], freezeRow: 1, rows: [head(["Site", "Acessos"]), ...r.sites.map(([h, c]) => [h, c])] },
+      { name: "Todos os acessos", cols: itemCols, freezeRow: 1, rows: [itemHead, ...r.accesses.map(itemRow)] },
+    ];
+  }
+
+  function reportToText(r) {
+    const line = "=".repeat(60);
+    const sub = "-".repeat(60);
+    const out = [
+      line,
+      "RELATÓRIO GUARDIAN",
+      line,
+      `Filho:     ${r.who}`,
+      `Período:   ${r.period}`,
+      `Gerado em: ${r.generated}`,
+      "",
+      "NÚMEROS",
+      sub,
+      `Acessos à internet:          ${r.totals.totalEvents}`,
+      `Bloqueados pelo GuardIAn:    ${r.totals.blockAttempts}`,
+      `Conteúdos sensíveis vistos:  ${r.totals.sensitiveEvents}`,
+      `Sites diferentes:            ${r.totals.sites.size}`,
+    ];
+    if (r.perChild.length > 1) {
+      out.push("");
+      r.perChild.forEach(({ child, stats }) => {
+        out.push(`${child.nickname}: ${plural(stats?.totalEvents ?? 0, "acesso", "acessos")}, ${plural(stats?.blockAttempts ?? 0, "bloqueio", "bloqueios")}, ${plural(stats?.sensitiveEvents ?? 0, "conteúdo sensível", "conteúdos sensíveis")}`);
+      });
+    }
+    out.push("", "RESUMO EM POUCAS PALAVRAS", sub);
+    if (!r.sentences.length) out.push("Nada para mostrar.");
+    r.sentences.forEach((s) => {
+      out.push(`• ${s.text}`);
+      if (s.sites) out.push(`  ${s.sites}`);
+    });
+
+    out.push("", `O QUE PRECISA DA SUA ATENÇÃO (${r.attention.length})`, sub);
+    if (!r.attention.length) out.push("Nada preocupante no período.");
+    r.attention.forEach((item) => {
+      out.push(`${formatDateTime(item.ocorridoEm)} — ${itemTitle(item, r.perChild.length > 1)}`);
+      out.push(`  Site: ${F.prettyHost(item.urlConteudo || item.urlHost)}${item.titulo ? ` — ${item.titulo}` : ""}`);
+      out.push(`  ${actionText(item)} · Risco: ${riskText(item.pontuacaoRisco)} · ${labelText(item.rotulo)}`);
+    });
+
+    out.push("", "SITES MAIS VISITADOS", sub);
+    if (!r.sites.length) out.push("Nenhum site visitado.");
+    r.sites.forEach(([host, count], i) => out.push(`${String(i + 1).padStart(3)}. ${host} — ${plural(count, "acesso", "acessos")}`));
+
+    out.push("", `TODOS OS ACESSOS (${r.accesses.length})`, sub);
+    if (!r.accesses.length) out.push("Nenhum acesso no período.");
+    r.accesses.forEach((item) => {
+      const who = r.perChild.length > 1 ? `${item.childName} · ` : "";
+      out.push(`${formatDateTime(item.ocorridoEm)} · ${who}${item.urlHost}${item.titulo ? ` — ${item.titulo}` : ""} · ${actionText(item)} · ${riskText(item.pontuacaoRisco)}`);
+    });
+    out.push("", line);
+    return out.join("\n");
+  }
+
+  function toggleExportMenu(open) {
+    const menu = $("#exportMenu");
+    const btn = $("#exportReportBtn");
+    const show = open ?? menu.hidden;
+    menu.hidden = !show;
+    btn.setAttribute("aria-expanded", String(show));
+    if (show) menu.querySelector("button")?.focus();
+  }
+
+  async function exportReport(format) {
+    toggleExportMenu(false);
+    if (!state.data) {
+      showToast("Espere o relatório carregar", "warning");
+      return;
+    }
+    const btn = $("#exportReportBtn");
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin ui-icon" aria-hidden="true"></i> Gerando...';
+    try {
+      const report = await collectReport();
+      const who = report.who.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
+      const name = `guardian-relatorio-${who}-${new Date().toISOString().slice(0, 10)}`;
+      if (format === "xlsx") {
+        window.GuardianExport.download(window.GuardianExport.xlsx(reportToSheets(report)), `${name}.xlsx`);
+      } else {
+        window.GuardianExport.download(window.GuardianExport.txt(reportToText(report)), `${name}.txt`);
+      }
+      showToast("Relatório exportado", "success");
+    } catch (error) {
+      showToast("Não foi possível exportar: " + error.message, "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
+  }
+
   // ---------- Fluxo ----------
   function render() {
     if (!state.data) return;
@@ -853,6 +1045,23 @@
       }
     });
     $("#exportBtn").addEventListener("click", exportCsv);
+    $("#exportReportBtn").addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleExportMenu();
+    });
+    $("#exportMenu").addEventListener("click", (event) => {
+      const item = event.target.closest("[data-format]");
+      if (item) exportReport(item.dataset.format);
+    });
+    document.addEventListener("click", (event) => {
+      if (!$("#exportMenu").hidden && !event.target.closest("#exportWrap")) toggleExportMenu(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !$("#exportMenu").hidden) {
+        toggleExportMenu(false);
+        $("#exportReportBtn").focus();
+      }
+    });
 
     load({ reloadFamily: true });
   }

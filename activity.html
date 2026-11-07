@@ -128,6 +128,23 @@
             <i class="fa-solid fa-rotate-right ui-icon" aria-hidden="true"></i>
             Atualizar
           </button>
+          <div class="rp-export" id="exportWrap">
+            <button type="button" class="btn btn-primary rp-export-btn" id="exportReportBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="exportMenu">
+              <i class="fa-solid fa-file-export ui-icon" aria-hidden="true"></i>
+              Exportar
+              <i class="fa-solid fa-chevron-down rp-export-caret" aria-hidden="true"></i>
+            </button>
+            <div class="rp-export-menu" id="exportMenu" role="menu" hidden>
+              <button type="button" role="menuitem" data-format="xlsx">
+                <i class="fa-solid fa-file-excel rp-export-ico xls" aria-hidden="true"></i>
+                <span><strong>Excel</strong><small>Planilha com abas (.xlsx)</small></span>
+              </button>
+              <button type="button" role="menuitem" data-format="txt">
+                <i class="fa-solid fa-file-lines rp-export-ico txt" aria-hidden="true"></i>
+                <span><strong>Texto</strong><small>Para ler ou imprimir (.txt)</small></span>
+              </button>
+            </div>
+          </div>
         </section>
 
         <!-- Frase principal -->
@@ -300,6 +317,7 @@
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/family-data.js"></script>
+    <script src="js/report-export.js"></script>
     <script src="js/reports.js"></script>
     <script src="js/guardian-flow.js"></script>
     <script src="js/guardian-tour.js"></script>

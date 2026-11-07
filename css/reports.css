@@ -560,3 +560,94 @@
     display: none;
   }
 }
+
+/* ---------- Exportar ---------- */
+.rp-export {
+  position: relative;
+}
+
+.rp-export-btn {
+  min-height: 44px;
+}
+
+.rp-export-caret {
+  font-size: 0.75em;
+  margin-left: 4px;
+  transition: transform 0.15s ease;
+}
+
+.rp-export-btn[aria-expanded="true"] .rp-export-caret {
+  transform: rotate(180deg);
+}
+
+.rp-export-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  min-width: 250px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.rp-export-menu[hidden] {
+  display: none;
+}
+
+.rp-export-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.rp-export-menu button:hover,
+.rp-export-menu button:focus-visible {
+  background: var(--surface-muted);
+  outline: none;
+}
+
+.rp-export-menu strong {
+  display: block;
+}
+
+.rp-export-menu small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.rp-export-ico {
+  font-size: 1.5rem;
+  width: 26px;
+  text-align: center;
+}
+
+.rp-export-ico.xls {
+  color: #1d7044;
+}
+
+.rp-export-ico.txt {
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .rp-export-btn {
+    width: 100%;
+  }
+
+  .rp-export-menu {
+    left: 0;
+  }
+}
