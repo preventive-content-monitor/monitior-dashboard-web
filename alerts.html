@@ -8,15 +8,7 @@
     <script>
       (function () {
         const savedTheme = localStorage.getItem("guardian_theme");
-        const prefersDark =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const initialTheme =
-          savedTheme === "dark" || savedTheme === "light"
-            ? savedTheme
-            : prefersDark
-              ? "dark"
-              : "light";
+        const initialTheme = savedTheme === "dark" ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", initialTheme);
       })();
     </script>

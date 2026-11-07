@@ -174,11 +174,7 @@
     if (storedTheme === "light" || storedTheme === "dark") {
       return storedTheme;
     }
-
-    const prefersDark =
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return prefersDark ? "dark" : "light";
+    return "light";
   }
 
   function syncThemeToggleUI(theme) {
