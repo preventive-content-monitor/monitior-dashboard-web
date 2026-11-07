@@ -213,7 +213,7 @@
       : await Promise.all([api("/api/dependentes"), isMinor() ? Promise.resolve([]) : api("/api/dispositivos")]);
     lastStatus = {
       dependents: (Array.isArray(r[0]) ? r[0] : []).map(normDependent),
-      devices: (Array.isArray(r[1]) ? r[1] : []).map(normDevice),
+      devices: (Array.isArray(r[1]) ? r[1] : []).filter(function (d) { return !d.removidoEm && !d.removedAt; }).map(normDevice),
       at: Date.now(),
     };
     if (lastStatus.devices.length > 0 && !getState().completedAt) {

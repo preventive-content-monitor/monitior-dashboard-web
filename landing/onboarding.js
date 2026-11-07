@@ -361,7 +361,9 @@
       $('homeDevices').innerHTML = '';
       return;
     }
-    $('homeLead').textContent = devs.length === 1
+    $('homeLead').textContent = devs.length === 0
+      ? 'Nenhum computador protegido agora. Instale a extensão no computador do seu filho.'
+      : devs.length === 1
       ? 'Você tem 1 computador protegido.'
       : 'Você tem ' + devs.length + ' computadores protegidos.';
     $('homeDevices').innerHTML = devs.map(function (d) {
