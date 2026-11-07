@@ -144,8 +144,10 @@
     return "fa-child";
   }
 
-  function devicesLabel(count) {
-    if (count === 0) return "Nenhum dispositivo";
+  function devicesLabel(depId) {
+    const all = depDevicesOf(depId);
+    const count = all.filter((d) => !d.removedAt).length;
+    if (count === 0) return all.length ? "Extensão removida do computador — reinstale" : "Nenhum dispositivo";
     return count === 1 ? "1 dispositivo" : `${count} dispositivos`;
   }
 
@@ -262,7 +264,7 @@
             <span class="pol-child-avatar" aria-hidden="true"><i class="fa-solid ${avatarIcon(dep, age)}"></i></span>
             <span class="pol-child-info">
               <span class="pol-child-name">${esc(dep.nickname)}</span>
-              <span class="pol-child-meta">${age !== null ? `${age} anos · ` : ""}${devicesLabel(count)}</span>
+              <span class="pol-child-meta">${age !== null ? `${age} anos · ` : ""}${devicesLabel(dep.id)}</span>
               ${status}
             </span>
             <span class="pol-child-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
@@ -337,7 +339,7 @@
         <span class="pol-banner-avatar" aria-hidden="true"><i class="fa-solid ${avatarIcon(dep, age)}"></i></span>
         <div class="pol-banner-text">
           <h2>Regras de ${name}</h2>
-          <p>${age !== null ? `${age} anos · ` : ""}${devicesLabel(count)} · as regras valem para todos</p>
+          <p>${age !== null ? `${age} anos · ` : ""}${devicesLabel(id)} · as regras valem para todos</p>
         </div>
         <span class="pol-pill pol-pill-lg" id="polProtectionPill"></span>
       </div>
