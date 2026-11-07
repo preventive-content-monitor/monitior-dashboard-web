@@ -295,12 +295,9 @@
             <p class="error-message" id="policyError"></p>
           </div>
           <div class="modal-footer">
+            <span id="policySaveStatus" style="margin-right:auto;color:var(--text-muted);font-size:.9rem">Alterações salvas automaticamente.</span>
             <button type="button" class="btn btn-secondary modal-cancel">
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary" id="policySubmitBtn">
-              <span class="btn-icon">💾</span>
-              Salvar Política
+              Fechar
             </button>
           </div>
         </form>
@@ -510,7 +507,9 @@
           if (e.target === $("#policyModal")) closeModal();
         });
 
-        $("#policyForm").addEventListener("submit", handleSavePolicy);
+        $("#policyForm").addEventListener("submit", (e) => e.preventDefault());
+        $("#policyForm").addEventListener("change", schedulePolicySave);
+        $("#policyForm").addEventListener("input", schedulePolicySave);
       }
 
       async function openPolicyModal(deviceId) {
@@ -528,6 +527,7 @@
         // Load current policy
         try {
           const currentPolicy = await policy.get(deviceId);
+          loadedPolicy = currentPolicy || {};
 
           $("#policyMode").value = currentPolicy.mode || "BLOCK";
           $("#riskThreshold").value = currentPolicy.riskThreshold || 50;
@@ -547,59 +547,58 @@
           $("#blockedDomains").value = domains.join("\n");
         } catch (error) {
           // Default values if no policy exists
+          loadedPolicy = {};
           $("#policyMode").value = "BLOCK";
           $("#riskThreshold").value = 50;
           $("#blockedDomains").value = "";
         }
 
+        $("#policySaveStatus").textContent = "Alterações salvas automaticamente.";
         $("#policyModal").classList.add("show");
       }
 
-      function closeModal() {
+      async function closeModal() {
+        if (policySaveTimer) await savePolicyNow();
         $("#policyModal").classList.remove("show");
         currentDevice = null;
       }
 
-      async function handleSavePolicy(e) {
-        e.preventDefault();
+      let policySaveTimer = null;
+      let loadedPolicy = {};
+      function schedulePolicySave() {
+        clearTimeout(policySaveTimer);
+        $("#policySaveStatus").textContent = "Salvando…";
+        policySaveTimer = setTimeout(savePolicyNow, 700);
+      }
 
+      async function savePolicyNow() {
+        clearTimeout(policySaveTimer);
+        policySaveTimer = null;
         if (!currentDevice) return;
-
+        const deviceId = currentDevice.id;
         const mode = $("#policyMode").value;
         const riskThreshold = parseInt($("#riskThreshold").value);
-        const blockedDomainsText = $("#blockedDomains").value.trim();
         const errorEl = $("#policyError");
-        const btn = $("#policySubmitBtn");
-
+        const status = $("#policySaveStatus");
         errorEl.textContent = "";
 
-        if (riskThreshold < 0 || riskThreshold > 100) {
+        if (!Number.isFinite(riskThreshold) || riskThreshold < 0 || riskThreshold > 100) {
           errorEl.textContent = "O limite de risco deve estar entre 0 e 100";
+          status.textContent = "Não salvo.";
           return;
         }
 
-        const blockedDomains = blockedDomainsText
+        const blockedDomains = $("#blockedDomains").value
           .split("\n")
           .map((d) => d.trim().toLowerCase())
           .filter((d) => d.length > 0);
 
-        btn.disabled = true;
-        btn.innerHTML = '<span class="btn-icon">⏳</span> Salvando...';
-
         try {
-          await policy.update(currentDevice.id, {
-            mode,
-            riskThreshold,
-            blockedDomains,
-          });
-
-          showToast("Política atualizada com sucesso!", "success");
-          closeModal();
+          loadedPolicy = await policy.update(deviceId, { ...loadedPolicy, mode, riskThreshold, blockedDomains }) || loadedPolicy;
+          if (currentDevice && currentDevice.id === deviceId) status.textContent = "Salvo automaticamente ✓";
         } catch (error) {
           errorEl.textContent = error.message;
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = '<span class="btn-icon">💾</span> Salvar Política';
+          status.textContent = "Não foi possível salvar.";
         }
       }
 

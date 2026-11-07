@@ -2,7 +2,7 @@
  * GuardIAn - Página de Políticas.
  * Fluxo: 1) escolher o filho  2) nível de proteção  3) regras extras
  * (sites bloqueados e horário escolar)  4) ajustes avançados.
- * As alterações ficam em rascunho por filho até o responsável salvar.
+ * Cada alteração é salva automaticamente, pouco depois de feita.
  */
 (function () {
   "use strict";
@@ -339,10 +339,7 @@
           <h2>Regras de ${name}</h2>
           <p>${age !== null ? `${age} anos · ` : ""}${devicesLabel(count)} · as regras valem para todos</p>
         </div>
-        <span class="pol-pill pol-pill-lg ${saved.protectionEnabled ? "pol-tone-success" : "pol-tone-warning"}">
-          <i class="fa-solid ${saved.protectionEnabled ? "fa-circle-check" : "fa-circle-pause"}" aria-hidden="true"></i>
-          ${saved.protectionEnabled ? "Proteção ligada" : "Proteção pausada"}
-        </span>
+        <span class="pol-pill pol-pill-lg" id="polProtectionPill"></span>
       </div>
 
       <section class="pol-step" aria-labelledby="stepModeTitle">
@@ -487,14 +484,6 @@
 
       <div class="pol-savebar" id="polSavebar">
         <div class="pol-savebar-status" id="polSaveStatus" role="status"></div>
-        <div class="pol-savebar-actions">
-          <button type="button" class="btn btn-ghost" data-action="discard" id="polDiscard">
-            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Desfazer
-          </button>
-          <button type="button" class="btn btn-primary btn-large" data-action="save" id="polSave">
-            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar alterações
-          </button>
-        </div>
         <p class="error-message pol-error" id="polError" role="alert"></p>
       </div>`;
 
@@ -591,16 +580,38 @@
       : `Para ${box.dataset.age} anos, recomendamos <strong>${MODE_BY_VALUE[mode].title}</strong>.`;
   }
 
+  function updateProtectionPill() {
+    const pill = panel.querySelector("#polProtectionPill");
+    const saved = savedById[selectedId];
+    if (!pill || !saved) return;
+    const on = saved.protectionEnabled;
+    pill.className = `pol-pill pol-pill-lg ${on ? "pol-tone-success" : "pol-tone-warning"}`;
+    pill.innerHTML = `<i class="fa-solid ${on ? "fa-circle-check" : "fa-circle-pause"}" aria-hidden="true"></i> ${on ? "Proteção ligada" : "Proteção pausada"}`;
+  }
+
   function updateSaveBar() {
     const bar = panel.querySelector("#polSavebar");
     if (!bar) return;
     const dirty = isDirty(selectedId);
-    bar.classList.toggle("is-dirty", dirty);
-    panel.querySelector("#polDiscard").hidden = !dirty;
-    panel.querySelector("#polSaveStatus").innerHTML = dirty
-      ? `<i class="fa-solid fa-pen" aria-hidden="true"></i><span>Você fez mudanças. Clique em <strong>Salvar</strong> para aplicar.</span>`
-      : `<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Tudo salvo. As regras acima já estão valendo.</span>`;
+    if (dirty) scheduleSave(selectedId);
+    const busy = dirty || saving;
+    bar.classList.toggle("is-dirty", busy);
+    panel.querySelector("#polSaveStatus").innerHTML = busy
+      ? `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Salvando…</span>`
+      : `<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Salvo automaticamente. As regras acima já estão valendo.</span>`;
+    updateProtectionPill();
     renderPickerDots();
+  }
+
+  // Salva sozinho pouco depois de cada mudança (agrupa cliques e o arraste do controle).
+  const saveTimers = {};
+  let saveFailed = false;
+  function scheduleSave(id) {
+    clearTimeout(saveTimers[id]);
+    saveTimers[id] = setTimeout(() => {
+      delete saveTimers[id];
+      handleSavePolicy(id);
+    }, saveFailed ? 4000 : 700);
   }
 
   function renderPickerDots() {
@@ -665,8 +676,6 @@
       if (action === "add") addDomain(btn.dataset.type);
       else if (action === "remove") removeDomain(btn.dataset.type, btn.dataset.domain);
       else if (action === "use-reco") setMode(btn.dataset.mode);
-      else if (action === "save") handleSavePolicy();
-      else if (action === "discard") discardChanges();
       else if (action === "retry") {
         panel.innerHTML = `<div class="card pol-loading"><div class="loading-spinner"></div><p>Carregando as regras de proteção...</p></div>`;
         loadData();
@@ -713,40 +722,20 @@
     );
   }
 
-  function discardChanges() {
-    delete draftById[selectedId];
-    renderPanel();
-    showToast("Alterações desfeitas", "info");
-    panel.querySelector("#polSave")?.focus();
-  }
-
-  // ---------- Salvar ----------
-  function setSaving(isSaving) {
-    const btn = panel.querySelector("#polSave");
-    if (!btn) return;
-    btn.disabled = isSaving;
-    btn.innerHTML = isSaving
-      ? '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Salvando...'
-      : '<i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar alterações';
-  }
-
-  function handleSavePolicy() {
-    if (saving) return;
-    const dependentId = selectedId;
+  // ---------- Salvar (automático) ----------
+  function handleSavePolicy(dependentId) {
+    if (!isDirty(dependentId)) return;
+    if (saving || $("#allowedDomainsModal").classList.contains("show")) return scheduleSave(dependentId);
     const depDevices = depDevicesOf(dependentId);
-
-    if (depDevices.length === 0) {
-      showToast("Nenhum dispositivo vinculado", "error");
-      return;
-    }
+    if (depDevices.length === 0) return;
 
     const s = getDraft(dependentId);
     const errorEl = panel.querySelector("#polError");
-    errorEl.textContent = "";
+    if (errorEl) errorEl.textContent = "";
 
     const riskThreshold = parseInt(s.riskThreshold, 10);
     if (!Number.isFinite(riskThreshold) || riskThreshold < 0 || riskThreshold > 100) {
-      errorEl.textContent = "A sensibilidade deve ficar entre 0 e 100.";
+      if (errorEl) errorEl.textContent = "A sensibilidade deve ficar entre 0 e 100.";
       return;
     }
 
@@ -765,61 +754,76 @@
       schoolStart: s.schoolStart || null,
       schoolEnd: s.schoolEnd || null,
     };
+    const snapshot = cloneState(s);
 
-    if (allowedDomains.length > 0) {
+    // Confirma só ao ligar a lista de "só permitir" pela primeira vez (ela bloqueia todo o resto).
+    if (allowedDomains.length > 0 && (savedById[dependentId]?.allowedDomains.length || 0) === 0) {
       $("#allowedDomainsList").innerHTML = allowedDomains
         .map(
           (d) =>
             `<li><i class="fa-solid fa-circle-check" aria-hidden="true"></i> ${esc(d)}</li>`,
         )
         .join("");
-      pendingSaveData = { dependentId, depDevices, policyData };
+      pendingSaveData = { dependentId, depDevices, policyData, snapshot };
       $("#allowedDomainsModal").classList.add("show");
       setTimeout(() => $("#confirmAllowedBtn").focus(), 50);
       return;
     }
 
-    savePolicy({ dependentId, depDevices, policyData });
+    savePolicy({ dependentId, depDevices, policyData, snapshot });
   }
 
   function closeAllowedModal() {
-    const wasOpen = $("#allowedDomainsModal").classList.contains("show");
-    $("#allowedDomainsModal").classList.remove("show");
+    const modal = $("#allowedDomainsModal");
+    if (!modal.classList.contains("show")) return;
+    modal.classList.remove("show");
+    const pending = pendingSaveData;
     pendingSaveData = null;
-    if (wasOpen) panel.querySelector("#polSave")?.focus();
+    if (!pending) return;
+    // Cancelou: desfaz a lista de permitidos e salva o resto normalmente.
+    const draft = draftById[pending.dependentId];
+    if (draft) draft.allowedDomains = [...(savedById[pending.dependentId]?.allowedDomains || [])];
+    if (pending.dependentId === selectedId) renderSites("allowed");
+    if (pending.dependentId === selectedId) renderSites("blocked");
+    updateSaveBar();
   }
 
   function confirmAndSave() {
     if (!pendingSaveData) return;
     const data = pendingSaveData;
-    closeAllowedModal();
+    pendingSaveData = null;
+    $("#allowedDomainsModal").classList.remove("show");
     savePolicy(data);
   }
 
-  async function savePolicy({ dependentId, depDevices, policyData }) {
+  async function savePolicy({ dependentId, depDevices, policyData, snapshot }) {
     saving = true;
-    setSaving(true);
-    const dep = findDep(dependentId);
-
+    if (dependentId === selectedId) updateSaveBar();
     try {
       for (const device of depDevices) {
         await policy.update(device.id, policyData);
       }
-      delete draftById[dependentId];
-      showToast(
-        `Pronto! As regras de ${esc(dep?.nickname || "seu filho")} foram salvas.`,
-        "success",
-      );
-      await loadData();
+      saveFailed = false;
+      savedById[dependentId] = snapshot;
+      if (!isDirty(dependentId)) delete draftById[dependentId];
     } catch (error) {
       const errorEl = panel.querySelector("#polError");
-      if (errorEl) errorEl.textContent = error.message;
-      showToast("Não foi possível salvar. Tente de novo.", "error");
+      if (errorEl && dependentId === selectedId) errorEl.textContent = error.message;
+      if (!saveFailed) showToast("Não foi possível salvar. Tentando de novo…", "error");
+      saveFailed = true;
     } finally {
       saving = false;
-      setSaving(false);
+      renderPicker();
+      if (dependentId === selectedId) updateSaveBar();
     }
   }
+
+  window.addEventListener("beforeunload", (e) => {
+    if (saving || Object.keys(saveTimers).length) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  });
 
   init();
 })();
