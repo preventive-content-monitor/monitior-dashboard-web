@@ -20,6 +20,7 @@
     dependents: "/dashboard/dependents.html",
     devices: "/dashboard/devices.html",
     download: "/downloads/GuardIAn-Extensao.zip",
+    protection: "/downloads/GuardIAn-Protecao.bat",
   };
 
   var listeners = {};
@@ -332,7 +333,7 @@
 
   async function enrollWithExtension(code) {
     var installed = await detectExtension();
-    if (!installed || !installed.scopedEnrollment || installed.browserProtection !== true) {
+    if (!installed || !installed.scopedEnrollment || installed.browserProtection !== true || installed.incognitoPolicy !== true) {
       throw new Error("Atualize a extensão para ativar a proteção contra guia anônima e alterações no navegador: baixe o novo ZIP, substitua os arquivos e clique em Recarregar.");
     }
     await ensureKeyword();
@@ -388,6 +389,27 @@
     setState({ downloadedAt: Date.now() });
   }
 
+  function downloadProtection() {
+    var a = document.createElement("a");
+    a.href = URLS.protection;
+    a.download = "GuardIAn-Protecao.bat";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function protectionStepsHTML() {
+    var b = browserInfo();
+    return '<p>A guia anônima e o modo visitante abrem o navegador sem a extensão. Este arquivo desliga os dois neste computador.</p>' +
+      '<ol>' +
+        '<li>Clique em <strong>Baixar arquivo de proteção</strong>. Se o ' + (b.name === "Microsoft Edge" ? "Edge" : "Chrome") + ' avisar sobre o arquivo, clique em <strong>Manter</strong>.</li>' +
+        '<li>Abra o arquivo <strong>GuardIAn-Protecao</strong> (na lista de downloads, no canto superior direito).</li>' +
+        '<li>Se aparecer “O Windows protegeu o computador”, clique em <strong>Mais informações</strong> → <strong>Executar assim mesmo</strong>.</li>' +
+        '<li>Clique em <strong>Sim</strong> quando o Windows pedir permissão.</li>' +
+      '</ol>' +
+      '<button type="button" class="gf-btn gf-btn-soft" data-gf-protect>Baixar arquivo de proteção</button>';
+  }
+
   function copyText(text) {
     if (navigator.clipboard && window.isSecureContext) {
       return navigator.clipboard.writeText(text);
@@ -409,7 +431,7 @@
     var b = browserInfo();
     var warn = b.supported ? "" :
       '<div class="gf-alert">Para instalar a extensão, abra este site no <strong>Google Chrome</strong> ou no <strong>Microsoft Edge</strong>.</div>';
-    var protection = '<div class="gf-alert">Depois de vincular, o GuardIAn fecha abas anônimas (com a permissão ativada) e protege as páginas de extensões e de restauração. O responsável pode liberar essas configurações por 5 minutos com a palavra-chave.</div>';
+    var protection = '<div class="gf-alert">Depois de vincular, o GuardIAn bloqueia a guia anônima e protege as páginas de extensões e de restauração. O responsável pode liberar essas configurações por 5 minutos com a palavra-chave.</div>';
     return (
       warn +
       '<div class="gf-alert">Já tinha o Guardian instalado? Não digite sua senha na versão antiga. Baixe este ZIP, substitua os arquivos na pasta anterior e clique em <strong>Recarregar</strong> na página de extensões.</div>' +
@@ -440,9 +462,8 @@
           '<div class="gf-mock"><span class="gf-mock-btn">' + b.load + '</span><span class="gf-mock-btn ghost">Compactar extensão</span></div>' +
         '</div></li>' +
         '<li><span class="gf-n">6</span><div>' +
-          '<h3>Ative a proteção em janelas anônimas</h3>' +
-          '<p>No cartão do GuardIAn, clique em <strong>Detalhes</strong> e ligue <strong>' + b.incognito + '</strong>. Essa permissão deixa a extensão fechar uma janela anônima se ela for aberta. O Chrome e o Edge deixam essa opção desligada por padrão.</p>' +
-          '<div class="gf-mock"><span class="gf-mock-title">Guardian - Proteção Familiar</span><span class="gf-mock-btn ghost">Detalhes</span><span class="gf-toggle"><i></i></span><small>' + b.incognito + '</small></div>' +
+          '<h3>Desligue a guia anônima</h3>' +
+          protectionStepsHTML() +
         '</div></li>' +
         '<li><span class="gf-n">7</span><div>' +
           '<h3>Volte para cá</h3>' +
@@ -471,6 +492,9 @@
   function bindInstallGuide(root) {
     root.querySelectorAll("[data-gf-download]").forEach(function (btn) {
       btn.addEventListener("click", downloadExtension);
+    });
+    root.querySelectorAll("[data-gf-protect]").forEach(function (btn) {
+      btn.addEventListener("click", downloadProtection);
     });
     root.querySelectorAll("[data-gf-copy]").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -529,6 +553,8 @@
     },
     browserInfo: browserInfo,
     downloadExtension: downloadExtension,
+    downloadProtection: downloadProtection,
+    protectionStepsHTML: protectionStepsHTML,
     copyText: copyText,
     installGuideHTML: installGuideHTML,
     updateGuideHTML: updateGuideHTML,

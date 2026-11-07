@@ -47,7 +47,7 @@
   }
   function extInstalled() { return !!(extStatus && extStatus.installed); }
   function extOutdated() {
-    return extInstalled() && (!extStatus.scopedEnrollment || extStatus.browserProtection !== true);
+    return extInstalled() && (!extStatus.scopedEnrollment || extStatus.browserProtection !== true || extStatus.incognitoPolicy !== true);
   }
 
   var restrictedAsked = /[?&]restrito=1/.test(location.search);
@@ -88,7 +88,7 @@
 
     if (role === 'minor') {
       list.push(item(inst, !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'Siga o guia abaixo'));
-      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Ativar proteção em janelas anônimas', incognitoAllowed ? 'Permissão ativada' : 'Uma opção do navegador'));
+      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Desligar a guia anônima', incognitoAllowed ? 'Guia anônima protegida' : 'Um arquivo, um clique'));
       list.push(item(hasDep, inst && !hasDep, 'Cadastrar o filho', F.hasSetupSession() ? (depSub || 'Aqui mesmo, só o nome e a idade') : 'No painel do responsável'));
       list.push(item(isLinked, inst && !isLinked, 'Vincular este computador ao filho', F.hasSetupSession() ? 'Aqui mesmo, com um clique' : 'Com o código do painel'));
       $('guideTitle').textContent = inst ? 'Extensão instalada! Falta vincular' : 'Vamos proteger este computador';
@@ -119,7 +119,7 @@
     } else {
       list.push(item(hasDep, !hasDep, 'Cadastrar o filho no painel', depSub || 'Primeiro passo, no painel'));
       list.push(item(inst, hasDep && !inst, 'Instalar a extensão neste navegador', inst ? 'Extensão detectada' : 'O painel mostra como baixar e instalar'));
-      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Ativar proteção em janelas anônimas', incognitoAllowed ? 'Permissão ativada' : 'Uma opção do navegador'));
+      if (inst) list.push(item(incognitoAllowed, !incognitoAllowed, 'Desligar a guia anônima', incognitoAllowed ? 'Guia anônima protegida' : 'Um arquivo, um clique'));
       list.push(item(isLinked, hasDep && inst && !isLinked, 'Vincular este navegador ao filho', 'Um clique no painel, no botão destacado'));
       $('guideTitle').textContent = 'Vamos configurar tudo neste computador';
       $('guideLead').textContent = 'Primeiro o painel, depois a extensão. O painel abre em outra aba com cada passo destacado; esta aba fica aqui acompanhando.';
@@ -201,8 +201,8 @@
   function guideExtraHTML(role, st, inst, deps, outdated, needsAuth) {
     if (outdated) return F.updateGuideHTML();
     var incognitoSetup = inst && extStatus && extStatus.anonimoPermitido === false
-      ? '<div class="gf-alert"><strong>Falta ativar uma opção:</strong> na página de extensões, clique em <strong>Detalhes</strong> no GuardIAn e ligue <strong>' + F.browserInfo().incognito + '</strong>. Depois volte aqui; o passo será confirmado automaticamente.</div>' +
-        '<div class="gf-mock"><span class="gf-mock-title">Guardian - Proteção Familiar</span><span class="gf-mock-btn ghost">Detalhes</span><span class="gf-toggle"><i></i></span><small>' + F.browserInfo().incognito + '</small></div>'
+      ? '<div class="gf-alert"><strong>Falta 1 passo:</strong> desligue a guia anônima neste computador. Baixe o arquivo, abra-o (clique em <strong>Manter</strong> e depois em <strong>Sim</strong> se o navegador ou o Windows perguntar). Esta tela confirma sozinha. ' +
+        '<button type="button" class="gf-btn gf-btn-soft" data-gf-protect>Baixar arquivo de proteção</button></div>'
       : '';
     if (role === 'minor') {
       if (needsAuth) {

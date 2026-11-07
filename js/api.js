@@ -449,7 +449,7 @@
       tipo: "PROTECAO",
       severidade: "ATENCAO",
       titulo: "Guia anônima sem proteção no computador de Lucas",
-      mensagem: "A guia anônima do Chrome não está protegida. Ative \"Permitir no modo anônimo\" na extensão.",
+      mensagem: "A guia anônima do Chrome não está protegida. Abra o arquivo de proteção no computador do Lucas.",
       criadoEm: isoDaysAgo(1, 19, 12),
       dependente: "Lucas",
       referencia: "Chrome - PC da sala",
